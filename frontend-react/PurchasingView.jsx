@@ -13,7 +13,7 @@ export default function PurchasingView() {
   const { t, esc, num, money, cur, dt, ts, table, pager, loading, modal, closeModal,
           field, input, select, textarea, val, numVal, intVal, can } = UI;
 
-  const [tab, setTab] = useState('orders');
+  const [tab, setTab] = useState(() => App.takeNavigationIntent('purchasing')?.tab || 'orders');
   const [reloadToken, setReloadToken] = useState(0);
   const [ready, setReady] = useState(false);
 

@@ -254,17 +254,130 @@ const UI = (() => {
    * cols: [{ key, label, num, width, render(row), cls }]
    * Renders a card-wrapped table with optional pager.
    */
+  function contextualEmptyAction() {
+    const view = (location.hash || '#dashboard').slice(1).split('?')[0];
+    const tr = lang === 'tr';
+    const actions = {
+      items: ['itNew', tr ? 'Ürün ekle' : 'Add item', 'write'],
+      counts: ['cNew', tr ? 'Sayım başlat' : 'Start stock count', 'count'],
+      production: ['pNew', tr ? 'Üretim emri oluştur' : 'Create production order', 'write'],
+      purchasing: ['poNew', tr ? 'Satın alma kaydı oluştur' : 'Create purchasing record', 'write'],
+      crm: ['oppNew', tr ? 'Fırsat ekle' : 'Add opportunity', 'write'],
+      support: ['supNew', tr ? 'Destek kaydı oluştur' : 'Add support ticket', 'write'],
+      sales: ['soNew', tr ? 'Satış siparişi oluştur' : 'Create sales order', 'write'],
+      quality: ['inNew', tr ? 'Kalite kaydı oluştur' : 'Create quality record', 'quality'],
+      admin: ['usNew', tr ? 'Yönetim kaydı oluştur' : 'Create admin record', 'admin']
+    };
+    const action = actions[view];
+    return action && can(action[2]) ? { target: action[0], label: action[1] } : null;
+  }
+
+  function emptyState(opts = {}) {
+    const title = opts.title || (lang === 'tr' ? 'Henüz kayıt yok' : 'No records yet');
+    const text = opts.text || t('noData');
+    const contextual = contextualEmptyAction();
+    const target = opts.target || contextual?.target;
+    const action = opts.action === false ? '' : `<button class="btn btn-ghost btn-sm empty-action" type="button" ${target ? `data-empty-target="${esc(target)}"` : 'data-empty-refresh="1"'}>${esc(opts.actionLabel || contextual?.label || (lang === 'tr' ? 'Yenile' : 'Refresh'))}</button>`;
+    return `<div class="empty" role="status"><strong>${esc(title)}</strong><span>${esc(text)}</span>${action}</div>`;
+  }
+
+  function tablePreferenceKey(cols, opts) {
+    const view = (location.hash || '#general').slice(1).split('?')[0] || 'general';
+    const signature = cols.map(c => c.key || c.label).join('-').toLowerCase().replace(/[^a-z0-9_-]+/g, '-').slice(0, 90);
+    return `dp_table_${opts.preferenceKey || `${view}_${signature}`}`;
+  }
+
+  function readTablePreferences(key) {
+    try {
+      const value = JSON.parse(localStorage.getItem(key) || '{}');
+      return { hidden: Array.isArray(value.hidden) ? value.hidden.map(String) : [], sticky: value.sticky !== false };
+    } catch { return { hidden: [], sticky: true }; }
+  }
+
+  let tableControlsBound = false;
+  let emptyObserver = null;
+  function enhanceEmptyStates(root = document) {
+    root.querySelectorAll?.('.empty').forEach(node => {
+      if (node.dataset.emptyEnhanced || node.querySelector('strong,button') || node.getAttribute('role') === 'alert') return;
+      const message = node.textContent.trim();
+      if (!message || /yalnızca yönetic|admin-only/i.test(message)) return;
+      node.dataset.emptyEnhanced = '1';
+      node.setAttribute('role', 'status');
+      node.innerHTML = `<strong>${lang === 'tr' ? 'Burada henüz içerik yok' : 'Nothing here yet'}</strong><span>${esc(message)}</span><button class="btn btn-ghost btn-sm empty-action" type="button" data-empty-refresh="1">${lang === 'tr' ? 'Yenile' : 'Refresh'}</button>`;
+    });
+  }
+  function initEmptyStates() {
+    enhanceEmptyStates(document);
+    if (emptyObserver || typeof MutationObserver === 'undefined') return;
+    emptyObserver = new MutationObserver(records => records.forEach(record => record.addedNodes.forEach(node => {
+      if (node.nodeType !== 1) return;
+      if (node.matches?.('.empty')) enhanceEmptyStates(node.parentElement || document);
+      else enhanceEmptyStates(node);
+    })));
+    emptyObserver.observe(document.body, { childList: true, subtree: true });
+  }
+  function initTableControls() {
+    if (tableControlsBound) return;
+    tableControlsBound = true;
+    document.addEventListener('change', e => {
+      const input = e.target.closest('[data-table-col-toggle],[data-table-sticky-toggle]');
+      if (!input) return;
+      const shell = input.closest('.data-table-shell');
+      if (!shell) return;
+      const key = shell.dataset.preferenceKey;
+      const toggles = [...shell.querySelectorAll('[data-table-col-toggle]')];
+      if (input.hasAttribute('data-table-col-toggle') && toggles.filter(x => x.checked).length === 0) {
+        input.checked = true;
+        toast(lang === 'tr' ? 'En az bir sütun görünür kalmalı.' : 'At least one column must remain visible.', 'err');
+        return;
+      }
+      const hidden = toggles.filter(x => !x.checked).map(x => x.dataset.tableColToggle);
+      const sticky = shell.querySelector('[data-table-sticky-toggle]')?.checked !== false;
+      shell.querySelectorAll('[data-col]').forEach(cell => { cell.hidden = hidden.includes(cell.dataset.col); });
+      shell.querySelector('table')?.classList.toggle('sticky-first', sticky);
+      try { localStorage.setItem(key, JSON.stringify({ hidden, sticky })); } catch {}
+    });
+    document.addEventListener('click', e => {
+      const refresh = e.target.closest('[data-empty-refresh]');
+      const target = e.target.closest('[data-empty-target]');
+      if (refresh) {
+        closeModal();
+        if (typeof App !== 'undefined') App.go((location.hash || '#dashboard').slice(1).split('?')[0]);
+      }
+      if (target) {
+        const button = document.getElementById(target.dataset.emptyTarget);
+        if (button) button.click();
+        else if (typeof App !== 'undefined') App.go((location.hash || '#dashboard').slice(1).split('?')[0]);
+      }
+    });
+  }
+
   function table(cols, rows, opts = {}) {
-    if (!rows || rows.length === 0) return `<div class="empty" role="status"><strong>${esc(opts.emptyTitle || (lang === 'tr' ? 'Henüz kayıt yok' : 'No records yet'))}</strong><span>${esc(opts.emptyText || t('noData'))}</span></div>`;
-    const head = cols.map(c => `<th class="${c.num ? 'num' : ''}" ${c.width ? `style="width:${c.width}"` : ''}>${esc(c.label)}</th>`).join('');
+    if (!rows || rows.length === 0) return emptyState({
+      title: opts.emptyTitle,
+      text: opts.emptyText,
+      action: opts.emptyAction,
+      actionLabel: opts.emptyActionLabel,
+      target: opts.emptyTarget
+    });
+    const prefKey = tablePreferenceKey(cols, opts);
+    const prefs = readTablePreferences(prefKey);
+    const visibleCount = cols.filter((_, i) => !prefs.hidden.includes(String(i))).length;
+    if (!visibleCount) prefs.hidden = [];
+    const head = cols.map((c, i) => `<th data-col="${i}" ${prefs.hidden.includes(String(i)) ? 'hidden' : ''} class="${c.num ? 'num' : ''}" ${c.width ? `style="width:${c.width}"` : ''}>${esc(c.label)}</th>`).join('');
     const body = rows.map((r, i) => {
-      const tds = cols.map(c => {
+      const tds = cols.map((c, colIndex) => {
         const content = c.render ? c.render(r, i) : esc(r[c.key] ?? '—');
-        return `<td class="${c.num ? 'num' : ''} ${c.cls || ''}">${content}</td>`;
+        return `<td data-col="${colIndex}" ${prefs.hidden.includes(String(colIndex)) ? 'hidden' : ''} class="${c.num ? 'num' : ''} ${c.cls || ''}">${content}</td>`;
       }).join('');
       return `<tr ${opts.rowAttrs ? opts.rowAttrs(r, i) : ''}>${tds}</tr>`;
     }).join('');
-    return `<div class="table-wrap"><table><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table></div>`;
+    const tools = cols.length > 2 ? `<div class="table-tools"><details><summary class="btn btn-ghost btn-sm">${icon(ICONS.columns)}${lang === 'tr' ? 'Sütunlar' : 'Columns'}</summary><div class="table-column-menu">
+      <strong>${lang === 'tr' ? 'Görünür sütunlar' : 'Visible columns'}</strong>
+      ${cols.map((c, i) => `<label><input type="checkbox" data-table-col-toggle="${i}" ${prefs.hidden.includes(String(i)) ? '' : 'checked'}> <span>${esc(c.label)}</span></label>`).join('')}
+      <label class="table-pin-option"><input type="checkbox" data-table-sticky-toggle ${prefs.sticky ? 'checked' : ''}> <span>${lang === 'tr' ? 'İlk sütunu sabitle' : 'Pin first column'}</span></label>
+    </div></details></div>` : '';
+    return `<div class="data-table-shell" data-preference-key="${esc(prefKey)}">${tools}<div class="table-wrap"><table class="data-table ${prefs.sticky ? 'sticky-first' : ''}"><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table></div></div>`;
   }
 
   function pager(res, onPage) {
@@ -293,8 +406,8 @@ const UI = (() => {
     </div>`;
 
   const stat = (k, v, o = {}) =>
-    `<div class="stat ${o.onClick ? 'clickable' : ''}" ${o.id ? `id="${o.id}"` : ''}>
-      <div class="k">${esc(k)}</div><div class="v ${o.kind || ''}">${v}</div>
+    `<div class="stat ${o.view || o.onClick ? 'clickable' : ''}" ${o.id ? `id="${o.id}"` : ''} ${o.view ? `role="button" tabindex="0" data-dash-go="${esc(o.view)}" data-dash-intent="${esc(JSON.stringify(o.intent || {}))}" aria-label="${esc(`${k}: ${String(v).replace(/<[^>]*>/g, '')}. ${o.hint || (lang === 'tr' ? 'Detayı aç' : 'Open details')}`)}"` : ''}>
+      <div class="k">${o.icon ? `<span class="stat-icon ${o.kind || ''}" aria-hidden="true">${icon(o.icon)}</span>` : ''}<span>${esc(k)}</span>${o.statusLabel ? `<span class="stat-state ${o.kind || ''}">${esc(o.statusLabel)}</span>` : ''}</div><div class="v ${o.kind || ''}">${v}</div>
       ${o.sub ? `<div class="s">${esc(o.sub)}</div>` : ''}</div>`;
 
   const loading = () => `<div class="loading"><span class="spinner"></span>${t('loading')}</div>`;
@@ -368,23 +481,29 @@ const UI = (() => {
     if (charts[canvasId]) charts[canvasId].destroy();
     const styles = getComputedStyle(document.documentElement);
     const gridColor = styles.getPropertyValue('--border-soft').trim() || '#3A4046';
-    const tickColor = styles.getPropertyValue('--text-muted').trim() || '#9AA0A6';
     const panelColor = styles.getPropertyValue('--panel').trim() || '#24282C';
     const textColor = styles.getPropertyValue('--text').trim() || '#ECE9E2';
     if (config.type !== 'doughnut' && config.type !== 'pie') {
       config.options = config.options || {};
       config.options.scales = config.options.scales || {};
       ['x', 'y'].forEach(ax => {
-        config.options.scales[ax] = Object.assign({
-          ticks: { color: tickColor, font: { family: 'Segoe UI', size: 11 } },
-          grid: { color: gridColor }
-        }, config.options.scales[ax] || {});
+        const existing = config.options.scales[ax] || {};
+        config.options.scales[ax] = {
+          ...existing,
+          ticks: { color: textColor, font: { family: 'Segoe UI', size: 12.5, weight: '500' }, padding: 8, ...(existing.ticks || {}) },
+          grid: { color: gridColor, ...(existing.grid || {}) }
+        };
       });
     }
     config.options = Object.assign({ responsive: true, maintainAspectRatio: false }, config.options || {});
-    config.options.plugins = Object.assign({
-      legend: { labels: { color: textColor, font: { family: 'Segoe UI', size: 11.5 }, boxWidth: 12 } }
-    }, config.options.plugins || {});
+    const plugins = config.options.plugins || {};
+    const legend = plugins.legend || {};
+    const tooltip = plugins.tooltip || {};
+    config.options.plugins = {
+      ...plugins,
+      legend: { ...legend, labels: { color: textColor, font: { family: 'Segoe UI', size: 13, weight: '600' }, boxWidth: 14, padding: 16, ...(legend.labels || {}) } },
+      tooltip: { ...tooltip, titleFont: { family: 'Segoe UI', size: 13, weight: '600', ...(tooltip.titleFont || {}) }, bodyFont: { family: 'Segoe UI', size: 12.5, ...(tooltip.bodyFont || {}) } }
+    };
     (config.data?.datasets || []).forEach(ds => { if (ds.borderColor === '#24282C') ds.borderColor = panelColor; });
     charts[canvasId] = new Chart(el.getContext('2d'), config);
   }
@@ -571,6 +690,12 @@ const UI = (() => {
     download: '<path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M5 21h14"/>',
     search: '<circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/>',
     upload: '<path d="M12 21V9"/><path d="M7 14l5-5 5 5"/><path d="M5 3h14"/>',
+    columns: '<path d="M4 5h16v14H4z"/><path d="M10 5v14M15 5v14"/>',
+    inventory: '<path d="M3 7l9-4 9 4-9 4-9-4z"/><path d="M3 7v10l9 4 9-4V7"/>',
+    alert: '<path d="M12 3 2 21h20L12 3z"/><path d="M12 9v5M12 18h.01"/>',
+    cart: '<path d="M3 4h2l2 12h10l3-8H6"/><circle cx="9" cy="20" r="1"/><circle cx="17" cy="20" r="1"/>',
+    clock: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+    shield: '<path d="M12 3 4 6v5c0 5 3.5 8.5 8 10 4.5-1.5 8-5 8-10V6l-8-3z"/><path d="m9 12 2 2 4-4"/>',
   };
 
   const debounce = (fn, ms = 300) => { let tm; return (...a) => { clearTimeout(tm); tm = setTimeout(() => fn(...a), ms); }; };
@@ -648,7 +773,7 @@ const UI = (() => {
     t, setLang, getLang, esc, money, num, cur, dt, ts, ago, today, addDays, locale,
     toast, ok, err, modal, closeModal, confirmDialog,
     field, input, textarea, select, checkbox, val, numVal, intVal, checked,
-    table, pager, card, stat, loading, tabs,
+    table, pager, card, stat, loading, tabs, emptyState, initTableControls, initEmptyStates,
     lotStatusBadge, stockStatus, poStatusBadge, prodStatusBadge, shipStatusBadge, originBadge, roleLabel,
     chart, PALETTE, printDoc, clearPrintCache, loadPrintConfig, exportCsv, downloadJson, icon, ICONS,
     debounce, can, onBarcodeScan, enhanceSelects, missingOption, errorState

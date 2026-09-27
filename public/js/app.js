@@ -49,6 +49,7 @@ const App = (() => {
   }
 
   let current = null;
+  const navigationIntents = {};
 
   /* ---------- i18n on static markup ---------- */
   function applyStaticI18n() {
@@ -57,6 +58,7 @@ const App = (() => {
     document.getElementById('htmlRoot').lang = UI.getLang();
     updateThemeControls();
     updateSidebarCollapseControl();
+    updateDensityControl();
   }
 
   /* ---------- appearance and responsive navigation ---------- */
@@ -93,14 +95,33 @@ const App = (() => {
     updateThemeControls();
     if (current) go(current);
   }
+  function currentDensity() { return document.body.dataset.density === 'compact' ? 'compact' : 'comfortable'; }
+  function updateDensityControl() {
+    const button = document.getElementById('densityToggle');
+    if (!button) return;
+    const compact = currentDensity() === 'compact';
+    const label = UI.getLang() === 'tr'
+      ? (compact ? 'Rahat görünüme geç' : 'Kompakt görünüme geç')
+      : (compact ? 'Switch to comfortable view' : 'Switch to compact view');
+    button.setAttribute('aria-label', label);
+    button.title = label;
+    button.setAttribute('aria-pressed', String(compact));
+  }
+  function toggleDensity() {
+    const next = currentDensity() === 'compact' ? 'comfortable' : 'compact';
+    document.body.dataset.density = next;
+    localStorage.setItem('dp_density', next);
+    updateDensityControl();
+  }
   function closeMobileNav() {
     document.body.classList.remove('sidebar-open');
     document.getElementById('mobileMenuToggle')?.setAttribute('aria-expanded', 'false');
   }
 
   /* ---------- routing ---------- */
-  async function go(view) {
+  async function go(view, intent) {
     if (!VIEW_GLOBALS[view]) view = 'dashboard';
+    if (intent && Object.keys(intent).length) navigationIntents[view] = intent;
     current = view;
     closeMobileNav();
     document.querySelectorAll('.nav-tab').forEach(b => {
@@ -117,7 +138,12 @@ const App = (() => {
       if (!VIEWS[view]) { el.innerHTML = UI.loading(); await loadViewScript(view); }
       await VIEWS[view].render(el);
     }
-    catch (e) { UI.err(e); el.innerHTML = `<div class="empty">${UI.esc(e.message)}</div>`; }
+    catch (e) { UI.err(e); UI.errorState(el, e, () => go(view)); }
+  }
+  function takeNavigationIntent(view) {
+    const intent = navigationIntents[view] || null;
+    delete navigationIntents[view];
+    return intent;
   }
 
   /* ---------- session ---------- */
@@ -317,12 +343,16 @@ const App = (() => {
       const prefersLight = typeof matchMedia === 'function' && matchMedia('(prefers-color-scheme: light)').matches;
       document.documentElement.dataset.theme = savedTheme || (prefersLight ? 'light' : 'dark');
     }
+    document.body.dataset.density = localStorage.getItem('dp_density') === 'compact' ? 'compact' : 'comfortable';
     const langSaved = UI.getLang();
     document.getElementById('loginLang').value = langSaved;
     document.getElementById('langSelect').value = langSaved;
     applyStaticI18n();
 
     document.querySelectorAll('.theme-toggle').forEach(b => b.onclick = toggleTheme);
+    document.getElementById('densityToggle').onclick = toggleDensity;
+    UI.initTableControls();
+    UI.initEmptyStates();
     const mobileMenu = document.getElementById('mobileMenuToggle');
     mobileMenu.onclick = () => {
       const open = document.body.classList.toggle('sidebar-open');
@@ -411,5 +441,5 @@ const App = (() => {
 
   document.addEventListener('DOMContentLoaded', init);
 
-  return { go, refreshBadges, ensureViewLoaded, traceLot };
+  return { go, takeNavigationIntent, refreshBadges, ensureViewLoaded, traceLot };
 })();

@@ -19,7 +19,7 @@ const DEAD_STOCK_DEFAULT_DAYS = 180;
 export default function ReportsView() {
   const { t, esc, num, money, dt, ts, table, loading, select, field, input, modal, closeModal, val, can } = UI;
 
-  const [tab, setTab] = useState('valuation');
+  const [tab, setTab] = useState(() => App.takeNavigationIntent('reports')?.tab || 'valuation');
   const [reloadToken, setReloadToken] = useState(0);
   const deadDaysRef = useRef(DEAD_STOCK_DEFAULT_DAYS);
   const pivotConfigRef = useRef({ dataSource: 'movements', dimension: 'month', metric: 'value', filters: {} });

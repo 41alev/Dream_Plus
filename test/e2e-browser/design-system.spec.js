@@ -1,5 +1,5 @@
 // @ts-nocheck
-/* global document */
+/* global document, Chart */
 const { test, expect } = require('@playwright/test');
 const { login, goToView } = require('./helpers');
 
@@ -79,5 +79,70 @@ test.describe('Ürün tasarım sistemi', () => {
     await expect(dialog.locator('.form-section')).toHaveCount(5);
     await expect(dialog.locator('#itemIdentityTitle')).toBeVisible();
     await expect(dialog.locator('#itemBomTitle')).toBeVisible();
+  });
+
+  test('KPI ve grafikler okunabilir ayrıntılara yönlendirir', async ({ page }) => {
+    await login(page);
+    const chartStyle = await page.evaluate(() => {
+      const chart = Chart.getChart('chStatus');
+      return { size: chart.options.plugins.legend.labels.font.size, color: chart.options.plugins.legend.labels.color };
+    });
+    expect(chartStyle.size).toBeGreaterThanOrEqual(13);
+    expect(chartStyle.color).toBeTruthy();
+
+    await page.locator('#chTrend').click({ position: { x: 24, y: 24 } });
+    await expect(page).toHaveURL(/#reports$/);
+    await expect(page.locator('#view-reports [role="tab"][aria-selected="true"]')).toContainText('Trend');
+    await goToView(page, 'dashboard');
+
+    const quarantine = page.locator('.stat[data-dash-go="lots"]').filter({ hasText: 'Karantinada' });
+    await expect(quarantine).toHaveAttribute('role', 'button');
+    await expect(quarantine.locator('.stat-state')).toHaveText(/Normal|Uyarı/);
+    await quarantine.press('Enter');
+    await expect(page).toHaveURL(/#lots$/);
+    await expect(page.locator('#lStatus')).toHaveValue('quarantine');
+  });
+
+  test('tablo sütunları ve görünüm yoğunluğu kalıcıdır', async ({ page }) => {
+    await login(page);
+    await goToView(page, 'items');
+    const shell = page.locator('#view-items .data-table-shell').first();
+    await expect(shell.locator('table')).toHaveClass(/sticky-first/);
+    const stickyLayers = await shell.evaluate(node => {
+      const table = node.querySelector('table');
+      const head = table.querySelector('th:first-child');
+      const cell = table.querySelector('td:first-child');
+      return {
+        headPosition: getComputedStyle(head).position,
+        headZ: Number(getComputedStyle(head).zIndex),
+        cellPosition: getComputedStyle(cell).position,
+        cellZ: Number(getComputedStyle(cell).zIndex)
+      };
+    });
+    expect(stickyLayers).toEqual({ headPosition: 'sticky', headZ: 4, cellPosition: 'sticky', cellZ: 2 });
+    await shell.locator('summary').click();
+    await shell.locator('[data-table-col-toggle="1"]').uncheck();
+    await expect(shell.locator('th[data-col="1"]')).toBeHidden();
+
+    await page.locator('#densityToggle').click();
+    await expect(page.locator('body')).toHaveAttribute('data-density', 'compact');
+    await page.reload();
+    await expect(page.locator('body')).toHaveAttribute('data-density', 'compact');
+    const restored = page.locator('#view-items .data-table-shell').first();
+    await expect(restored.locator('[data-table-col-toggle="1"]')).not.toBeChecked();
+    await expect(restored.locator('th[data-col="1"]')).toBeHidden();
+  });
+
+  test('boş modül listeleri açıklama ve işlem sunar', async ({ page }) => {
+    await page.route(/\/api\/items(?:\?|$)/, route => route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({ data: [], total: 0, page: 1, pageSize: 25, totalPages: 0, facets: { categories: [] } })
+    }));
+    await login(page);
+    await goToView(page, 'items');
+    const empty = page.locator('#view-items .empty');
+    await expect(empty.locator('strong')).toContainText('Henüz kayıt yok');
+    await expect(empty.locator('.empty-action')).toBeVisible();
   });
 });

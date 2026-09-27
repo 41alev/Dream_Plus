@@ -136,7 +136,7 @@ const DEFAULT_FILTERS = { page: 1, q: '', status: '', warehouseId: '', itemId: '
 export default function LotsView() {
   const { card, pager, select, field, input, val, numVal, intVal, can, modal } = UI;
 
-  const [filters, setFilters] = useState(DEFAULT_FILTERS);
+  const [filters, setFilters] = useState(() => ({ ...DEFAULT_FILTERS, ...(App.takeNavigationIntent('lots')?.filters || {}) }));
   const [phase, setPhase] = useState({ status: 'loading', res: null, error: null });
   const warehousesRef = useRef([]);
   const firstLoadRef = useRef(true);

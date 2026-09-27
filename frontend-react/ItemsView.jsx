@@ -28,7 +28,7 @@ export default function ItemsView() {
   const { t, esc, num, card, table, pager, loading, modal, closeModal,
           field, input, select, textarea, checkbox, val, numVal, intVal, checked, can } = UI;
 
-  const [filters, setFilters] = useState(DEFAULT_FILTERS);
+  const [filters, setFilters] = useState(() => ({ ...DEFAULT_FILTERS, ...(App.takeNavigationIntent('items')?.filters || {}) }));
   const [reloadToken, setReloadToken] = useState(0);
   const [phase, setPhase] = useState({ status: 'loading', res: null, error: null });
 

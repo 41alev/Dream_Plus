@@ -51,7 +51,15 @@ export default function DashboardView() {
     const btn = document.getElementById('dashRefresh');
     if (btn) btn.onclick = load;
     document.querySelectorAll('[data-dash-go]').forEach(b => {
-      b.onclick = () => App.go(b.dataset.dashGo);
+      const activate = () => {
+        let intent = {};
+        try { intent = JSON.parse(b.dataset.dashIntent || '{}'); } catch {}
+        App.go(b.dataset.dashGo, intent);
+      };
+      b.onclick = activate;
+      b.onkeydown = e => {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); activate(); }
+      };
     });
 
     if (document.getElementById('chTrend')) UI.chart('chTrend', {
@@ -62,7 +70,8 @@ export default function DashboardView() {
           { label: lang0('in'), data: tr.stockInValue, borderColor: UI.PALETTE[2], backgroundColor: 'rgba(111,169,122,.12)', fill: true, tension: .3 },
           { label: lang0('out'), data: tr.stockOutValue, borderColor: UI.PALETTE[3], backgroundColor: 'rgba(226,87,76,.12)', fill: true, tension: .3 }
         ]
-      }
+      },
+      options: {}
     });
 
     if (document.getElementById('chStatus')) UI.chart('chStatus', {
@@ -71,7 +80,13 @@ export default function DashboardView() {
         labels: s.statusBreakdown.map(x => UI.lotStatusBadge(x.status).replace(/<[^>]*>/g, '')),
         datasets: [{ data: s.statusBreakdown.map(x => Math.round(x.value)), backgroundColor: UI.PALETTE, borderColor: '#24282C', borderWidth: 2 }]
       },
-      options: { plugins: { legend: { position: 'bottom' } } }
+      options: {
+        plugins: { legend: { position: 'bottom' } },
+        onClick: (_event, elements) => {
+          const index = elements?.[0]?.index;
+          if (index != null) App.go('lots', { filters: { status: s.statusBreakdown[index]?.status || '' } });
+        }
+      }
     });
 
     if (document.getElementById('chCat')) UI.chart('chCat', {
@@ -80,7 +95,13 @@ export default function DashboardView() {
         labels: s.categoryValue.map(c => c.category),
         datasets: [{ label: '₺', data: s.categoryValue.map(c => c.value), backgroundColor: UI.PALETTE[0], borderRadius: 4 }]
       },
-      options: { plugins: { legend: { display: false } } }
+      options: {
+        plugins: { legend: { display: false } },
+        onClick: (_event, elements) => {
+          const index = elements?.[0]?.index;
+          if (index != null) App.go('items', { filters: { category: s.categoryValue[index]?.category || '' } });
+        }
+      }
     });
   }, [state, load]);
 
@@ -97,6 +118,12 @@ export default function DashboardView() {
   const hasCategory = (s.categoryValue || []).some(x => Number(x.value));
   const emptyChart = (title, text) => `<div class="chart-empty" role="status"><strong>${esc(title)}</strong><span>${esc(text)}</span></div>`;
   const firstRun = !hasTrend && !hasStatus && !hasCategory && !s.lowStockList?.length && !s.expiringList?.length;
+  const statusLabel = kind => UI.getLang() === 'tr'
+    ? ({ ok: 'Normal', warn: 'Uyarı', crit: 'Kritik', info: 'Takip' }[kind] || 'Bilgi')
+    : ({ ok: 'Normal', warn: 'Warning', crit: 'Critical', info: 'Monitor' }[kind] || 'Info');
+  const detailLabel = UI.getLang() === 'tr' ? 'Detayı aç' : 'Open details';
+  const chartAction = (view, intent = {}) => `<button class="btn btn-ghost btn-sm" type="button" data-dash-go="${view}" data-dash-intent='${esc(JSON.stringify(intent))}'>${detailLabel}</button>`;
+  const metric = (label, value, options = {}) => stat(label, value, { statusLabel: statusLabel(options.kind || 'info'), ...options });
   const html = `
     <div class="topbar">
       <div><h2>${t('dashTitle')}</h2><div class="sub">${t('dashSub')}</div></div>
@@ -115,29 +142,29 @@ export default function DashboardView() {
     </section>` : ''}
 
     <div class="stat-row">
-      ${stat(t('kpiStockValue'), '₺' + money(s.totalValueTRY))}
-      ${stat(t('kpiQuarantine'), '₺' + money(s.quarantineValueTRY), { kind: 'warn', sub: t('quarantine') })}
-      ${stat(t('kpiBlocked'), '₺' + money(s.blockedValueTRY), { kind: 'crit' })}
-      ${stat(t('kpiPendingPO'), '₺' + money(s.pendingPOTotalTRY), { kind: 'info' })}
+      ${metric(t('kpiStockValue'), '₺' + money(s.totalValueTRY), { kind: 'info', icon: UI.ICONS.inventory, view: 'items' })}
+      ${metric(t('kpiQuarantine'), '₺' + money(s.quarantineValueTRY), { kind: s.quarantineValueTRY ? 'warn' : 'ok', icon: UI.ICONS.alert, sub: t('quarantine'), view: 'lots', intent: { filters: { status: 'quarantine' } } })}
+      ${metric(t('kpiBlocked'), '₺' + money(s.blockedValueTRY), { kind: s.blockedValueTRY ? 'crit' : 'ok', icon: UI.ICONS.shield, view: 'lots', intent: { filters: { status: 'blocked' } } })}
+      ${metric(t('kpiPendingPO'), '₺' + money(s.pendingPOTotalTRY), { kind: 'info', icon: UI.ICONS.cart, view: 'purchasing', intent: { tab: 'orders' } })}
     </div>
 
     <div class="stat-row">
-      ${stat(t('kpiLowStock'), s.lowStockCount, { kind: s.lowStockCount ? 'warn' : 'ok' })}
-      ${stat(t('kpiExpiring'), s.expiringCount, { kind: s.expiringCount ? 'crit' : 'ok' })}
-      ${stat(t('kpiOverduePO'), s.overduePOCount, { kind: s.overduePOCount ? 'crit' : 'ok' })}
-      ${stat(t('kpiApprovals'), s.pendingApprovalCount, { kind: s.pendingApprovalCount ? 'warn' : 'ok' })}
-      ${stat(t('kpiOpenNCR'), s.openNCRCount, { kind: s.openNCRCount ? 'warn' : 'ok' })}
-      ${stat(t('kpiPendingInsp'), s.pendingInspectionCount, { kind: s.pendingInspectionCount ? 'warn' : 'ok' })}
-      ${stat(t('kpiOpenProd'), s.openProductionCount, { kind: 'info' })}
-      ${stat(t('kpiCalibration'), s.calibrationDueCount, { kind: s.calibrationDueCount ? 'warn' : 'ok' })}
+      ${metric(t('kpiLowStock'), s.lowStockCount, { kind: s.lowStockCount ? 'warn' : 'ok', icon: UI.ICONS.alert, view: 'items', intent: { filters: { lowOnly: true } } })}
+      ${metric(t('kpiExpiring'), s.expiringCount, { kind: s.expiringCount ? 'crit' : 'ok', icon: UI.ICONS.clock, view: 'lots', intent: { filters: { expiringDays: '30' } } })}
+      ${metric(t('kpiOverduePO'), s.overduePOCount, { kind: s.overduePOCount ? 'crit' : 'ok', icon: UI.ICONS.clock, view: 'purchasing', intent: { tab: 'orders' } })}
+      ${metric(t('kpiApprovals'), s.pendingApprovalCount, { kind: s.pendingApprovalCount ? 'warn' : 'ok', icon: UI.ICONS.check, view: 'purchasing', intent: { tab: 'orders' } })}
+      ${metric(t('kpiOpenNCR'), s.openNCRCount, { kind: s.openNCRCount ? 'warn' : 'ok', icon: UI.ICONS.alert, view: 'quality', intent: { tab: 'ncr' } })}
+      ${metric(t('kpiPendingInsp'), s.pendingInspectionCount, { kind: s.pendingInspectionCount ? 'warn' : 'ok', icon: UI.ICONS.shield, view: 'quality', intent: { tab: 'inspections' } })}
+      ${metric(t('kpiOpenProd'), s.openProductionCount, { kind: 'info', icon: UI.ICONS.inventory, view: 'production' })}
+      ${metric(t('kpiCalibration'), s.calibrationDueCount, { kind: s.calibrationDueCount ? 'warn' : 'ok', icon: UI.ICONS.clock, view: 'quality', intent: { tab: 'equipment' } })}
     </div>
 
     <div class="grid-2">
-      ${card(t('chartTrend'), hasTrend ? '<div class="chart-wrap"><canvas id="chTrend"></canvas></div>' : emptyChart(UI.getLang() === 'tr' ? 'Trend verisi bekleniyor' : 'Waiting for trend data', UI.getLang() === 'tr' ? 'Stok hareketleri oluştukça aylık değişim burada görünür.' : 'Monthly movement appears here after stock transactions.'))}
-      ${card(t('chartStockStatus'), hasStatus ? '<div class="chart-wrap"><canvas id="chStatus"></canvas></div>' : emptyChart(UI.getLang() === 'tr' ? 'Dağılım henüz oluşmadı' : 'No distribution yet', UI.getLang() === 'tr' ? 'Parti ve stok kayıtları eklendiğinde durum dağılımı gösterilir.' : 'Status distribution appears after lot and stock records are added.'))}
+      ${card(t('chartTrend'), hasTrend ? '<div class="chart-wrap clickable" role="button" tabindex="0" data-dash-go="reports" data-dash-intent=\'' + esc(JSON.stringify({ tab: 'trends' })) + '\' aria-label="' + esc(t('chartTrend') + ' · ' + detailLabel) + '"><canvas id="chTrend" role="img" aria-label="' + esc(t('chartTrend')) + '"></canvas></div>' : emptyChart(UI.getLang() === 'tr' ? 'Trend verisi bekleniyor' : 'Waiting for trend data', UI.getLang() === 'tr' ? 'Stok hareketleri oluştukça aylık değişim burada görünür.' : 'Monthly movement appears here after stock transactions.'), chartAction('reports', { tab: 'trends' }))}
+      ${card(t('chartStockStatus'), hasStatus ? '<div class="chart-wrap clickable"><canvas id="chStatus" role="img" aria-label="' + esc(t('chartStockStatus')) + '"></canvas></div>' : emptyChart(UI.getLang() === 'tr' ? 'Dağılım henüz oluşmadı' : 'No distribution yet', UI.getLang() === 'tr' ? 'Parti ve stok kayıtları eklendiğinde durum dağılımı gösterilir.' : 'Status distribution appears after lot and stock records are added.'), chartAction('lots'))}
     </div>
 
-    ${card(t('chartCategoryValue'), hasCategory ? '<div class="chart-wrap"><canvas id="chCat"></canvas></div>' : emptyChart(UI.getLang() === 'tr' ? 'Kategori değeri yok' : 'No category value yet', UI.getLang() === 'tr' ? 'Maliyetli stok oluştuğunda kategori karşılaştırması burada görünür.' : 'Category comparison appears when valued stock is available.'))}
+    ${card(t('chartCategoryValue'), hasCategory ? '<div class="chart-wrap clickable"><canvas id="chCat" role="img" aria-label="' + esc(t('chartCategoryValue')) + '"></canvas></div>' : emptyChart(UI.getLang() === 'tr' ? 'Kategori değeri yok' : 'No category value yet', UI.getLang() === 'tr' ? 'Maliyetli stok oluştuğunda kategori karşılaştırması burada görünür.' : 'Category comparison appears when valued stock is available.'), chartAction('items'))}
 
     <div class="grid-2">
       ${card(t('lowStockList'), table([

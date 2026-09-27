@@ -11,7 +11,7 @@ export default function QualityView() {
   const { t, esc, num, dt, ts, table, pager, loading, modal, closeModal,
           field, input, select, textarea, val, numVal, intVal, can } = UI;
 
-  const [tab, setTab] = useState('inspections');
+  const [tab, setTab] = useState(() => App.takeNavigationIntent('quality')?.tab || 'inspections');
   const [reloadToken, setReloadToken] = useState(0);
   const [ready, setReady] = useState(false);
 
