@@ -1,5 +1,50 @@
 # PROJECT_STATUS.md
 
+## 27 Eylül 2026 — ürün tasarımı ve erişilebilirlik yenilemesi (Codex)
+
+**Aktif hedef ve kabul ölçütü:** Dream Plus'ın satış demosu ve günlük kullanım
+arayüzünü masaüstü/mobilde tutarlı, erişilebilir, çevrimdışı kurulabilir ve
+kurumsal görünümlü hale getirmek; mevcut iş akışlarını ve veri sözleşmelerini
+korumak; bütün değişiklikleri test edip temiz müşteri paketine almaktır.
+
+**Sonuç — Geçti:** Açık/koyu tema, ilk boyamadan önce tema seçimi, modern giriş
+ekranı, daraltılabilir masaüstü menüsü, mobil çekmece, mobil üst çubuk, yeni
+kart/form/tablo/boş-yükleniyor durumları ve duyarlı kırılma noktaları eklendi.
+Panel ilk kullanım yönlendirmesi ve anlamlı grafik boş durumları kazanırken ürün
+formu beş okunabilir bölüme ayrıldı. Aktif ana menü `aria-current` ile, içerik
+sekmeleri gerçek tab semantiği ve klavye yön tuşlarıyla çalışır; menü ve tema
+düğmelerinin erişilebilir adları güncel durumu açıklar.
+
+**Dağıtım ve güvenlik etkisi:** Google Fonts ve CDN Chart.js kaldırıldı;
+Chart.js 4.4.1 derleme sırasında `public/vendor` altına kopyalanır. Uygulama
+arayüzü ağ olmadan yüklenir. CSP betik, stil ve font kaynaklarında yalnız aynı
+kaynağa izin verir (mevcut zorunlu satır içi stiller korunur). API, veritabanı,
+migration ve iş kuralı sözleşmesi değişmedi; testler izole veri dizinlerinde
+çalıştı ve gerçek müşteri verisine dokunmadı.
+
+**Doğrulama — Geçti:** `npm run build`; `npm run typecheck`; `npm run lint`
+(0 hata, önceden var olan 42 uyarı); `npm audit --audit-level=high` (0 bulgu);
+`npm run test:all` (41/41 paket); `npm run test:e2e-browser` (43/43 Chromium);
+tasarım sistemi hedefli testi 4/4; `node test/visual-audit.js` 38 geçti, 0
+uyarı, 0 hata; `git diff --check`. Giriş, panel, rapor, ürün ve yönetim ekranları
+gerçek tarayıcıda ayrıca görsel olarak incelendi; mobil ve masaüstünde global
+yatay taşma bulunmadı.
+
+**Bağımsız inceleme:** `ai_team.py --phase plan/review --rounds 2 --timeout 300`
+ile Claude ve Gemini görüşleri alındı; iki araç da çalıştı. Son incelemedeki
+aktif menü duyurusu, daraltma düğmesi etiketi ve ilk yükleme tema rengi bulguları
+uygulanıp tarayıcı testiyle kapatıldı. Modele gönderilmeyen dosyalara ilişkin
+varsayımlar yerel kaynak ve test kanıtıyla değerlendirildi.
+
+**Kalan saha kabulü:** Tarayıcı/yazıcı sürücüsüne bağlı fiziksel baskı görünümü,
+müşteri marka tercihleri ve gerçek operatörlerle kullanılabilirlik yalnız hedef
+ortamda pilot sırasında onaylanabilir; bunlar kod deposunda kapatılabilecek bir
+tasarım hatası değildir.
+
+**Sonraki tek somut adım:** Temiz commit üzerinden 2.0.1 müşteri paketini yeniden
+üretip manifest/checksum ve izole kurulum smoke testini doğrula; ardından ilk
+müşteride marka ve fiziksel çıktı kabulünü tamamla.
+
 ## 26 Eylül 2026 — müşteri paketinde gereksiz dosya denetimi (Codex)
 
 **Aktif hedef ve kabul ölçütü:** `release/dream-plus-2.0.1` içinde yalnız

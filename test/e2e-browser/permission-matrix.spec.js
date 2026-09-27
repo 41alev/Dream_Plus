@@ -21,7 +21,7 @@ test.describe('Yetki matrisi — frontend can() backend PERMISSIONS ile eşleşi
     // her zaman 403 alıyordu. Düzeltme: buton da can('admin')'e geçirildi.
     await login(page, 'mudur', 'Mudur123!');
     await goToView(page, 'sales');
-    await page.getByRole('button', { name: 'Sevkiyatlar', exact: true }).click();
+    await page.getByRole('tab', { name: 'Sevkiyatlar', exact: true }).click();
     const row = page.locator('#view-sales table tbody tr').first();
     await expect(row).toBeVisible({ timeout: 10000 });
     await expect(row.locator('[data-del]')).toHaveCount(0);
@@ -79,7 +79,7 @@ test.describe('Yetki matrisi — frontend can() backend PERMISSIONS ile eşleşi
     // yöneticilere açık" deseni webhooksTab'a da uygulandı.
     await login(page, 'mudur', 'Mudur123!');
     await goToView(page, 'admin');
-    await page.getByRole('button', { name: "Webhook'lar", exact: true }).click();
+    await page.getByRole('tab', { name: "Webhook'lar", exact: true }).click();
     await expect(page.locator('#adBody')).toContainText('yalnızca yöneticilere açıktır', { timeout: 10000 });
   });
 
@@ -92,7 +92,7 @@ test.describe('Yetki matrisi — frontend can() backend PERMISSIONS ile eşleşi
     // aynı paylaşılan raporu önce sahibiyle, sonra başkasıyla kontrol ediyor.
     await login(page, 'mudur', 'Mudur123!');
     await goToView(page, 'reports');
-    await page.getByRole('button', { name: 'Özel Rapor', exact: true }).click();
+    await page.getByRole('tab', { name: 'Özel Rapor', exact: true }).click();
     await page.click('#pvSave');
     await page.fill('#pvName', SHARED_REPORT_NAME);
     await page.click('#pvSaveGo');
@@ -125,7 +125,7 @@ test.describe('Yetki matrisi — frontend can() backend PERMISSIONS ile eşleşi
   test('Başkasının kayıtlı raporunu Operatör silemiyor', async ({ page }) => {
     await login(page, 'operator', 'Operator123!');
     await goToView(page, 'reports');
-    await page.getByRole('button', { name: 'Özel Rapor', exact: true }).click();
+    await page.getByRole('tab', { name: 'Özel Rapor', exact: true }).click();
     const opBadge = page.locator('.badge', { hasText: SHARED_REPORT_NAME });
     await expect(opBadge).toBeVisible({ timeout: 10000 });
     // Sahibi değil ve yönetici/müdür de değil — silme ikonu görünmemeli.

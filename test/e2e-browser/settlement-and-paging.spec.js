@@ -31,7 +31,7 @@ test.describe('Fatura mutabakatı, kısmi ödeme ve sayfalama', () => {
     expect(inv.matchStatus).toBe('matched');
 
     await goToView(page, 'purchasing');
-    await page.getByRole('button', { name: 'Faturalar', exact: true }).click();
+    await page.getByRole('tab', { name: 'Faturalar', exact: true }).click();
     const row = page.locator('tr', { hasText: 'E2E-PAY-1' });
     await row.getByRole('button', { name: 'Onayla' }).click();
     await page.locator('#apGo').click();
@@ -50,7 +50,7 @@ test.describe('Fatura mutabakatı, kısmi ödeme ve sayfalama', () => {
     const customer = (await api(page, 'POST', '/sales/customers', { name: 'E2E Tahsilat Müşteri' })).data;
     const inv = (await api(page, 'POST', '/sales/invoices', { customerId: customer.id, amount: 200 })).data;
     await goToView(page, 'sales');
-    await page.getByRole('button', { name: 'Faturalar', exact: true }).click();
+    await page.getByRole('tab', { name: 'Faturalar', exact: true }).click();
     const row = page.locator('tr', { hasText: inv.invoice_no });
     await row.getByRole('button', { name: 'Tahsilat' }).click();
     await page.fill('#coAmt', '80');
@@ -63,7 +63,7 @@ test.describe('Fatura mutabakatı, kısmi ödeme ve sayfalama', () => {
     await login(page);
     for (let i = 0; i < 55; i++) await api(page, 'POST', '/sales/customers', { name: `ZZ Sayfa Müşteri ${String(i).padStart(2, '0')}` });
     await goToView(page, 'sales');
-    await page.getByRole('button', { name: 'Müşteriler', exact: true }).click();
+    await page.getByRole('tab', { name: 'Müşteriler', exact: true }).click();
     const pager = page.locator('#salesBody .pager, .pager').first();
     await expect(pager).toBeVisible();
     await pager.getByRole('button', { name: 'Sonraki' }).click();

@@ -187,6 +187,8 @@ export default function ItemsView() {
       title: isEdit ? t('edit') + ' — ' + item.name : t('newItem'),
       size: 'wide',
       body: `
+        <section class="form-section" aria-labelledby="itemIdentityTitle">
+        <div class="form-section-head"><span class="form-section-index">01</span><div><h4 id="itemIdentityTitle">${UI.getLang() === 'tr' ? 'Ürün kimliği' : 'Item identity'}</h4><p>${UI.getLang() === 'tr' ? 'Ürünü arama, barkod ve raporlarda tanımlayan temel bilgiler.' : 'Core details used in search, barcode and reports.'}</p></div></div>
         <div class="field-row">
           ${field(t('itemName'), input('iName', { value: item?.name || '' }))}
           ${field(t('itemCode'), input('iCode', { value: item?.code || '' }))}
@@ -202,6 +204,9 @@ export default function ItemsView() {
           ${field(t('origin'), select('iOrigin', [{ v: 'Yurt İçi', l: t('originDomestic') }, { v: 'Yurt Dışı', l: t('originIntl') }], item?.origin || 'Yurt İçi'))}
           ${field(t('unit'), input('iUnit', { value: item?.unit || 'adet' }))}
         </div>
+        </section>
+        <section class="form-section" aria-labelledby="itemStockTitle">
+        <div class="form-section-head"><span class="form-section-index">02</span><div><h4 id="itemStockTitle">${UI.getLang() === 'tr' ? 'Stok ve raf düzeni' : 'Inventory and location'}</h4><p>${UI.getLang() === 'tr' ? 'Varsayılan depo, raf ve stok yenileme eşikleri.' : 'Default warehouse, shelf and replenishment thresholds.'}</p></div></div>
         <div class="field-row">
           ${field(t('warehouse'), select('iWh', warehouses.map(w => ({ v: w.id, l: w.name })), item?.warehouseId || warehouses[0]?.id))}
           ${field(t('location'), input('iLoc', { value: item?.location || '' }))}
@@ -211,6 +216,9 @@ export default function ItemsView() {
           ${field(t('reorderQty'), input('iReorder', { type: 'number', value: item?.reorderQty ?? 0, min: 0 }))}
           ${field(t('shelfLife'), input('iShelf', { type: 'number', value: item?.shelfLifeDays ?? '', min: 0 }))}
         </div>
+        </section>
+        <section class="form-section" aria-labelledby="itemCommercialTitle">
+        <div class="form-section-head"><span class="form-section-index">03</span><div><h4 id="itemCommercialTitle">${UI.getLang() === 'tr' ? 'Tedarik ve maliyet' : 'Sourcing and costing'}</h4><p>${UI.getLang() === 'tr' ? 'Satın alma veya üretim yöntemi ile ticari değerler.' : 'Procurement method and commercial values.'}</p></div></div>
         <div class="field-row three">
           ${field(t('costingMethod'), select('iCosting', [{ v: 'moving_average', l: t('movingAverage') }, { v: 'fifo', l: t('fifo') }], item?.costingMethod || 'moving_average'))}
           ${field(t('salePrice'), input('iSale', { type: 'number', step: '0.01', value: item?.salePrice ?? 0, min: 0 }))}
@@ -221,14 +229,18 @@ export default function ItemsView() {
             { v: 'buy', l: UI.getLang() === 'tr' ? 'Satın al' : 'Buy' },
             { v: 'make', l: UI.getLang() === 'tr' ? 'Üret' : 'Make' }
           ], item?.procurementType || 'buy'))}
+        </section>
+        <section class="form-section" aria-labelledby="itemQualityTitle">
+        <div class="form-section-head"><span class="form-section-index">04</span><div><h4 id="itemQualityTitle">${UI.getLang() === 'tr' ? 'Kalite ve izlenebilirlik' : 'Quality and traceability'}</h4><p>${UI.getLang() === 'tr' ? 'Parti takibi, giriş muayenesi ve ürün açıklaması.' : 'Lot tracking, incoming inspection and item notes.'}</p></div></div>
         ${checkbox('iLot', t('lotTracked'), item ? item.isLotTracked : true)}
         ${checkbox('iInsp', t('requiresInspection'), item?.requiresIncomingInspection || false)}
         ${field(t('description'), textarea('iDesc', { value: item?.description || '' }))}
-
-        <div class="section-title">${t('bomTitle')}</div>
-        <div class="sub" style="font-size:11.5px;color:var(--text-faint);margin-bottom:8px">${t('bomSub')}</div>
+        </section>
+        <section class="form-section" aria-labelledby="itemBomTitle">
+        <div class="form-section-head"><span class="form-section-index">05</span><div><h4 id="itemBomTitle">${t('bomTitle')}</h4><p>${t('bomSub')}</p></div></div>
         <div class="dyn-list" id="bomList"></div>
-        <button class="btn btn-ghost btn-sm" id="bomAdd" type="button">${t('addBomLine')}</button>`,
+        <button class="btn btn-ghost btn-sm" id="bomAdd" type="button">${t('addBomLine')}</button>
+        </section>`,
       footer: `<button class="btn btn-ghost" data-close>${t('cancel')}</button>
                <button class="btn btn-primary" id="iSave">${t('save')}</button>`,
       onOpen: (box) => {

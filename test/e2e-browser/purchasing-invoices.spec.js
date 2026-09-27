@@ -20,7 +20,7 @@ test.describe('Satın Alma — fatura 3\'lü eşleştirme gerçek verilerle dolu
   test('yeni fatura girildiğinde tedarikçi adı ve fark notu doğru gösteriliyor', async ({ page }) => {
     await login(page);
     await goToView(page, 'purchasing');
-    await page.getByRole('button', { name: 'Faturalar', exact: true }).click();
+    await page.getByRole('tab', { name: 'Faturalar', exact: true }).click();
 
     await page.getByRole('button', { name: 'Fatura Gir' }).click();
     await page.waitForSelector('#ivPo');
@@ -41,7 +41,7 @@ test.describe('Satın Alma — fatura 3\'lü eşleştirme gerçek verilerle dolu
   test('kısmi teslim miktarı formda seçilip eşleşen fatura kaydediliyor', async ({ page }) => {
     await login(page);
     await goToView(page, 'purchasing');
-    await page.getByRole('button', { name: 'Faturalar', exact: true }).click();
+    await page.getByRole('tab', { name: 'Faturalar', exact: true }).click();
     await page.getByRole('button', { name: 'Fatura Gir' }).click();
     await page.selectOption('#ivPo', { label: 'SA-2026-001 — Akım Bağlantı San. Ltd.' });
     const qty = page.locator('.iv-line-qty');

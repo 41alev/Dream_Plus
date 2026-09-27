@@ -50,8 +50,11 @@ export default function DashboardView() {
     const { s, tr } = state;
     const btn = document.getElementById('dashRefresh');
     if (btn) btn.onclick = load;
+    document.querySelectorAll('[data-dash-go]').forEach(b => {
+      b.onclick = () => App.go(b.dataset.dashGo);
+    });
 
-    UI.chart('chTrend', {
+    if (document.getElementById('chTrend')) UI.chart('chTrend', {
       type: 'line',
       data: {
         labels: tr.periods,
@@ -62,7 +65,7 @@ export default function DashboardView() {
       }
     });
 
-    UI.chart('chStatus', {
+    if (document.getElementById('chStatus')) UI.chart('chStatus', {
       type: 'doughnut',
       data: {
         labels: s.statusBreakdown.map(x => UI.lotStatusBadge(x.status).replace(/<[^>]*>/g, '')),
@@ -71,7 +74,7 @@ export default function DashboardView() {
       options: { plugins: { legend: { position: 'bottom' } } }
     });
 
-    UI.chart('chCat', {
+    if (document.getElementById('chCat')) UI.chart('chCat', {
       type: 'bar',
       data: {
         labels: s.categoryValue.map(c => c.category),
@@ -88,7 +91,12 @@ export default function DashboardView() {
     return <div className="empty">{esc(state.error)}</div>;
   }
 
-  const { s } = state;
+  const { s, tr } = state;
+  const hasTrend = (tr?.periods || []).some((_, i) => Number(tr.stockInValue?.[i]) || Number(tr.stockOutValue?.[i]));
+  const hasStatus = (s.statusBreakdown || []).some(x => Number(x.value));
+  const hasCategory = (s.categoryValue || []).some(x => Number(x.value));
+  const emptyChart = (title, text) => `<div class="chart-empty" role="status"><strong>${esc(title)}</strong><span>${esc(text)}</span></div>`;
+  const firstRun = !hasTrend && !hasStatus && !hasCategory && !s.lowStockList?.length && !s.expiringList?.length;
   const html = `
     <div class="topbar">
       <div><h2>${t('dashTitle')}</h2><div class="sub">${t('dashSub')}</div></div>
@@ -96,6 +104,15 @@ export default function DashboardView() {
         <button class="btn btn-ghost btn-sm" id="dashRefresh">${UI.icon(UI.ICONS.search)}${t('refresh')}</button>
       </div>
     </div>
+
+    ${firstRun ? `<section class="dashboard-welcome">
+      <div><h3>${UI.getLang() === 'tr' ? 'Çalışma alanınız hazır' : 'Your workspace is ready'}</h3>
+      <p>${UI.getLang() === 'tr' ? 'İlk ürününüzü ekleyin veya mevcut verilerinizi içe aktararak başlayın.' : 'Add your first item or import existing data to get started.'}</p></div>
+      <div class="dashboard-quick-actions">
+        <button class="btn btn-primary" type="button" data-dash-go="items">${UI.getLang() === 'tr' ? 'Ürünlere git' : 'Open items'}</button>
+        ${UI.can('approve') ? `<button class="btn btn-ghost" type="button" data-dash-go="admin">${UI.getLang() === 'tr' ? 'Veri aktarımı' : 'Import data'}</button>` : ''}
+      </div>
+    </section>` : ''}
 
     <div class="stat-row">
       ${stat(t('kpiStockValue'), '₺' + money(s.totalValueTRY))}
@@ -116,11 +133,11 @@ export default function DashboardView() {
     </div>
 
     <div class="grid-2">
-      ${card(t('chartTrend'), '<div class="chart-wrap"><canvas id="chTrend"></canvas></div>')}
-      ${card(t('chartStockStatus'), '<div class="chart-wrap"><canvas id="chStatus"></canvas></div>')}
+      ${card(t('chartTrend'), hasTrend ? '<div class="chart-wrap"><canvas id="chTrend"></canvas></div>' : emptyChart(UI.getLang() === 'tr' ? 'Trend verisi bekleniyor' : 'Waiting for trend data', UI.getLang() === 'tr' ? 'Stok hareketleri oluştukça aylık değişim burada görünür.' : 'Monthly movement appears here after stock transactions.'))}
+      ${card(t('chartStockStatus'), hasStatus ? '<div class="chart-wrap"><canvas id="chStatus"></canvas></div>' : emptyChart(UI.getLang() === 'tr' ? 'Dağılım henüz oluşmadı' : 'No distribution yet', UI.getLang() === 'tr' ? 'Parti ve stok kayıtları eklendiğinde durum dağılımı gösterilir.' : 'Status distribution appears after lot and stock records are added.'))}
     </div>
 
-    ${card(t('chartCategoryValue'), '<div class="chart-wrap"><canvas id="chCat"></canvas></div>')}
+    ${card(t('chartCategoryValue'), hasCategory ? '<div class="chart-wrap"><canvas id="chCat"></canvas></div>' : emptyChart(UI.getLang() === 'tr' ? 'Kategori değeri yok' : 'No category value yet', UI.getLang() === 'tr' ? 'Maliyetli stok oluştuğunda kategori karşılaştırması burada görünür.' : 'Category comparison appears when valued stock is available.'))}
 
     <div class="grid-2">
       ${card(t('lowStockList'), table([

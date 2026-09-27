@@ -1394,13 +1394,13 @@ export default function AdminView() {
       <div><h2>${t('adminTitle')}</h2><div class="sub">${t('adminSub')}</div></div>
       <div class="topbar-actions" id="adActions"></div>
     </div>
-    ${UI.tabs([
+    <div class="admin-tabs-shell">${UI.tabs([
       { k: 'users', l: t('tabUsers') }, { k: 'warehouses', l: t('tabWarehouses') },
       { k: 'fx', l: t('tabFx') }, { k: 'rules', l: t('tabRules') },
       { k: 'audit', l: t('tabAudit') }, { k: 'settings', l: t('tabSettings') },
       { k: 'import', l: t('tabImport') }, { k: 'templates', l: t('tabTemplates') }, { k: 'health', l: t('tabDataHealth') },
       { k: 'accounting', l: t('tabAccounting') }, { k: 'webhooks', l: t('tabWebhooks') }
-    ], tab, k => setTab(k))}
+    ], tab, k => setTab(k))}</div>
     <div id="adBody">${loading()}</div>`;
 
   return <div dangerouslySetInnerHTML={{ __html: html }} />;

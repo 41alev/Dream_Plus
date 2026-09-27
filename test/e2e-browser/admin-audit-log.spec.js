@@ -23,7 +23,7 @@ test.describe('Yönetim — Denetim Kaydı null rol sızdırmıyor', () => {
 
     await login(page);
     await goToView(page, 'admin');
-    await page.getByRole('button', { name: 'Denetim Kaydı', exact: true }).click();
+    await page.getByRole('tab', { name: 'Denetim Kaydı', exact: true }).click();
 
     const row = page.locator('tr', { hasText: 'başarısız giriş denemesi' }).first();
     await expect(row).toBeVisible({ timeout: 10000 });

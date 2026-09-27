@@ -2,6 +2,9 @@
 const I18N = {
 tr: {
   loginUsername:"Kullanıcı adı", loginPassword:"Şifre", loginSubmit:"Giriş Yap",
+  loginWelcome:"Güvenli çalışma alanınıza giriş yapın",
+  loginStoryTitle:"Operasyonun tamamı tek, güvenilir ekranda.",
+  loginStoryText:"Stok, üretim, satın alma, kalite ve satış süreçlerinizi kesintisiz yönetin.",
   loginFailed:"Kullanıcı adı veya şifre hatalı.", logout:"Çıkış",
   navDashboard:"Panel", navGroupStock:"Stok", navItems:"Ürünler", navLots:"Partiler / Lotlar",
   navCounts:"Sayım", navGroupOps:"Operasyon", navProduction:"Üretim", navPurchasing:"Satın Alma",
@@ -382,6 +385,9 @@ tr: {
 },
 en: {
   loginUsername:"Username", loginPassword:"Password", loginSubmit:"Sign In",
+  loginWelcome:"Sign in to your secure workspace",
+  loginStoryTitle:"Your entire operation in one trusted workspace.",
+  loginStoryText:"Run inventory, production, purchasing, quality and sales without interruption.",
   loginFailed:"Incorrect username or password.", logout:"Sign out",
   navDashboard:"Dashboard", navGroupStock:"Stock", navItems:"Items", navLots:"Lots / Batches",
   navCounts:"Stock Count", navGroupOps:"Operations", navProduction:"Production", navPurchasing:"Purchasing",

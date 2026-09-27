@@ -19,11 +19,13 @@
  *   node scripts/build-frontend.js   (npm run build bunu çağırır)
  */
 const path = require('path');
+const fs = require('fs');
 const { build } = require('vite');
 const react = require('@vitejs/plugin-react');
 
 const ROOT = path.resolve(__dirname, '..');
 const OUT_DIR = path.join(ROOT, 'public/dist');
+const VENDOR_DIR = path.join(ROOT, 'public/vendor');
 const REACT_SPECIFIERS = ['react', 'react-dom/client', 'react/jsx-runtime'];
 
 const VIEW_ENTRIES = [
@@ -58,6 +60,13 @@ async function buildOne({ name, entry, externalizeReact, first }) {
 }
 
 async function buildAll() {
+  fs.mkdirSync(VENDOR_DIR, { recursive: true });
+  fs.copyFileSync(
+    path.join(path.dirname(require.resolve('chart.js')), 'chart.umd.js'),
+    path.join(VENDOR_DIR, 'chart.umd.js')
+  );
+  console.log('  ✓ vendor/chart.umd.js (offline grafik paketi)');
+
   console.log('React vendor paketi (React/ReactDOM BİR KEZ, paylaşılan global olarak)...');
   await buildOne({
     name: 'vendor-react',
@@ -83,7 +92,6 @@ async function buildAll() {
   await buildAll();
 
   if (process.argv.includes('--watch')) {
-    const fs = require('fs');
     console.log('\nİzleniyor: frontend-react/ değişince yeniden derlenecek (Ctrl+C ile çık)...');
     let pending = false, timer = null;
     const rebuild = () => {

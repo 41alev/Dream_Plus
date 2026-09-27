@@ -22,7 +22,7 @@ test.describe('Yazdırma çıktıları — gerçek belge içeriği', () => {
   test('sevkiyat irsaliyesi çıktısı GERÇEK sevkiyat verisini içeriyor (şablon değil)', async ({ page, context }) => {
     await login(page);
     await goToView(page, 'sales');
-    await page.getByRole('button', { name: 'Sevkiyatlar', exact: true }).click();
+    await page.getByRole('tab', { name: 'Sevkiyatlar', exact: true }).click();
 
     const row = page.locator('#view-sales table tbody tr').first();
     await expect(row).toBeVisible({ timeout: 10000 });

@@ -55,13 +55,60 @@ const App = (() => {
     document.querySelectorAll('[data-i18n]').forEach(n => { n.textContent = UI.t(n.dataset.i18n); });
     document.querySelectorAll('[data-i18n-placeholder]').forEach(n => { n.placeholder = UI.t(n.dataset.i18nPlaceholder); });
     document.getElementById('htmlRoot').lang = UI.getLang();
+    updateThemeControls();
+    updateSidebarCollapseControl();
+  }
+
+  /* ---------- appearance and responsive navigation ---------- */
+  function currentTheme() { return document.documentElement.dataset.theme === 'light' ? 'light' : 'dark'; }
+  function updateThemeControls() {
+    const light = currentTheme() === 'light';
+    const label = UI.getLang() === 'tr'
+      ? (light ? 'Koyu temaya geç' : 'Açık temaya geç')
+      : (light ? 'Switch to dark theme' : 'Switch to light theme');
+    const icon = light
+      ? '<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9z"/></svg>'
+      : '<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.66 6.34l1.41-1.41"/></svg>';
+    document.querySelectorAll('.theme-toggle').forEach(b => { b.innerHTML = icon; b.title = label; b.setAttribute('aria-label', label); });
+    document.querySelector('meta[name="theme-color"]')?.setAttribute('content', light ? '#F4F6F8' : '#111827');
+  }
+  function updateSidebarCollapseControl() {
+    const button = document.getElementById('sidebarCollapse');
+    if (!button) return;
+    const mobile = typeof matchMedia === 'function' && matchMedia('(max-width: 960px)').matches;
+    const collapsed = document.body.classList.contains('sidebar-collapsed');
+    const tr = UI.getLang() === 'tr';
+    const label = mobile
+      ? (tr ? 'Menüyü kapat' : 'Close menu')
+      : collapsed
+        ? (tr ? 'Menüyü genişlet' : 'Expand menu')
+        : (tr ? 'Menüyü daralt' : 'Collapse menu');
+    button.setAttribute('aria-label', label);
+    button.title = label;
+  }
+  function toggleTheme() {
+    const next = currentTheme() === 'light' ? 'dark' : 'light';
+    document.documentElement.dataset.theme = next;
+    localStorage.setItem('dp_theme', next);
+    updateThemeControls();
+    if (current) go(current);
+  }
+  function closeMobileNav() {
+    document.body.classList.remove('sidebar-open');
+    document.getElementById('mobileMenuToggle')?.setAttribute('aria-expanded', 'false');
   }
 
   /* ---------- routing ---------- */
   async function go(view) {
     if (!VIEW_GLOBALS[view]) view = 'dashboard';
     current = view;
-    document.querySelectorAll('.nav-tab').forEach(b => b.classList.toggle('active', b.dataset.view === view));
+    closeMobileNav();
+    document.querySelectorAll('.nav-tab').forEach(b => {
+      const active = b.dataset.view === view;
+      b.classList.toggle('active', active);
+      if (active) b.setAttribute('aria-current', 'page');
+      else b.removeAttribute('aria-current');
+    });
     document.querySelectorAll('.view').forEach(s => s.classList.remove('active'));
     const el = document.getElementById('view-' + view);
     el.classList.add('active');
@@ -75,6 +122,7 @@ const App = (() => {
 
   /* ---------- session ---------- */
   function showLogin() {
+    closeMobileNav();
     document.getElementById('loginScreen').style.display = 'flex';
     document.getElementById('appShell').style.display = 'none';
   }
@@ -99,7 +147,11 @@ const App = (() => {
 
     try {
       const s = await Api.publicSettings();
-      if (s.companyName) document.getElementById('brandName').textContent = s.companyName;
+      if (s.companyName) {
+        document.getElementById('brandName').textContent = s.companyName;
+        document.getElementById('loginBrandName').textContent = s.companyName;
+        document.getElementById('mobileBrandName').textContent = s.companyName;
+      }
     } catch {}
 
     if (u.mustChangePassword) promptPasswordChange();
@@ -260,10 +312,34 @@ const App = (() => {
 
   /* ---------- init ---------- */
   function init() {
+    if (!document.documentElement.dataset.theme) {
+      const savedTheme = localStorage.getItem('dp_theme');
+      const prefersLight = typeof matchMedia === 'function' && matchMedia('(prefers-color-scheme: light)').matches;
+      document.documentElement.dataset.theme = savedTheme || (prefersLight ? 'light' : 'dark');
+    }
     const langSaved = UI.getLang();
     document.getElementById('loginLang').value = langSaved;
     document.getElementById('langSelect').value = langSaved;
     applyStaticI18n();
+
+    document.querySelectorAll('.theme-toggle').forEach(b => b.onclick = toggleTheme);
+    const mobileMenu = document.getElementById('mobileMenuToggle');
+    mobileMenu.onclick = () => {
+      const open = document.body.classList.toggle('sidebar-open');
+      mobileMenu.setAttribute('aria-expanded', String(open));
+      if (open) document.querySelector('.sidebar .nav-tab.active')?.focus();
+    };
+    document.getElementById('sidebarScrim').onclick = closeMobileNav;
+    document.getElementById('sidebarCollapse').onclick = () => {
+      if (matchMedia('(max-width: 960px)').matches) return closeMobileNav();
+      const collapsed = document.body.classList.toggle('sidebar-collapsed');
+      localStorage.setItem('dp_sidebar_collapsed', collapsed ? '1' : '0');
+      updateSidebarCollapseControl();
+    };
+    if (localStorage.getItem('dp_sidebar_collapsed') === '1') document.body.classList.add('sidebar-collapsed');
+    updateSidebarCollapseControl();
+    window.addEventListener('resize', updateSidebarCollapseControl);
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeMobileNav(); });
 
     // Login
     document.getElementById('loginForm').onsubmit = async (e) => {

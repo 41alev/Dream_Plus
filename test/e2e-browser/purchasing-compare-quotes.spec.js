@@ -20,7 +20,7 @@ test.describe('Satın Alma — teklif karşılaştırma gerçek verilerle doluyo
   test('3 teklifli RFQ karşılaştırma tablosu doğru fiyat/tedarikçi/en iyi fiyatı gösteriyor', async ({ page }) => {
     await login(page);
     await goToView(page, 'purchasing');
-    await page.getByRole('button', { name: 'Teklifler', exact: true }).click();
+    await page.getByRole('tab', { name: 'Teklifler', exact: true }).click();
 
     const row = page.locator('tr', { hasText: 'TEK-2026-001' });
     await expect(row).toBeVisible({ timeout: 10000 });

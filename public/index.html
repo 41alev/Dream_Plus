@@ -3,44 +3,55 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#111827">
 <title>Dream Plus</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"
-  integrity="sha384-bs/nf9FbdNouRbMiFcrcZfLXYPKiPaGVGplVbv7dLGECccEXDW+S3zjqSKR5ZEaD" crossorigin="anonymous"></script>
+<script src="/js/theme-bootstrap.js"></script>
 <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
 
 <!-- ============ LOGIN ============ -->
 <div class="login-screen" id="loginScreen">
-  <form class="login-card" id="loginForm">
+  <div class="login-layout">
+    <section class="login-story" aria-label="Dream Plus">
+      <div class="login-story-badge">DREAM PLUS ERP</div>
+      <h2 data-i18n="loginStoryTitle">Operasyonun tamamı tek, güvenilir ekranda.</h2>
+      <p data-i18n="loginStoryText">Stok, üretim, satın alma, kalite ve satış süreçlerinizi kesintisiz yönetin.</p>
+      <div class="login-story-points" aria-hidden="true"><span>Stok</span><span>Üretim</span><span>Kalite</span><span>Satış</span></div>
+    </section>
+    <form class="login-card" id="loginForm">
+    <button type="button" class="icon-btn theme-toggle login-theme" id="loginThemeToggle" aria-label="Temayı değiştir" title="Temayı değiştir"></button>
     <div class="brand" style="border:none;padding:0;margin-bottom:20px">
       <div class="brand-mark">
         <svg viewBox="0 0 24 24" fill="none" stroke="#1B1E21" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M3 7l9-4 9 4-9 4-9-4z"/><path d="M3 7v10l9 4 9-4V7"/><path d="M12 11v10"/></svg>
       </div>
-      <div class="brand-text"><h1>Dream Plus</h1></div>
+      <div class="brand-text"><h1 id="loginBrandName">Dream Plus</h1><span data-i18n="loginWelcome">Güvenli çalışma alanınıza giriş yapın</span></div>
     </div>
-    <div class="field"><label data-i18n="loginUsername">Kullanıcı adı</label><input type="text" id="loginUsername" autocomplete="username" required></div>
-    <div class="field"><label data-i18n="loginPassword">Şifre</label><input type="password" id="loginPassword" autocomplete="current-password" required></div>
+    <div class="field"><label for="loginUsername" data-i18n="loginUsername">Kullanıcı adı</label><input type="text" id="loginUsername" autocomplete="username" required></div>
+    <div class="field"><label for="loginPassword" data-i18n="loginPassword">Şifre</label><input type="password" id="loginPassword" autocomplete="current-password" required></div>
     <div class="login-error" id="loginError"></div>
     <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center" data-i18n="loginSubmit">Giriş Yap</button>
     <div class="login-lang">
       <select id="loginLang" class="btn btn-ghost btn-sm"><option value="tr">Türkçe</option><option value="en">English</option></select>
     </div>
-  </form>
+    </form>
+  </div>
 </div>
 
 <!-- ============ APP ============ -->
 <div class="shell" id="appShell" style="display:none">
-  <aside class="sidebar">
+  <div class="sidebar-scrim" id="sidebarScrim" aria-hidden="true"></div>
+  <aside class="sidebar" id="sidebar" aria-label="Ana menü">
     <div class="brand">
       <div class="brand-mark">
         <svg viewBox="0 0 24 24" fill="none" stroke="#1B1E21" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M3 7l9-4 9 4-9 4-9-4z"/><path d="M3 7v10l9 4 9-4V7"/><path d="M12 11v10"/></svg>
       </div>
       <div class="brand-text"><h1 id="brandName">Dream Plus</h1></div>
+      <button type="button" class="icon-btn sidebar-collapse" id="sidebarCollapse" aria-label="Menüyü daralt" title="Menüyü daralt">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 18-6-6 6-6"/></svg>
+      </button>
     </div>
 
     <div class="global-search">
@@ -129,6 +140,7 @@
         </button>
       </div>
       <div style="display:flex;gap:6px">
+        <button type="button" class="icon-btn theme-toggle" id="themeToggle" aria-label="Temayı değiştir" title="Temayı değiştir"></button>
         <select id="langSelect" class="btn btn-ghost btn-sm" style="flex:1"><option value="tr">TR</option><option value="en">EN</option></select>
         <button class="btn btn-ghost btn-sm" id="btnLogout" style="flex:2;justify-content:center" data-i18n="logout">Çıkış</button>
       </div>
@@ -136,6 +148,13 @@
   </aside>
 
   <main class="main">
+    <header class="mobile-bar">
+      <button type="button" class="icon-btn" id="mobileMenuToggle" aria-controls="sidebar" aria-expanded="false" aria-label="Menüyü aç">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+      </button>
+      <div class="mobile-brand"><span class="brand-dot"></span><strong id="mobileBrandName">Dream Plus</strong></div>
+      <button type="button" class="icon-btn theme-toggle" id="mobileThemeToggle" aria-label="Temayı değiştir" title="Temayı değiştir"></button>
+    </header>
     <section class="view active" id="view-dashboard"></section>
     <section class="view" id="view-items"></section>
     <section class="view" id="view-lots"></section>
@@ -169,6 +188,7 @@
 <div class="overlay" id="modalOverlay"><div class="modal" id="modalBox"></div></div>
 <div class="toast" id="toast"></div>
 
+<script src="/vendor/chart.umd.js"></script>
 <script src="/js/i18n.js"></script>
 <script src="/js/api.js"></script>
 <script src="/js/ui.js"></script>

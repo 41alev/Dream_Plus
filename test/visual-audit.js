@@ -148,6 +148,14 @@ check('geniş tablolar yatay kaydırılabilir / wide tables scroll', 'fail',
   /\.table-wrap\{overflow-x:auto\}/.test(css.replace(/\s+/g, '')), '');
 check('viewport meta etiketi var / viewport meta present', 'fail',
   /name="viewport"[^>]*width=device-width/.test(html), '');
+check('harici CDN bağımlılığı yok / no external CDN dependency', 'fail',
+  !/(fonts\.googleapis\.com|cdnjs\.cloudflare\.com)/.test(html), '');
+check('Chart.js yerel paketlenmiş / Chart.js bundled locally', 'fail',
+  /src="\/vendor\/chart\.umd\.js"/.test(html), '');
+check('mobil çekmece denetimi var / mobile drawer control present', 'fail',
+  /id="mobileMenuToggle"[^>]*aria-controls="sidebar"/.test(html), '');
+check('açık ve koyu tema tokenları var / light and dark theme tokens', 'fail',
+  /:root\[data-theme="light"\]/.test(css) && /id="themeToggle"/.test(html), '');
 
 console.log('\n=== ERİŞİLEBİLİRLİK / ACCESSIBILITY ===');
 check('klavye odak göstergesi tanımlı / focus-visible styled', 'fail',

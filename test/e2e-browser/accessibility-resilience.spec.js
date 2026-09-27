@@ -12,7 +12,7 @@ test.describe('Erişilebilirlik ve hata dayanıklılığı', () => {
   test('diyalog: rol, ilk alana odak, Tab tuzağı, Escape ile açan düğmeye dönüş, etiket bağlantısı', async ({ page }) => {
     await login(page);
     await goToView(page, 'sales');
-    await page.getByRole('button', { name: 'Müşteriler', exact: true }).click();
+    await page.getByRole('tab', { name: 'Müşteriler', exact: true }).click();
     const opener = page.getByRole('button', { name: 'Yeni Müşteri' });
     await opener.click();
     const dialog = page.getByRole('dialog');
@@ -38,7 +38,7 @@ test.describe('Erişilebilirlik ve hata dayanıklılığı', () => {
   test('kaydet düğmesine çift tıklama tek kayıt oluşturur', async ({ page }) => {
     await login(page);
     await goToView(page, 'sales');
-    await page.getByRole('button', { name: 'Müşteriler', exact: true }).click();
+    await page.getByRole('tab', { name: 'Müşteriler', exact: true }).click();
     await page.getByRole('button', { name: 'Yeni Müşteri' }).click();
     const name = 'Çift Tık Müşteri ' + Date.now();
     await page.getByRole('dialog').locator('input').first().fill(name);

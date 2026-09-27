@@ -123,9 +123,9 @@ app.use((req, res, next) => {
   // bu listeyi 'self' ile daraltabilirsiniz.
   res.setHeader('Content-Security-Policy', [
     "default-src 'self'",
-    "script-src 'self' https://cdnjs.cloudflare.com",
-    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com",
-    "font-src 'self' https://fonts.gstatic.com",
+    "script-src 'self'",
+    "style-src 'self' 'unsafe-inline'",
+    "font-src 'self'",
     "img-src 'self' data: blob:",
     "connect-src 'self'",
     "media-src 'self' blob:",           // barkod okuma için kamera akışı

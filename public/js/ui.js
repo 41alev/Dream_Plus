@@ -255,7 +255,7 @@ const UI = (() => {
    * Renders a card-wrapped table with optional pager.
    */
   function table(cols, rows, opts = {}) {
-    if (!rows || rows.length === 0) return `<div class="empty">${esc(opts.emptyText || t('noData'))}</div>`;
+    if (!rows || rows.length === 0) return `<div class="empty" role="status"><strong>${esc(opts.emptyTitle || (lang === 'tr' ? 'Henüz kayıt yok' : 'No records yet'))}</strong><span>${esc(opts.emptyText || t('noData'))}</span></div>`;
     const head = cols.map(c => `<th class="${c.num ? 'num' : ''}" ${c.width ? `style="width:${c.width}"` : ''}>${esc(c.label)}</th>`).join('');
     const body = rows.map((r, i) => {
       const tds = cols.map(c => {
@@ -304,10 +304,20 @@ const UI = (() => {
     setTimeout(() => {
       document.getElementById(id)?.querySelectorAll('.chip').forEach(b => {
         b.onclick = () => onSelect(b.dataset.k);
+        b.tabIndex = b.getAttribute('aria-selected') === 'true' ? 0 : -1;
+        b.onkeydown = e => {
+          if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(e.key)) return;
+          e.preventDefault();
+          const tabs = [...b.closest('[role="tablist"]').querySelectorAll('[role="tab"]')];
+          const current = tabs.indexOf(b);
+          const next = e.key === 'Home' ? tabs[0] : e.key === 'End' ? tabs.at(-1)
+            : tabs[(current + (e.key === 'ArrowRight' ? 1 : -1) + tabs.length) % tabs.length];
+          next.focus(); next.click();
+        };
       });
     }, 0);
-    return `<div class="chip-row" id="${id}" style="margin-bottom:16px">${items.map(i =>
-      `<button class="chip ${i.k === active ? 'active' : ''}" data-k="${esc(i.k)}">${esc(i.l)}${i.badge ? ` (${i.badge})` : ''}</button>`).join('')}</div>`;
+    return `<div class="chip-row" id="${id}" role="tablist" aria-label="${lang === 'tr' ? 'Bölümler' : 'Sections'}" style="margin-bottom:16px">${items.map(i =>
+      `<button class="chip ${i.k === active ? 'active' : ''}" type="button" role="tab" aria-selected="${i.k === active}" data-k="${esc(i.k)}">${esc(i.l)}${i.badge ? ` (${i.badge})` : ''}</button>`).join('')}</div>`;
   };
 
   /* ---------- status badges ---------- */
@@ -356,21 +366,26 @@ const UI = (() => {
     const el = document.getElementById(canvasId);
     if (!el || typeof Chart === 'undefined') return;
     if (charts[canvasId]) charts[canvasId].destroy();
-    const gridColor = '#2F3438', tickColor = '#9AA0A6';
+    const styles = getComputedStyle(document.documentElement);
+    const gridColor = styles.getPropertyValue('--border-soft').trim() || '#3A4046';
+    const tickColor = styles.getPropertyValue('--text-muted').trim() || '#9AA0A6';
+    const panelColor = styles.getPropertyValue('--panel').trim() || '#24282C';
+    const textColor = styles.getPropertyValue('--text').trim() || '#ECE9E2';
     if (config.type !== 'doughnut' && config.type !== 'pie') {
       config.options = config.options || {};
       config.options.scales = config.options.scales || {};
       ['x', 'y'].forEach(ax => {
         config.options.scales[ax] = Object.assign({
-          ticks: { color: tickColor, font: { family: 'Inter', size: 10.5 } },
+          ticks: { color: tickColor, font: { family: 'Segoe UI', size: 11 } },
           grid: { color: gridColor }
         }, config.options.scales[ax] || {});
       });
     }
     config.options = Object.assign({ responsive: true, maintainAspectRatio: false }, config.options || {});
     config.options.plugins = Object.assign({
-      legend: { labels: { color: '#ECE9E2', font: { family: 'Inter', size: 11.5 }, boxWidth: 12 } }
+      legend: { labels: { color: textColor, font: { family: 'Segoe UI', size: 11.5 }, boxWidth: 12 } }
     }, config.options.plugins || {});
+    (config.data?.datasets || []).forEach(ds => { if (ds.borderColor === '#24282C') ds.borderColor = panelColor; });
     charts[canvasId] = new Chart(el.getContext('2d'), config);
   }
   const PALETTE = ['#F2A900', '#7FA6D9', '#6FA97A', '#E2574C', '#A88BD0', '#D9A87F', '#8BD0C4', '#D08BA8'];
