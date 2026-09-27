@@ -1,5 +1,53 @@
 # PROJECT_STATUS.md
 
+## 27 Eylül 2026 — seçilen tasarım iyileştirmeleri 2, 4, 6, 7, 8 ve 9 (Codex)
+
+**Aktif hedef ve kabul ölçütü:** Grafik metinlerini okunur kılmak; KPI durumunu
+renge ek olarak ikon ve metinle anlatmak; panel KPI/grafiklerini ilgili filtreli
+ekrana bağlamak; tablo sütun görünürlüğünü ve ilk sütun sabitlemesini kalıcı
+yapmak; rahat/kompakt görünüm seçimini saklamak; boş listelerde kullanıcıya
+anlamlı açıklama ve yetkisine uygun eylem sunmak. Mevcut API, veri ve rol
+sözleşmeleri korunacaktır.
+
+**Sonuç — Geçti:** Panel KPI'ları `Normal/Uyarı/Kritik/Takip` metni, ikon,
+klavye odağı ve erişilebilir ad taşır. KPI ve grafik ayrıntıları hedef ekranın
+ilgili sekme/filtre durumunu tek kullanımlık gezinme niyetiyle açar. Grafik
+eksenleri, lejantları ve araç ipuçları büyütülüp tema metin rengine bağlandı.
+Standart tablolar sütun seçici ve açılışta etkin ilk sütun sabitleme kazandı;
+bu tercihler ile rahat/kompakt yoğunluk tarayıcıda kalıcıdır. Boş listeler
+başlık, açıklama ve yetkiye uygun başlangıç eylemi sunar; yükleme hataları ayrı
+`alert` ve `Yeniden Dene` akışı olarak kalır.
+
+**Etki:** Değişiklik istemci arayüzü ve tarayıcı tercihleriyle sınırlıdır. API,
+veritabanı, migration ve iş kuralı değişmedi. Kalıcı tercihler yalnız yerel
+tarayıcı `localStorage` alanında tutulur; müşteri verisi veya sır içermez.
+
+**Doğrulama — Geçti:** `npm run build`; `npm run typecheck`; `npm run lint`
+(0 hata, önceden var olan 42 uyarı); `npm run test:all` (41/41 takım);
+`npm run test:e2e-browser` (46/46 Chromium); final hata/erişilebilirlik
+düzeltmesinden sonra hedefli Playwright 10/10; tasarım paketi 7/7;
+`node test/visual-audit.js` 38 geçti, 0 uyarı, 0 hata; `git diff --check`.
+Tarayıcı testi özellikle grafik tıklamasını, KPI klavye yönlendirmesini ve
+durum metnini, filtre aktarımını, sütun/yoğunluk kalıcılığını, sticky başlık ile
+ilk sütun z-index katmanlarını ve yönlendirmeli boş durumu doğrular.
+
+**Bağımsız inceleme:** `ai_team.py --phase plan/review --rounds 2 --timeout
+300` ile Claude ve Gemini yanıt verdi. İnceleme bağlam sınırı nedeniyle bazı
+React/CSS bölümlerini göremedi; işaretlenen KPI metni ve sticky katman riskleri
+yerel kaynakta doğrulandı ve doğrudan Playwright beklentileri eklenerek kapandı.
+
+**Müşteri paketi — Geçti:** Kaynak değişikliği `60670ef` commit'ine alındı;
+`release/dream-plus-2.0.1` bu temiz commit'ten yeniden üretildi. Paket 135 dosya
+taşır; checksum/manifest, kurcalama algılama, sır/veri/test/iç not dışlama ve
+mevcut paketin üzerine yazmama kontrolleri geçti.
+
+**Kalan saha kabulü:** Müşteri marka tercihleri, gerçek operatör kullanım
+gözlemi ve fiziksel baskı görünümü yalnız hedef sahadaki pilotta onaylanabilir.
+Kod deposunda bu seçili altı tasarım maddesine ait açık hata kalmadı.
+
+**Sonraki tek somut adım:** Kullanıcının ertelediği diğer tasarım maddelerini
+ayrı kapsam olarak ele al; mevcut müşteri paketi seçilen altı madde için hazırdır.
+
 ## 27 Eylül 2026 — ürün tasarımı ve erişilebilirlik yenilemesi (Codex)
 
 **Aktif hedef ve kabul ölçütü:** Dream Plus'ın satış demosu ve günlük kullanım
