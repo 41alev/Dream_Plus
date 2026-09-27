@@ -37,14 +37,22 @@ aktif menü duyurusu, daraltma düğmesi etiketi ve ilk yükleme tema rengi bulg
 uygulanıp tarayıcı testiyle kapatıldı. Modele gönderilmeyen dosyalara ilişkin
 varsayımlar yerel kaynak ve test kanıtıyla değerlendirildi.
 
+**Müşteri paketi — Geçti:** Temiz commit üzerinden `npm run release` ile
+Dream Plus 2.0.1 paketi üretildi. Paket 135 dosya taşır; manifest/checksum,
+kurcalama algılama, sır/veri/test/iç not sızıntısı ve mevcut paketin üzerine
+yazmama kontrolleri geçti. Yerel Chart.js ve Swagger UI varlıkları pakete
+dahildir; `RELEASE.json` çalışma ağacını temiz olarak kaydeder. Paketin ayrı
+geçici klasörde `npm ci --omit=dev` kurulumu 216 paket ve 0 zafiyetle tamamlandı;
+parametreli kurulumdan sonra üretim sürecinde `/health=ok`, yönetici girişi,
+API dokümanı ve iki yerel vendor varlığı HTTP 200 verdi.
+
 **Kalan saha kabulü:** Tarayıcı/yazıcı sürücüsüne bağlı fiziksel baskı görünümü,
 müşteri marka tercihleri ve gerçek operatörlerle kullanılabilirlik yalnız hedef
 ortamda pilot sırasında onaylanabilir; bunlar kod deposunda kapatılabilecek bir
 tasarım hatası değildir.
 
-**Sonraki tek somut adım:** Temiz commit üzerinden 2.0.1 müşteri paketini yeniden
-üretip manifest/checksum ve izole kurulum smoke testini doğrula; ardından ilk
-müşteride marka ve fiziksel çıktı kabulünü tamamla.
+**Sonraki tek somut adım:** İlk müşteride kurulum kartını uygulayıp firma marka
+tercihlerini, gerçek kullanıcı akışlarını ve fiziksel çıktı kabulünü imzalat.
 
 ## 26 Eylül 2026 — müşteri paketinde gereksiz dosya denetimi (Codex)
 
