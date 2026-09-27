@@ -15,9 +15,10 @@ formu beş okunabilir bölüme ayrıldı. Aktif ana menü `aria-current` ile, i�
 sekmeleri gerçek tab semantiği ve klavye yön tuşlarıyla çalışır; menü ve tema
 düğmelerinin erişilebilir adları güncel durumu açıklar.
 
-**Dağıtım ve güvenlik etkisi:** Google Fonts ve CDN Chart.js kaldırıldı;
-Chart.js 4.4.1 derleme sırasında `public/vendor` altına kopyalanır. Uygulama
-arayüzü ağ olmadan yüklenir. CSP betik, stil ve font kaynaklarında yalnız aynı
+**Dağıtım ve güvenlik etkisi:** Google Fonts ile Chart.js ve Swagger UI CDN
+bağımlılıkları kaldırıldı; sürümlenmiş varlıklar derleme sırasında
+`public/vendor` altına kopyalanır. Uygulama ve API dokümanı ağ olmadan yüklenir.
+CSP betik, stil ve font kaynaklarında yalnız aynı
 kaynağa izin verir (mevcut zorunlu satır içi stiller korunur). API, veritabanı,
 migration ve iş kuralı sözleşmesi değişmedi; testler izole veri dizinlerinde
 çalıştı ve gerçek müşteri verisine dokunmadı.

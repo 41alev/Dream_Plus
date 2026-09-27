@@ -65,7 +65,15 @@ async function buildAll() {
     path.join(path.dirname(require.resolve('chart.js')), 'chart.umd.js'),
     path.join(VENDOR_DIR, 'chart.umd.js')
   );
-  console.log('  ✓ vendor/chart.umd.js (offline grafik paketi)');
+  fs.copyFileSync(
+    require.resolve('swagger-ui-dist/swagger-ui-bundle.js'),
+    path.join(VENDOR_DIR, 'swagger-ui-bundle.js')
+  );
+  fs.copyFileSync(
+    require.resolve('swagger-ui-dist/swagger-ui.css'),
+    path.join(VENDOR_DIR, 'swagger-ui.css')
+  );
+  console.log('  ✓ vendor varlıkları (Chart.js + Swagger UI, çevrimdışı)');
 
   console.log('React vendor paketi (React/ReactDOM BİR KEZ, paylaşılan global olarak)...');
   await buildOne({

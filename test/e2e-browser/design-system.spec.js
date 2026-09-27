@@ -22,6 +22,10 @@ test.describe('Ürün tasarım sistemi', () => {
     expect(after).not.toBe(before);
     await page.reload();
     await expect.poll(() => page.evaluate(() => document.documentElement.dataset.theme)).toBe(after);
+
+    await page.goto('/api-docs.html');
+    await expect(page.locator('.swagger-ui')).toBeVisible();
+    expect(external).toEqual([]);
   });
 
   test('mobil menü çekmece olarak açılır ve sayfa yatay taşmaz', async ({ page }) => {
@@ -77,4 +81,3 @@ test.describe('Ürün tasarım sistemi', () => {
     await expect(dialog.locator('#itemBomTitle')).toBeVisible();
   });
 });
-
