@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * KVKK m.7/m.11 — ilgili kişinin talebi veya saklama süresi sonunda kişisel
  * veriyi geri döndürülemez şekilde anonimleştirme ve "hangi veri tutuluyor"

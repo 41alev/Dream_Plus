@@ -1,5 +1,4 @@
 #!/usr/bin/env node
-// @ts-nocheck
 /**
  * Müşteri için lisans dosyası üretir. YALNIZCA SATICI (bu depoyu işleten kişi)
  * çalıştırır — özel anahtar müşteriye asla verilmez, yalnızca üretilen

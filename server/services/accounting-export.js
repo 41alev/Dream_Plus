@@ -22,6 +22,7 @@ const db = require('../db');
 const { AppError } = require('../lib/core');
 const { toMinor, fromMinor, multiplyMinor } = require('../lib/money');
 
+/** @param {number|string} [companyId] */
 function getMappings(companyId = 1) {
   const rows = db.prepare('SELECT mapping_key, account_code, account_name FROM account_code_mappings WHERE company_id = ?')
     .all(companyId);
@@ -51,7 +52,7 @@ function purchaseVatRate(poId) {
 
 /**
  * Verilen tarih aralığındaki satış ve alış faturalarından yevmiye satırları üretir.
- * @param {{ from: string, to: string, companyId?: number }} params
+ * @param {{ from: string, to: string, companyId?: number|string }} params
  */
 function generateJournalEntries({ from, to, companyId = 1 }) {
   if (!from || !to || from > to) throw new AppError('Geçersiz tarih aralığı / Invalid date range', 400);

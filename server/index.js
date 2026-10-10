@@ -1,10 +1,9 @@
-// @ts-nocheck
 require('dotenv').config();
 const crypto = require('crypto');
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
-const rateLimit = require('express-rate-limit');
+const { rateLimit } = require('express-rate-limit');
 const pino = require('pino');
 
 // Configuration failures must not create a database or apply migrations.

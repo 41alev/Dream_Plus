@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * T06 + K-05: supplier invoice reconciliation/approval gate and partial
  * payment ledgers for both customer and supplier invoices.

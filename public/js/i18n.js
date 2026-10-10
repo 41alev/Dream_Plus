@@ -1,3 +1,4 @@
+/* exported I18N */
 // @ts-nocheck
 const I18N = {
 tr: {

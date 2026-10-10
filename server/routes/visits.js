@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Saha ziyaret kaydı — CRM fırsatlarına (opportunity) isteğe bağlı olarak
  * bağlanabilen, GERÇEKLEŞMİŞ bir müşteri ziyaretinin kaydı.

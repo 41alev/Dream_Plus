@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * OpenAPI şemasını servis eder. Kimlik doğrulama GEREKTİRMEZ — bu bir
  * belge/şema, iş verisi değil; Postman/Insomnia/kod üretici gibi araçların

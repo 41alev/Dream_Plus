@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Aşama 8'in ilk sürümü özel raporu YALNIZCA `movements` (stok hareketleri)
  * tablosuyla sınırlıyordu — bu, "satış performansı × ürün kategorisi" gibi

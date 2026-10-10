@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Genel arama (global search) — üst çubuktaki tek kutudan ürün, müşteri,
  * tedarikçi, satış siparişi, satın alma siparişi ve parti aranabilir.

@@ -12,7 +12,7 @@
 import { useEffect, useState, useRef, useCallback } from 'react';
 
 export default function CountsView() {
-  const { t, esc, num, ts, card, table, pager, loading, modal, closeModal,
+  const { t, esc, num, ts, table, pager, loading, modal, closeModal,
           field, input, select, val, intVal, can } = UI;
 
   const [reloadToken, setReloadToken] = useState(0);

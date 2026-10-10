@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Webhook altyapısı — rakip ERP'lerin çoğunda olmayan, "ERP'niz bizim
  * sistemimize haber verebilir mi?" sorusuna cevap. Bir dış sistem (e-ticaret,

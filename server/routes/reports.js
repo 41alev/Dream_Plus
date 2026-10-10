@@ -1,4 +1,3 @@
-// @ts-nocheck
 const express = require('express');
 const db = require('../db');
 const { requireAuth } = require('../middleware/auth');
@@ -12,7 +11,7 @@ const router = express.Router();
 router.use(requireAuth);
 
 const DAY = 86400000;
-function daysAgoStr(n) { return addDays(todayStr(), -n); }
+
 
 /* ---------- helper: stock value at lot cost (already in base currency) ---------- */
 function stockValueBase(where = '', params = []) {
@@ -87,7 +86,7 @@ router.get('/summary', (req, res) => {
     lowStockList: lowStock.slice(0, 50).map(i => ({ id: i.id, name: i.name, warehouse: i.warehouse, qty: i.qty_cache, unit: i.unit, minStock: i.min_stock })),
     expiringList: expiring.slice(0, 50).map(l => ({
       lotId: l.id, itemName: l.item_name, lotNo: l.lot_no, qty: l.qty, unit: l.unit,
-      expiryDate: l.expiry_date, daysLeft: Math.floor((new Date(l.expiry_date) - Date.now()) / DAY), status: l.status
+      expiryDate: l.expiry_date, daysLeft: Math.floor((new Date(l.expiry_date).getTime() - Date.now()) / DAY), status: l.status
     }))
   });
 });

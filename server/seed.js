@@ -1,4 +1,3 @@
-// @ts-nocheck
 const bcrypt = require('bcryptjs');
 const db = require('./db');
 const { uuid } = require('./lib/core');
@@ -74,7 +73,7 @@ function seed() {
       'Ostim', 'Yenimahalle', 'Ankara').lastInsertRowid;
     const cusNordic = insCus.run('MUS-002', 'Nordic Industrial AB', 'Erik Lindqvist', '+46 8 555 7070', 'purchasing@nordicind.se', 'Göteborg, Sweden', 'SE', 'SE556677', 'EUR', 45, 500000, 'FOB', Date.now(),
       null, null, 'Göteborg').lastInsertRowid;
-    const cusEge = insCus.run('MUS-003', 'Ege Otomotiv Ltd.', 'Zeynep Arslan', '+90 232 555 8080', 'tedarik@egeotomotiv.com', 'Torbalı, İzmir', 'TR', '5556667778', 'TRY', 30, 750000, 'EXW', Date.now(),
+    insCus.run('MUS-003', 'Ege Otomotiv Ltd.', 'Zeynep Arslan', '+90 232 555 8080', 'tedarik@egeotomotiv.com', 'Torbalı, İzmir', 'TR', '5556667778', 'TRY', 30, 750000, 'EXW', Date.now(),
       'Torbalı', 'Torbalı', 'İzmir').lastInsertRowid;
 
     // ---------- Items ----------
@@ -144,12 +143,12 @@ function seed() {
     };
 
     const lotSomun1 = openLot('somun', 'Altıgen Somun M8', whMain, 'LOT-SM-2401', 250, 2.05, 200, { supplier: supAkim });
-    const lotSomun2 = openLot('somun', 'Altıgen Somun M8', whMain, 'LOT-SM-2402', 400, 2.18, 45, { supplier: supAkim });
+    openLot('somun', 'Altıgen Somun M8', whMain, 'LOT-SM-2402', 400, 2.18, 45, { supplier: supAkim });
     const lotKablo1 = openLot('kablo', 'Kablo Rulosu 2.5mm', whMain, 'LOT-KB-2405', 22, 1735.00, 60, { supplier: supElek });
     const lotVida1 = openLot('vida', 'Paslanmaz Vida 4x30', whMain, 'LOT-VD-2403', 60, 22.50, 90, { supplier: supAkim });
-    const lotSac1 = openLot('sac', 'Paslanmaz Sac 2mm', whMain, 'LOT-SC-2404', 850, 148.00, 70, { supplier: supAkim });
+    openLot('sac', 'Paslanmaz Sac 2mm', whMain, 'LOT-SC-2404', 850, 148.00, 70, { supplier: supAkim });
     const lotEldiven = openLot('eldiven', 'Endüstriyel Eldiven (L)', whIntl, 'LOT-PP-2312', 6, 122.40, 210, { supplier: supSafe });
-    const lotYag = openLot('yag', 'Hidrolik Yağ 15L', whIntl, 'LOT-HY-2402', 9, 1414.50, 160, { expiry: dstr(21), supplier: supLub });
+    openLot('yag', 'Hidrolik Yağ 15L', whIntl, 'LOT-HY-2402', 9, 1414.50, 160, { expiry: dstr(21), supplier: supLub });
     openLot('palet', 'Ahşap Palet 120x80', whIzmir, null, 0, 85.00, 300, { supplier: supPalet });
     // A quarantined lot awaiting incoming inspection
     const lotSacQ = openLot('sac', 'Paslanmaz Sac 2mm', whQuar, 'LOT-SC-2501', 300, 152.00, 3, { status: 'quarantine', supplier: supAkim });

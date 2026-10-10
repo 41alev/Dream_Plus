@@ -134,7 +134,7 @@ function printTrace(lot, back, fwd, recall) {
 const DEFAULT_FILTERS = { page: 1, q: '', status: '', warehouseId: '', itemId: '', expiringDays: '' };
 
 export default function LotsView() {
-  const { card, pager, select, field, input, val, numVal, intVal, can, modal } = UI;
+  const { pager, select, field, input, val, numVal, intVal, can, modal } = UI;
 
   const [filters, setFilters] = useState(() => ({ ...DEFAULT_FILTERS, ...(App.takeNavigationIntent('lots')?.filters || {}) }));
   const [phase, setPhase] = useState({ status: 'loading', res: null, error: null });

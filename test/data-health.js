@@ -85,7 +85,7 @@ const findCheck = (report, id) => report.checks.find(c => c.id === id);
     token: manager, body: { itemIds: [makeNoBom.data.id], field: 'procurementType', value: 'make' } });
 
   // 4) Kritik stok tanımlı ama tedarikçisiz
-  const noSupplier = await api('POST', '/api/items', {
+  await api('POST', '/api/items', {
     token: admin, body: { name: 'Tedarikçisiz Kritik', code: 'DH-NOSUP', unit: 'adet', minStock: 50 } });
 
   // Doğrudan veritabanı üzerinden bozulacaklar için özel uçlar yok; bunlar

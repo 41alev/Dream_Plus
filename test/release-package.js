@@ -6,10 +6,20 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
+const { spawnSync } = require('node:child_process');
 const { packageRelease, verifyRelease } = require('../scripts/package-release');
+const { acquireMaintenanceLock } = require('../server/lib/maintenance-lock');
 
 const out = fs.mkdtempSync(path.join(os.tmpdir(), 'dream-plus-release-'));
 try {
+  const releaseBuildLock = acquireMaintenanceLock(path.join(__dirname, '..', '.frontend-build'));
+  try {
+    const collision = spawnSync(process.execPath, [path.join(__dirname, '..', 'scripts', 'package-release.js'), '--out', out], { encoding: 'utf8' });
+    assert.equal(collision.status, 1);
+    assert.match(collision.stderr, /maintenance is active/);
+    assert.deepEqual(fs.readdirSync(out), [], 'concurrent packaging must not create a partial package');
+  } finally { releaseBuildLock(); }
+  console.log('✓ concurrent frontend build/packaging is blocked before output is created');
   const r = packageRelease({ out });
   const list = [];
   (function walk(dir, rel) {

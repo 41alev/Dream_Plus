@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * e-Fatura/e-Arşiv/e-İrsaliye (e-Belge) modülünün KALICI olarak kaldırılması.
  *

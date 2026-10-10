@@ -16,6 +16,7 @@ const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
 const { execFileSync } = require('child_process');
+const { acquireMaintenanceLock } = require('../server/lib/maintenance-lock');
 
 const ROOT = path.join(__dirname, '..');
 
@@ -31,6 +32,7 @@ const INCLUDE = [
 
 /** Repository files that are useful to developers/the vendor, never to a customer installation. */
 const CUSTOMER_EXCLUDE = new Set([
+  'server/scripts/dev.js',
   'server/scripts/demo.js',
   'server/scripts/license-generate.js',
   'server/seed.js',
@@ -148,6 +150,12 @@ function assertClean(files, base) {
 
 /** @param {{ out?: string }} [options] */
 function packageRelease({ out } = {}) {
+  const releaseLock = acquireMaintenanceLock(path.join(ROOT, '.frontend-build'));
+  try { return packageReleaseUnlocked({ out }); } finally { releaseLock(); }
+}
+
+/** @param {{ out?: string }} options */
+function packageReleaseUnlocked({ out }) {
   const pkg = JSON.parse(fs.readFileSync(path.join(ROOT, 'package.json'), 'utf8'));
   if (!fs.existsSync(path.join(ROOT, 'public', 'dist'))) {
     throw new Error('public/dist yok; önce `npm run build` çalıştırın / Run npm run build first');

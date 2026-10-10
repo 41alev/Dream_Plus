@@ -11,6 +11,8 @@ npm-debug.log*
 *.zip
 coverage/
 test-results/
+test-results-chromium/
+test-results-webkit/
 playwright-report/
 blob-report/
 playwright/.cache/

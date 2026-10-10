@@ -1,6 +1,6 @@
 {
   "name": "dream-plus",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "description": "Dream Plus - Warehouse, Production, Purchasing, Quality Management System",
   "main": "server/index.js",
   "scripts": {
@@ -14,7 +14,7 @@
     "backup:full": "node server/scripts/full-backup.js",
     "restore:full": "node server/scripts/full-backup.js --restore",
     "test": "node test/e2e.js",
-    "dev": "NODE_ENV=development node server/index.js",
+    "dev": "node server/scripts/dev.js",
     "test:contract": "node test/run-all.js contract",
     "test:ui": "node test/run-all.js ui-smoke",
     "test:all": "node test/run-all.js",
@@ -45,7 +45,7 @@
     "test:visits": "node test/run-all.js visits",
     "test:e2e-browser": "playwright test",
     "typecheck": "tsc --noEmit",
-    "lint": "eslint .",
+    "lint": "eslint . --max-warnings=0",
     "license:generate": "node server/scripts/license-generate.js",
     "release": "node scripts/build-frontend.js && node scripts/package-release.js"
   },

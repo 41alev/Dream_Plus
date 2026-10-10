@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * CRM / satış hunisi — rakiplerin çoğunda (Logo/Netsis/Mikro) olmayan,
  * "sipariş oluşmadan ÖNCEKİ" süreç: bir satış fırsatı (opportunity) doğar,

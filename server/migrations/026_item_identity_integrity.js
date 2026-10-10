@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Product identifiers are operational identities, not display hints.
  *

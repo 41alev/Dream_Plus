@@ -1,4 +1,3 @@
-// @ts-nocheck
 const express = require('express');
 const path = require('path');
 const fs = require('fs');
@@ -225,5 +224,4 @@ router.delete('/:id', MANAGER, (req, res) => {
   res.status(204).end();
 });
 
-module.exports = router;
-module.exports.uploadDir = uploadDir;
+module.exports = Object.assign(router, { uploadDir });

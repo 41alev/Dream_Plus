@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Üretim planlama: iş merkezleri, rotalar, vardiyalar, kapasite ve MRP.
  *

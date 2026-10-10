@@ -273,7 +273,7 @@ async function login(username, password) {
   ok('historical FX rates stored', fxAll.status === 200 && fxAll.data.total >= 8, `total ${fxAll.data.total}`);
 
   console.log('\n=== AUDIT LOG (old → new values) ===');
-  const beforeName = (await api('GET', `/api/items/${sacItem.id}`, { token: admin })).data.name;
+  (await api('GET', `/api/items/${sacItem.id}`, { token: admin })).data.name;
   await api('PUT', `/api/items/${sacItem.id}`, { token: admin, body: { salePrice: 999 } });
   const audit = await api('GET', '/api/audit?entityType=item&pageSize=20', { token: admin });
   const editEntry = audit.data.data.find(a => a.actionKey === 'auditItemEdit' && a.newValue);

@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Webhook gönderim motoru şimdiye kadar "fire and forget"ti (bkz.
  * 009_webhooks.js'in kapsam notu): iş işlemi commit olduktan hemen sonra

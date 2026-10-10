@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Immutable correction ledgers and complete accounting bridge mappings.
  * Original payment rows remain untouched; a reversal is a separate, auditable

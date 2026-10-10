@@ -1,4 +1,3 @@
-// @ts-nocheck
 const express = require('express');
 const net = require('net');
 const db = require('../db');

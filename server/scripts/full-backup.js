@@ -1,4 +1,3 @@
-// @ts-nocheck
 /** Database plus uploaded documents. A bundle is a directory so no archive
  * dependency or extraction path traversal is needed. Keep it on the same
  * filesystem as its backup directory; copy the entire directory off-site. */

@@ -1,4 +1,3 @@
-// @ts-nocheck
 const express = require('express');
 const db = require('../db');
 const { AppError, uuid, nextNumber, logAudit, paginate } = require('../lib/core');

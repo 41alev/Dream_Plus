@@ -22,6 +22,7 @@ const path = require('path');
 const fs = require('fs');
 const { build } = require('vite');
 const react = require('@vitejs/plugin-react');
+const { acquireMaintenanceLock } = require('../server/lib/maintenance-lock');
 
 const ROOT = path.resolve(__dirname, '..');
 const OUT_DIR = path.join(ROOT, 'public/dist');
@@ -37,6 +38,9 @@ async function buildOne({ name, entry, externalizeReact, first }) {
   await build({
     root: ROOT,
     configFile: false,
+    // Runtime .env contains customer configuration; the build has no need
+    // to read it (or its production NODE_ENV).
+    envDir: false,
     logLevel: 'warn',
     plugins: [react()],
     publicDir: false,
@@ -60,6 +64,11 @@ async function buildOne({ name, entry, externalizeReact, first }) {
 }
 
 async function buildAll() {
+  const releaseLock = acquireMaintenanceLock(path.join(ROOT, '.frontend-build'));
+  try { await buildAllUnlocked(); } finally { releaseLock(); }
+}
+
+async function buildAllUnlocked() {
   fs.mkdirSync(VENDOR_DIR, { recursive: true });
   fs.copyFileSync(
     path.join(path.dirname(require.resolve('chart.js')), 'chart.umd.js'),

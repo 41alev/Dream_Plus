@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Özel rapor / pivot motoru — server/migrations/011_saved_reports.js'teki
  * kapsam notuna bakın: serbest SQL yok, yalnızca aşağıdaki whitelist'ten
@@ -133,6 +132,7 @@ function meta() {
 /**
  * @param {{dataSource?:string, dimension:string, metric:string, filters?:object}} input
  */
+/** @param {{dataSource?: string, dimension: string, metric: string, filters?: Record<string, string|number>}} input */
 function runPivot(input) {
   const dsKey = input.dataSource || 'movements';
   // Own keys only: '__proto__'/'constructor' must not resolve to prototype members (RP-05).

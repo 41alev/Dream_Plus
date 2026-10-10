@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Müşteri destek/talep (ticket) takibi.
  *

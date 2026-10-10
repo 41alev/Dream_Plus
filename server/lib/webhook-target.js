@@ -1,4 +1,3 @@
-// @ts-nocheck
 const dns = require('node:dns').promises;
 const net = require('node:net');
 const http = require('node:http');
@@ -6,21 +5,26 @@ const https = require('node:https');
 const { AppError } = require('./core');
 
 const blocked = new net.BlockList();
-for (const [base, prefix] of [
+/** @type {[string, number][]} */
+const ipv4Subnets = [
   ['0.0.0.0', 8], ['10.0.0.0', 8], ['100.64.0.0', 10], ['127.0.0.0', 8],
   ['169.254.0.0', 16], ['172.16.0.0', 12], ['192.0.0.0', 24],
   ['192.0.2.0', 24], ['192.168.0.0', 16], ['198.18.0.0', 15],
   ['198.51.100.0', 24], ['203.0.113.0', 24], ['224.0.0.0', 4], ['240.0.0.0', 4]
-]) blocked.addSubnet(base, prefix, 'ipv4');
-for (const [base, prefix] of [
+];
+for (const [base, prefix] of ipv4Subnets) blocked.addSubnet(base, prefix, 'ipv4');
+/** @type {[string, number][]} */
+const ipv6Subnets = [
   ['::', 128], ['::1', 128], ['fc00::', 7], ['fe80::', 10], ['ff00::', 8],
   ['2001:db8::', 32], ['2001::', 32], ['2002::', 16], ['64:ff9b::', 96]
-]) blocked.addSubnet(base, prefix, 'ipv6');
+];
+for (const [base, prefix] of ipv6Subnets) blocked.addSubnet(base, prefix, 'ipv6');
 
 // Only isolated test sandboxes may send to their local HTTP receiver.
 const testPrivateAllowed = () => process.env.NODE_ENV === 'test' && process.env.WEBHOOK_ALLOW_PRIVATE === '1';
 const invalid = () => new AppError('Güvenli, genel internete açık HTTPS adresi gerekli / A public HTTPS endpoint is required', 422);
 
+/** @param {string} raw @returns {URL} */
 function parseTarget(raw) {
   let url;
   try { url = new URL(raw); } catch { throw invalid(); }
@@ -29,10 +33,12 @@ function parseTarget(raw) {
   return url;
 }
 
+/** @param {string} address @param {number} family @returns {boolean} */
 function isBlockedAddress(address, family) {
   return blocked.check(address, family === 6 ? 'ipv6' : 'ipv4');
 }
 
+/** @param {string} raw @returns {Promise<{url: URL, address: import('node:dns').LookupAddress}>} */
 async function resolveTarget(raw) {
   const url = parseTarget(raw);
   let addresses;
@@ -47,6 +53,7 @@ async function resolveTarget(raw) {
   return { url, address: addresses[0] };
 }
 
+/** @param {string} raw @param {string} body @param {Record<string,string>} headers @param {number} timeoutMs @returns {Promise<number>} */
 async function postWebhook(raw, body, headers, timeoutMs) {
   const { url, address } = await resolveTarget(raw);
   const transport = url.protocol === 'https:' ? https : http;

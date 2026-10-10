@@ -15,6 +15,7 @@
  * Çalıştırma:  npx playwright test --config=playwright.cross-browser.config.js
  */
 const { defineConfig, devices } = require('@playwright/test');
+const baseURL = `http://127.0.0.1:${process.env.PLAYWRIGHT_PORT || '3301'}`;
 
 module.exports = defineConfig({
   testDir: './test/e2e-browser',
@@ -24,7 +25,7 @@ module.exports = defineConfig({
   retries: 0,
   reporter: [['list']],
   use: {
-    baseURL: 'http://localhost:3000',
+    baseURL,
     trace: 'retain-on-failure',
     screenshot: 'only-on-failure'
   },
@@ -34,9 +35,9 @@ module.exports = defineConfig({
   ],
   webServer: {
     command: 'node test/e2e-browser/reset-and-start.js',
-    url: 'http://localhost:3000/health',
+    url: `${baseURL}/health`,
     reuseExistingServer: false,
-    env: { ...process.env, DEMO_DATA: '1' },
+    env: { ...process.env, DEMO_DATA: '1', API_RATE_LIMIT: '200000' },
     timeout: 30000,
     stdout: 'pipe'
   }

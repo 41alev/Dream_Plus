@@ -1,4 +1,3 @@
-// @ts-nocheck
 const fs = require('fs');
 const path = require('path');
 const { exec } = require('child_process');
@@ -40,6 +39,7 @@ function runOffsiteSync(file) {
  * so a backup taken while the server is running is never half-written.
  * Old backups are rotated so the disk cannot fill up silently.
  */
+/** @param {{keep?: number, dir?: string, label?: string}} [options] */
 async function runBackup({ keep = Number(process.env.BACKUP_KEEP || 14), dir, label } = {}) {
   const backupDir = dir || process.env.BACKUP_DIR || path.join(db.dataDir, 'backups');
   if (!fs.existsSync(backupDir)) fs.mkdirSync(backupDir, { recursive: true });

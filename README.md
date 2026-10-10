@@ -1,5 +1,8 @@
 # Dream Plus
 
+> Son teknik denetim ve açık sınırlar:
+> [`docs/ENGINEERING-DENETIM-2026-10-10.md`](docs/ENGINEERING-DENETIM-2026-10-10.md).
+>
 > Güncel satış ve teslim kapıları:
 > [`docs/SATISA-HAZIRLIK-SON-DURUM-2026-09-26.md`](docs/SATISA-HAZIRLIK-SON-DURUM-2026-09-26.md).
 

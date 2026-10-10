@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Lisans doğrulama.
  *
@@ -18,12 +17,17 @@
 const crypto = require('crypto');
 const fs = require('fs');
 
+/** @typedef {{licenseId: string, licensee: string, product: string, issuedAt: string, expiresAt?: string|null}} LicensePayload */
+
 const PUBLIC_KEY_PEM = `-----BEGIN PUBLIC KEY-----
 MCowBQYDK2VwAyEAgu5ZolXI45HsqQJbiwi1KpC3MSVj3hedJNJ1rg3ryck=
 -----END PUBLIC KEY-----
 `;
 
-/** payload alanlarının imza öncesi/sonrası hep aynı sırada serileşmesini garanti eder. */
+/**
+ * payload alanlarının imza öncesi/sonrası hep aynı sırada serileşmesini garanti eder.
+ * @param {LicensePayload} payload
+ */
 function canonicalPayload(payload) {
   return JSON.stringify({
     licenseId: payload.licenseId,
@@ -34,6 +38,7 @@ function canonicalPayload(payload) {
   });
 }
 
+/** @param {LicensePayload} payload @param {string|Buffer} privateKeyPem */
 function sign(payload, privateKeyPem) {
   const privateKey = crypto.createPrivateKey(privateKeyPem);
   const data = Buffer.from(canonicalPayload(payload), 'utf8');
@@ -42,8 +47,8 @@ function sign(payload, privateKeyPem) {
 }
 
 /**
- * @param {object} licenseFile - { payload, signature } — bkz. license-generate.js çıktısı
- * @returns {{ valid: true, license: object, expired: boolean, daysRemaining: number|null } | { valid: false, reason: string }}
+ * @param {{payload?: LicensePayload, signature?: string}|null} licenseFile
+ * @returns {{ valid: true, license: LicensePayload, expired: false, daysRemaining: number|null } | { valid: false, reason: string, expired?: true, license?: LicensePayload }}
  */
 function verify(licenseFile) {
   if (!licenseFile || typeof licenseFile !== 'object' || !licenseFile.payload || !licenseFile.signature) {
@@ -81,7 +86,7 @@ function verify(licenseFile) {
  * aynı projedeki "boş veritabanıyla açılmaz, kuruluma yönlendirir" deseniyle
  * tutarlı (bkz. docs/KURULUM.md).
  *
- * @returns {{ enforced: boolean, valid?: boolean, license?: object, daysRemaining?: number|null, reason?: string }}
+ * @returns {{ enforced: boolean, valid?: boolean, license?: LicensePayload, daysRemaining?: number|null, reason?: string }}
  */
 function checkOnStartup() {
   const filePath = process.env.LICENSE_FILE;
@@ -101,7 +106,7 @@ function checkOnStartup() {
   }
 
   const result = verify(parsed);
-  if (!result.valid) {
+  if (result.valid === false) {
     console.error(`\n✗ Lisans geçersiz: ${result.reason}`);
     console.error('  Yeni bir lisans dosyası için satıcınızla iletişime geçin.\n');
     process.exit(1);
@@ -115,6 +120,7 @@ function checkOnStartup() {
 }
 
 /** Admin panelindeki "Veri Sağlığı" ekranı için — sunucuyu yeniden başlatmadan durumu okur. */
+/** @returns {{enforced: boolean, valid?: boolean, license?: LicensePayload, daysRemaining?: number, reason?: string}} */
 function currentStatus() {
   const filePath = process.env.LICENSE_FILE;
   if (!filePath) return { enforced: false };

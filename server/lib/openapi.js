@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * OpenAPI 3.0 şeması — ubl.js/zpl.js ile aynı desen: saf, yan etkisiz bir
  * ÜRETİCİ. server/routes/docs.js bunu JSON olarak servis eder.

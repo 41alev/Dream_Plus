@@ -1,4 +1,3 @@
-// @ts-nocheck
 const express = require('express');
 const db = require('../db');
 const { AppError, uuid, nextNumber, logAudit, diff, fxRate, paginate } = require('../lib/core');
@@ -490,7 +489,7 @@ const poSchema = z.object({
   items: z.array(z.object({
     itemId: z.string(),
     qty: z.coerce.number().positive(),
-    price: z.union([z.number(), z.string().trim().min(1)]).pipe(z.coerce.number().min(0)),
+    price: z.union([z.number(), z.string().trim().min(1)]).transform(Number).pipe(z.number().min(0)),
     currency: currency.optional(),
     tolerancePct: z.coerce.number().min(0).max(100).default(0)
   })).min(1)

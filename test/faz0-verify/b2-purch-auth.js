@@ -282,7 +282,7 @@ const { invariants } = require('./inv');
     assert.equal(next.status, 200, 'kilit süresi bittikten sonra tek yanlış deneme hesabı yeniden kilitledi (sayaç sıfırlanmıyor)');
   });
   await check('AU-03', 'şifre değiştirme: yanlış mevcut şifre 400; aynı şifreyle "değiştirme" zorunlu değişimi atlatmamalı', async () => {
-    const u = await ok('POST', '/users', { username: 'pwtest', password: 'Pw123456a!', role: 'operator', mustChangePassword: true });
+    await ok('POST', '/users', { username: 'pwtest', password: 'Pw123456a!', role: 'operator', mustChangePassword: true });
     const tok = (await api('POST', '/auth/login', { username: 'pwtest', password: 'Pw123456a!' }, null)).data.token;
     statusIn(await api('POST', '/auth/change-password', { currentPassword: 'wrong', newPassword: 'Newpass123' }, null, { token: tok }), [400]);
     const same = await api('POST', '/auth/change-password', { currentPassword: 'Pw123456a!', newPassword: 'Pw123456a!' }, null, { token: tok });
@@ -296,7 +296,7 @@ const { invariants } = require('./inv');
     for (const pw of pwList) {
       const nm = 'polusr' + (++n);
       const c = await api('POST', '/users', { username: nm, password: pw, role: 'viewer', mustChangePassword: false }); admin[pw] = c.status;
-      const u2 = await ok('POST', '/users', { username: nm + 'b', password: 'Base12345!', role: 'viewer', mustChangePassword: false });
+      await ok('POST', '/users', { username: nm + 'b', password: 'Base12345!', role: 'viewer', mustChangePassword: false });
       const tok = (await api('POST', '/auth/login', { username: nm + 'b', password: 'Base12345!' }, null)).data.token;
       self[pw] = (await api('POST', '/auth/change-password', { currentPassword: 'Base12345!', newPassword: pw }, null, { token: tok })).status;
     }
@@ -382,7 +382,7 @@ const { invariants } = require('./inv');
     const w = await ok('POST', '/warehouses', { name: 'Test Depo ' + Date.now() });
     const e = await api('PUT', '/warehouses/' + w.id, { name: '' }); info('AD-06b', "PUT name=''", { status: e.status, ad: e.data && e.data.name });
     const t = await api('PUT', '/warehouses/' + w.id, { name: { x: 1 } }); info('AD-06c', 'PUT name=obje', { status: t.status });
-    const it = await ok('POST', '/items', { name: 'depo-stok', warehouseId: w.id, openingQty: 5 });
+    await ok('POST', '/items', { name: 'depo-stok', warehouseId: w.id, openingQty: 5 });
     const d = await api('PUT', '/warehouses/' + w.id, { isActive: false }); info('AD-06d', 'stoklu depoyu pasifleştir', { status: d.status });
     assert(e.status >= 400, 'boş depo adı kabul edildi'); assert(t.status < 500, 'tipsiz gövde 500'); assert(d.status >= 400, 'stoklu depo pasifleştirilebildi');
   });

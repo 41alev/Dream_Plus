@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * KVKK saklama süresi politikası — "ilişkisi sona eren müşteri/tedarikçi
  * verisi N yıl sonra anonimleştirilir" (docs/KVKK-DEGERLENDIRME.md §4.5).

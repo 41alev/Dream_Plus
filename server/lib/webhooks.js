@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Webhook gönderim motoru.
  *
@@ -42,6 +41,7 @@ const EVENT_CATALOG = [
   'production_order.completed', 'ncr.opened', 'opportunity.won'
 ];
 
+/** @param {string} event @param {number|string} [companyId] */
 function activeSubscribersFor(event, companyId = 1) {
   const rows = db.prepare('SELECT * FROM webhooks WHERE is_active = 1 AND company_id = ?').all(companyId);
   return rows.filter(w => {
@@ -89,6 +89,7 @@ async function sendDelivery(webhook, event, data, retryCount = 0, options = {}) 
 }
 
 /** Must be called inside the business transaction for no commit-to-queue gap. */
+/** @param {string} event @param {object} data @param {number|string} [companyId] */
 function dispatchEvent(event, data, companyId = 1) {
   if (!EVENT_CATALOG.includes(event)) throw new Error(`Bilinmeyen webhook olayı / Unknown webhook event: ${event}`);
   const subs = activeSubscribersFor(event, companyId);

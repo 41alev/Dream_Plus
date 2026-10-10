@@ -9,7 +9,7 @@
  *
  *   node test/dates.js
  */
-const { toLocalDateStr, today, isValidLocalDate, addDays, isoWeekday, daysBetween, DAY_MS } = require('../server/lib/dates');
+const { toLocalDateStr, today, isValidLocalDate, addDays, isoWeekday, daysBetween } = require('../server/lib/dates');
 
 let pass = 0, fail = 0;
 const failures = [];

@@ -14,7 +14,7 @@
  *   count, sample[], fixable (otomatik düzeltilebilir mi), fixAction
  */
 const db = require('../db');
-const { AppError, uuid } = require('../lib/core');
+const { AppError } = require('../lib/core');
 const { today, addDays } = require('../lib/dates');
 const stock = require('./stock');
 

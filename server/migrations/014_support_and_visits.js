@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Müşteri destek/talep takibi (ticket) ve saha ziyaret kaydı.
  *

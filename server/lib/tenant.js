@@ -3,10 +3,10 @@
  *
  * Sistem bugün tek bir firma varsayımıyla çalışıyor. Bu modül, gelecekte
  * gerçek çoklu şirket desteği eklenmek istendiğinde tüm sorgu filtrelemesinin
- * TEK bir yerden geçmesini sağlamak için var — bugün HİÇBİR YERDE
- * çağrılmıyor/filtrelemiyor. `req.user.companyId` (bkz. middleware/auth.js)
- * dolduruluyor ama okunmuyor; bu, verinin hazır olduğu, davranışın
- * değişmediği anlamına gelir.
+ * TEK bir yerden geçmesini sağlamak için var. Şirket kimliği bugün webhook
+ * ve muhasebe akışlarında kullanılıyor; bütün iş sorgularını kapsamıyor.
+ * Desteklenen kurulum modeli her müşteri için ayrı veri dizini ve tek firmadır.
+ * Bu yardımcı tek başına çoklu şirket veri izolasyonu sağlamaz.
  */
 const DEFAULT_COMPANY_ID = 1;
 

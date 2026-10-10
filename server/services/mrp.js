@@ -24,8 +24,6 @@ const db = require('../db');
 const { AppError, uuid, nextNumber, getSetting } = require('../lib/core');
 const { toLocalDateStr: dstr, addDays } = require('../lib/dates');
 
-const DAY = 86400000;
-
 /**
  * Reçeteyi açarak her ürünün seviyesini bulur.
  * Seviye 0 = kimsenin bileşeni olmayan (satılan) ürün.

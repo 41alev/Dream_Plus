@@ -1,4 +1,3 @@
-// @ts-nocheck
 const express = require('express');
 const multer = require('multer');
 const db = require('../db');

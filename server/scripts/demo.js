@@ -1,5 +1,4 @@
 #!/usr/bin/env node
-// @ts-nocheck
 /**
  * Hızlı deneme başlatıcı: DEMO_DATA=1'i platform bağımsız şekilde ayarlayıp
  * sunucuyu başlatır. `DEMO_DATA=1 npm start` Unix kabuğuna özgüdür ve

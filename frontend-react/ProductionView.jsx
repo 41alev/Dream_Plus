@@ -8,7 +8,7 @@ import { useEffect, useState, useRef } from 'react';
 const DEFAULT_FILTERS = { page: 1, status: '' };
 
 export default function ProductionView() {
-  const { t, esc, num, dt, card, table, pager, loading, modal, closeModal,
+  const { t, esc, num, dt, table, pager, loading, modal, closeModal,
           field, input, select, val, numVal, intVal, can } = UI;
 
   const [filters, setFilters] = useState(DEFAULT_FILTERS);

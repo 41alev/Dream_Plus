@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Genel muhasebe dışa aktarım köprüsü.
  *

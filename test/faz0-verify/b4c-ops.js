@@ -345,7 +345,7 @@ const { invariants } = require('./inv');
   await check('RP-05', 'pivot: geçersiz veri kaynağı/boyut/ölçü 400 (500 değil); SQL benzeri değerler zararsız; bozuk filtre', async () => {
     const cases = [{ dataSource: 'nope', dimension: 'x', metric: 'y' }, { dataSource: 'movements', dimension: "type; DROP TABLE items;--", metric: 'qty' }, { dataSource: 'movements', dimension: 'type', metric: "1) UNION SELECT password_hash FROM users--" }, { dataSource: '__proto__', dimension: 'constructor', metric: 'toString' }];
     for (const c of cases) { const r = await api('POST', '/reports/pivot', c); info('RP-05a', JSON.stringify(c).slice(0, 70), { status: r.status }); assert(r.status >= 400 && r.status < 500, `${JSON.stringify(c)} → ${r.status}`); }
-    const meta = await ok('GET', '/reports/pivot-meta'); const src = Object.keys(meta.dataSources || meta)[0]; info('RP-05b', 'pivot kaynakları', Object.keys(meta.dataSources || meta));
+    const meta = await ok('GET', '/reports/pivot-meta'); info('RP-05b', 'pivot kaynakları', Object.keys(meta.dataSources || meta));
     assert(db.prepare("SELECT COUNT(*) n FROM sqlite_master WHERE name='items'").get().n === 1);
   });
   await check('RP-06', 'kayıtlı rapor: geçersiz boyut 400; başkasının raporunu operatör silemez; yönetici siler', async () => {

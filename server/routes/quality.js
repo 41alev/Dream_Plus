@@ -1,4 +1,3 @@
-// @ts-nocheck
 const express = require('express');
 const crypto = require('crypto');
 const bcrypt = require('bcryptjs');

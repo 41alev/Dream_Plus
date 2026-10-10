@@ -9,12 +9,10 @@
  */
 const ExcelJS = require('exceljs');
 const db = require('../db');
-const { AppError, uuid, logAudit } = require('../lib/core');
+const { AppError, uuid } = require('../lib/core');
 const { SCHEMAS, HEADERS } = require('./import');
 
 /* ============================ YAZMA ============================ */
-
-const lower = (s) => String(s || '').toLocaleLowerCase('tr');
 
 /** Kod veya barkoda göre ürün bulur — aktarımlarda referans hep kodla verilir. */
 function findItem(code) {

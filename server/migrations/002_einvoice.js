@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * e-Fatura / e-Arşiv / e-İrsaliye desteği.
  *

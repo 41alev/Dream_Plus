@@ -7,7 +7,7 @@
 import { useEffect, useState, useRef } from 'react';
 
 export default function SalesView() {
-  const { t, esc, num, money, cur, dt, ts, table, pager, loading, modal, closeModal,
+  const { t, esc, num, money, cur, dt, table, pager, loading, modal, closeModal,
           field, input, select, textarea, val, numVal, intVal, can } = UI;
 
   const [tab, setTab] = useState('orders');

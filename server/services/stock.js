@@ -70,6 +70,7 @@ function updateAverageCost(itemId, inboundQty, inboundUnitCostBase) {
 }
 
 /** Create (or top up) a lot and record the inbound movement. */
+/** @param {{itemId: string|number, warehouseId: string|number, qty: number, lotNo?: string, serialNo?: string, expiryDate?: string, unitCostBase?: number, status?: string, sourceType?: string, sourceId?: string|number, supplierId?: string|number, note?: string, userId?: string|number}} input */
 function receiveLot({ itemId, warehouseId, qty, lotNo, serialNo, expiryDate, unitCostBase, status = 'available',
                       sourceType, sourceId, supplierId, note, userId }) {
   if (!(qty > 0)) throw new AppError('Miktar sıfırdan büyük olmalı / Quantity must be positive');
@@ -132,6 +133,7 @@ function availableQty(itemId, warehouseId = null) {
 }
 
 /** Consume stock using FEFO. Returns the lots actually consumed (for genealogy). */
+/** @param {{itemId: string|number, qty: number, warehouseId?: string|number, refType?: string, refId?: string|number, note?: string, userId?: string|number, allowPartial?: boolean}} input */
 function issueStock({ itemId, qty, warehouseId, refType, refId, note, userId, allowPartial = false }) {
   if (!Number.isFinite(qty) || qty <= 0) throw new AppError('Geçersiz miktar / Invalid quantity', 422);
   const item = db.prepare('SELECT id, name, unit FROM items WHERE id = ?').get(itemId);
@@ -161,6 +163,7 @@ function issueStock({ itemId, qty, warehouseId, refType, refId, note, userId, al
 }
 
 /** Move a lot (or part of it) between quality statuses: available <-> quarantine/blocked/rejected. */
+/** @param {{lotId: string, toStatus: string, qty?: number, note?: string, userId?: string|number, refType?: string, refId?: string|number}} input */
 function changeLotStatus({ lotId, toStatus, qty, note, userId, refType, refId }) {
   const lot = db.prepare('SELECT * FROM stock_lots WHERE id = ?').get(lotId);
   if (!lot) throw new AppError('Parti bulunamadı / Lot not found', 404);

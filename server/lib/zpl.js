@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * ZPL (Zebra Programming Language) etiket üreticisi.
  *

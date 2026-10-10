@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * KVKK m.7/m.11 — kişisel veri sahibi haklarını (anonimleştirme, saklama
  * süresi sonunda otomatik anonimleştirme) teknik olarak karşılayacak alanlar.

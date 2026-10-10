@@ -94,6 +94,7 @@ module.exports = [
     // public/dist/**: Vite'ın ürettiği, dakikalık minified build çıktısı —
     // kaynak dosya değil, düzenlenmez (bkz. CLAUDE.md §54). Kaynağı
     // frontend-react/**/*.jsx zaten lint ediliyor.
-    ignores: ['node_modules/**', 'data/**', 'public/dist/**', 'public/vendor/**', 'release/**']
+    // Historical audit evidence is immutable; lint maintained application/tests.
+    ignores: ['node_modules/**', 'data/**', 'public/dist/**', 'public/vendor/**', 'release/**', 'docs/**/kanitlar/**']
   }
 ];

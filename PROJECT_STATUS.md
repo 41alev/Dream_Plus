@@ -1,5 +1,25 @@
 # PROJECT_STATUS.md
 
+## 10 Ekim 2026 — engineering v8.3 düzeltmeleri, sürüm 2.0.2
+
+Bağımlılık audit açıkları, lint hataları/uyarıları, cross-browser portu,
+Vite `.env` okuması, build/paketleme yarışı ve WebKit modal odak hatası
+düzeltildi. Sunucu kaynakları/migration/CLI'da `@ts-nocheck` kalmadı.
+Windows geliştirme başlatıcısı taşınabilir hale getirildi. Linux CI'a
+Firefox/WebKit işi eklendi; uzak koşu bu makinede doğrulanamadı.
+
+Final kontroller: build, typecheck, lint (0 uyarı/hata), audit (0 bilinen
+açık), 41/41 test takımı, Chromium 46/46 ve WebKit 46/46 geçti. Ayrı geçici
+müşteri paketinde temiz production bağımlılık kurulumu, ilk setup, giriş,
+health ve tam yedek geri yükleme geçti. Gerçek müşteri verisi kullanılmadı.
+
+Kalan sınırlar: frontend/public JS'de 35 `@ts-nocheck`, strict olmayan ayarlar
+ve gevşek SQL satır tipleri; yerel Firefox SideBySide başlatma engeli;
+Docker/Linux/Node 22 final hedefi ve müşteride saha kabulü doğrulanmadı.
+Bu maddeler kapanmış veya kullanıcı tarafından ertelenmiş sayılmıyor.
+Ayrıntılı bulgu/kanıt eşlemesi:
+[`ENGINEERING-DENETIM-2026-10-10.md`](docs/ENGINEERING-DENETIM-2026-10-10.md).
+
 ## 27 Eylül 2026 — seçilen tasarım iyileştirmeleri 2, 4, 6, 7, 8 ve 9 (Codex)
 
 **Aktif hedef ve kabul ölçütü:** Grafik metinlerini okunur kılmak; KPI durumunu

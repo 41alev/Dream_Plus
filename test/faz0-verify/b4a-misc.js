@@ -3,7 +3,7 @@ const http = require('node:http');
 const crypto = require('node:crypto');
 const fs = require('node:fs');
 const path = require('node:path');
-const { start, api, ok, snap, check, info, statusIn, finish, state } = require('./lib');
+const { start, api, ok, check, info, statusIn, finish, state } = require('./lib');
 /** @type {typeof import('node:assert/strict')} */
 const assert = require('node:assert/strict');
 
@@ -11,7 +11,7 @@ const assert = require('node:assert/strict');
   await start({ WEBHOOK_RETRY_BASE_MS: '50', WEBHOOK_ALLOW_PRIVATE: '1' });
   const db = state.db;
   const whs = db.prepare('SELECT id FROM warehouses ORDER BY id').all().map(w => w.id);
-  const sups = db.prepare('SELECT id FROM suppliers WHERE is_approved=1 ORDER BY id').all().map(s => s.id);
+  db.prepare('SELECT id FROM suppliers WHERE is_approved=1 ORDER BY id').all().map(s => s.id);
 
   // ------------------------------------------------ KVKK
   console.log('\n[KVKK] anonimleştirme kalıntı taraması (tüm tablolar/sütunlar)');
@@ -37,7 +37,7 @@ const assert = require('node:assert/strict');
     await ok('POST', '/support', { customerId: c.id, customerName: T.name, subject: 'Sorun ' + T.name, description: T.person + ' aradı' });
     await ok('POST', '/visits', { customerId: c.id, visitDate: '2026-09-01', notes: T.person + ' ile görüşüldü' });
     const tokens = [T.name, T.person, T.phone, T.email, T.addr, T.tax];
-    const before = scan(tokens);
+    scan(tokens);
     await ok('POST', `/sales/customers/${c.id}/anonymize`, {});
     const after = scan(tokens);
     info('KV-01b', 'anonimleştirme sonrası kimlik kalıntısı olan tablo.sütunlar', after);
@@ -47,7 +47,7 @@ const assert = require('node:assert/strict');
     const T = { name: 'KvkkTedarikciAbc', person: 'Mehmet KvkkT', email: 'kvkk.ted@example.org', bank: 'TR99 0001 KVKKBANK' };
     const s = await ok('POST', '/purchasing/suppliers', { name: T.name, contactPerson: T.person, email: T.email, bankInfo: T.bank, isApproved: true });
     const it = await ok('POST', '/items', { name: 'kvkk-urun2' });
-    const p = await ok('POST', '/purchasing/orders', { supplierId: s.id, warehouseId: whs[0], items: [{ itemId: it.id, qty: 1, price: 1 }] });
+    await ok('POST', '/purchasing/orders', { supplierId: s.id, warehouseId: whs[0], items: [{ itemId: it.id, qty: 1, price: 1 }] });
     const tokens = [T.name, T.person, T.email, T.bank];
     await ok('POST', `/purchasing/suppliers/${s.id}/anonymize`, {});
     const after = scan(tokens); info('KV-02b', 'tedarikçi kalıntıları', after);

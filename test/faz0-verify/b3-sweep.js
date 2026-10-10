@@ -1,7 +1,7 @@
 // Batch 3 — tüm uç noktaların sistematik taraması: kimlik doğrulama, rol matrisi, fuzz (500 / bilgi sızıntısı)
 const fs = require('node:fs');
 const path = require('node:path');
-const { start, api, ok, check, info, finish, state } = require('./lib');
+const { start, api, check, info, finish, state } = require('./lib');
 /** @type {typeof import('node:assert/strict')} */
 const assert = require('node:assert/strict');
 
@@ -100,7 +100,6 @@ const fill = (p, v = '1') => p.replace(/:[A-Za-z]+/g, v);
   ];
   const queries = ['', '?page=-1', '?page=abc&pageSize=abc', "?q='%22;--", '?q=%25&status=%27', '?pageSize=100000', '?from=abc&to=2026-99-99', '?days=abc', '?itemId[]=1&itemId[]=2', '?a=' + 'z'.repeat(20000)];
   const pathVals = ["'", '%00', '../../etc/passwd', '9'.repeat(400), '-1', 'null', 'undefined', '<script>'];
-  const seen = new Set();
   const flag = (tag, r, x) => {
     const body = typeof x.data === 'string' ? x.data : JSON.stringify(x.data || '');
     if (x.status >= 500) results.fivexx.push(`${tag} -> ${x.status}`);

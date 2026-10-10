@@ -71,3 +71,24 @@ jobs:
 
       - name: Audit production dependencies
         run: npm audit --omit=dev
+
+  cross-browser:
+    name: Firefox and WebKit (Linux, node 22)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - run: npx playwright install --with-deps firefox webkit
+      - run: npx playwright test --config=playwright.cross-browser.config.js
+      - name: Upload browser failure evidence
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cross-browser-failures
+          path: test-results/
+          retention-days: 14

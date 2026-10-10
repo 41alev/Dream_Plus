@@ -1,4 +1,3 @@
-// @ts-nocheck
 /** Durable per-subscriber event queue; enqueue in the same transaction as the business change. */
 module.exports = {
   name: 'webhook_outbox',

@@ -1,4 +1,3 @@
-// @ts-nocheck
 /** Per-user notification read state. A global alert remains shared; only its receipt is personal. */
 module.exports = {
   name: 'per-user notification read receipts',

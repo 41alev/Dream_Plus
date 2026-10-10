@@ -1,3 +1,4 @@
+/* exported UI */
 // @ts-nocheck
 const UI = (() => {
   let lang = localStorage.getItem('dt_lang') || 'tr';
@@ -71,7 +72,12 @@ const UI = (() => {
     box.setAttribute('role', 'dialog');
     box.setAttribute('aria-modal', 'true');
     box.setAttribute('aria-labelledby', 'modalTitle');
-    if (!ov.classList.contains('show')) lastFocus = document.activeElement;
+    if (!ov.classList.contains('show')) {
+      // WebKit does not focus a button when it is clicked. Remember the
+      // actual activation target so Escape returns to the opener there too.
+      lastFocus = lastActivation && performance.now() - lastActivation.time < 1500
+        ? lastActivation.element : document.activeElement;
+    }
     box.innerHTML = `
       <div class="modal-head">
         <div><h3 id="modalTitle">${esc(title)}</h3>${sub ? `<div class="sub">${esc(sub)}</div>` : ''}</div>
@@ -95,6 +101,11 @@ const UI = (() => {
   }
   let modalObserver = null;
   let lastFocus = null;
+  let lastActivation = null;
+  document.addEventListener('click', e => {
+    const element = e.target.closest && e.target.closest('button, [href], input, select, textarea, [tabindex]');
+    if (element && !element.closest('#modalOverlay')) lastActivation = { element, time: performance.now() };
+  }, true);
   function closeModal() {
     if (modalObserver) { modalObserver.disconnect(); modalObserver = null; }
     const ov = document.getElementById('modalOverlay');

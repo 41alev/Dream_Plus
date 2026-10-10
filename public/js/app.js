@@ -1,3 +1,4 @@
+/* exported App */
 // @ts-nocheck
 const App = (() => {
   // Ekran paketleri artık ayrı ayrı, isteğe bağlı (lazy) yükleniyor — bkz.

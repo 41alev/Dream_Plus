@@ -1,5 +1,5 @@
 const db = require('../db');
-const { uuid, getSetting } = require('../lib/core');
+const { uuid } = require('../lib/core');
 const { today, addDays } = require('../lib/dates');
 
 let mailer = null;

@@ -39,7 +39,7 @@ const { invariants } = require('./inv');
     statusIn(await api('POST', `/stock/counts/${c.id}/approve`, {}), [409]);
   });
   await check('CNT-03', 'satır doğrulaması: başka sayımın satırı, tekrar, negatif, NaN/metin, sonsuz', async () => {
-    const a = await item(10); const c1 = await ok('POST', '/stock/counts', {}); const c2 = await ok('POST', '/stock/counts', {});
+    await item(10); const c1 = await ok('POST', '/stock/counts', {}); const c2 = await ok('POST', '/stock/counts', {});
     const l1 = countLines(c1.id)[0], l2 = countLines(c2.id)[0];
     const put = lines => api('PUT', `/stock/counts/${c1.id}/lines`, { lines });
     await unchanged(() => put([{ id: l2.id, countedQty: 1 }]), [422]);
@@ -48,7 +48,7 @@ const { invariants } = require('./inv');
     await unchanged(() => api('PUT', '/stock/counts/nope/lines', { lines: [{ id: 1, countedQty: 1 }] }), [404]);
     const accepted = [];
     for (const q of [-1, 'abc', null, '', ' ', false, [], true]) {
-      const before = snap(); const r = await put([{ id: l1.id, countedQty: q }]);
+      snap(); const r = await put([{ id: l1.id, countedQty: q }]);
       const stored = db.prepare('SELECT counted_qty FROM stock_count_lines WHERE id=?').get(l1.id).counted_qty;
       info('CNT-03b', `countedQty=${JSON.stringify(q)}`, { status: r.status, saklanan: stored });
       if (r.status === 200) accepted.push(`${JSON.stringify(q)}→${stored}`);
@@ -70,7 +70,7 @@ const { invariants } = require('./inv');
     assert.equal(lotOf(a.lot.id).qty, 0); assert.equal(lotOf(a.lot.id).status, 'consumed'); assert.equal(cacheOf(a.id), 0);
   });
   await check('CNT-06', 'rol matrisi (kayıt): viewer sayım açamaz/kaydedemez/onaylayamaz', async () => {
-    const a = await item(5); const c = await ok('POST', '/stock/counts', {}); const l = countLines(c.id)[0];
+    await item(5); const c = await ok('POST', '/stock/counts', {}); const l = countLines(c.id)[0];
     const matrix = {};
     for (const who of ['viewer', 'operator', 'quality', 'manager']) {
       matrix[who] = {
@@ -278,12 +278,12 @@ const { invariants } = require('./inv');
     const out = lotOf(r.outputLotId); assert(Math.abs(out.unit_cost - unit) < 1e-6, `birim maliyet ${out.unit_cost} beklenen ${unit}`);
   });
   await check('PR-02', 'yetersiz hammaddede tamamlama 400 ve kısmi tüketim yok', async () => {
-    const { c1, c2, fin } = await mkBom(); await ok('POST', '/stock/move', { itemId: c2.id, type: 'out', qty: 95 });
+    const { c2, fin } = await mkBom(); await ok('POST', '/stock/move', { itemId: c2.id, type: 'out', qty: 95 });
     const po = await ok('POST', '/production', { itemId: fin.id, qty: 10 });
     await unchanged(() => api('POST', `/production/${po.id}/complete`, {}), [400]);
   });
   await check('PR-03', 'iki kez tamamlama reddedilir; eşzamanlı iki tamamlama tek etki', async () => {
-    const { fin, c1 } = await mkBom(); const po = await ok('POST', '/production', { itemId: fin.id, qty: 5 });
+    const { fin } = await mkBom(); const po = await ok('POST', '/production', { itemId: fin.id, qty: 5 });
     const rs = await Promise.all([api('POST', `/production/${po.id}/complete`, {}), api('POST', `/production/${po.id}/complete`, {})]);
     assert.deepEqual(rs.map(r => r.status).sort(), [200, 400]);
     assert.equal(cacheOf(fin.id), 5);
@@ -340,7 +340,7 @@ const { invariants } = require('./inv');
     info('IT-01b', 'silinmiş ürüne: sipariş / stok girişi / üretim', { siparis: so.status, giris: mv.status, uretim: pr.status });
   });
   await check('IT-02', 'reçetede kullanılan ürün silinemez; mükerrer kod/barkod 409', async () => {
-    const comp = await item(0); const fin = await ok('POST', '/items', { name: 'F', itemType: 'finished', bom: [{ componentItemId: comp.id, qtyPerUnit: 1 }] });
+    const comp = await item(0); await ok('POST', '/items', { name: 'F', itemType: 'finished', bom: [{ componentItemId: comp.id, qtyPerUnit: 1 }] });
     const d = await api('DELETE', '/items/' + comp.id); info('IT-02b', 'reçete bileşeni ürünü sil', { status: d.status });
     const c1 = await api('POST', '/items', { name: 'dupA', code: 'DUPCODE', barcode: 'DUPBAR' });
     const c2 = await api('POST', '/items', { name: 'dupB', code: 'DUPCODE', barcode: 'DUPBAR' });

@@ -83,6 +83,7 @@ test.describe('Ürün tasarım sistemi', () => {
 
   test('KPI ve grafikler okunabilir ayrıntılara yönlendirir', async ({ page }) => {
     await login(page);
+    await page.waitForFunction(() => Boolean(Chart.getChart("chStatus")));
     const chartStyle = await page.evaluate(() => {
       const chart = Chart.getChart('chStatus');
       return { size: chart.options.plugins.legend.labels.font.size, color: chart.options.plugins.legend.labels.color };
@@ -112,11 +113,12 @@ test.describe('Ürün tasarım sistemi', () => {
       const table = node.querySelector('table');
       const head = table.querySelector('th:first-child');
       const cell = table.querySelector('td:first-child');
+      const browserWindow = node.ownerDocument.defaultView;
       return {
-        headPosition: getComputedStyle(head).position,
-        headZ: Number(getComputedStyle(head).zIndex),
-        cellPosition: getComputedStyle(cell).position,
-        cellZ: Number(getComputedStyle(cell).zIndex)
+        headPosition: browserWindow.getComputedStyle(head).position,
+        headZ: Number(browserWindow.getComputedStyle(head).zIndex),
+        cellPosition: browserWindow.getComputedStyle(cell).position,
+        cellZ: Number(browserWindow.getComputedStyle(cell).zIndex)
       };
     });
     expect(stickyLayers).toEqual({ headPosition: 'sticky', headZ: 4, cellPosition: 'sticky', cellZ: 2 });

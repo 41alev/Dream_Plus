@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Satış siparişi oluşturma — hem doğrudan (server/routes/sales.js) hem de
  * kazanılmış bir CRM fırsatının dönüştürülmesiyle (server/routes/crm.js)

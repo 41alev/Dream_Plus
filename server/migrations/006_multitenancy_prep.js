@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Çok şirketlilik altyapı hazırlığı — HENÜZ DEVREYE ALINMIYOR.
  *

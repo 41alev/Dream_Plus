@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * CRM / satış hunisi — sipariş oluşmadan ÖNCEKİ süreç. Bir fırsat (opportunity)
  * doğar, aşamalardan geçer (yeni → iletişimde → teklif verildi → kazanıldı/

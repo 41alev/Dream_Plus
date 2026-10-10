@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Invoice settlement (K-05: partial payments allowed).
  *
@@ -68,6 +67,7 @@ function existingByKey(table, invoiceId, requestKey) {
  * Records a customer payment. Omitting `amount` pays the full open amount,
  * which keeps the older one-click "mark paid" contract working.
  */
+/** @returns {{ok: boolean, paymentId?: string, duplicate?: boolean, alreadyPaid?: boolean, status: string, paidAmount: number, creditAmount: number, openAmount: number}} */
 function recordCustomerPayment(req, invoiceId, input = {}) {
   return db.txImmediate(() => {
     const inv = db.prepare('SELECT * FROM customer_invoices WHERE id=?').get(invoiceId);
@@ -158,6 +158,7 @@ function snapshotVatAmount(invoiceId, netAmount) {
   return round2(netAmount * (row.weighted / row.base) / 100);
 }
 
+/** @returns {{ok: boolean, paymentId?: string, duplicate?: boolean, alreadyPaid?: boolean, status: string, grossAmount: number|null, paidAmount: number, openAmount: number|null}} */
 function recordSupplierPayment(req, invoiceId, input = {}) {
   return db.txImmediate(() => {
     const inv = db.prepare('SELECT * FROM supplier_invoices WHERE id=?').get(invoiceId);

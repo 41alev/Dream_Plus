@@ -25,7 +25,7 @@ import { openLabelPrintDialog } from './labelPrint.js';
 const DEFAULT_FILTERS = { page: 1, q: '', category: '', origin: '', warehouseId: '', itemType: '', lowOnly: false };
 
 export default function ItemsView() {
-  const { t, esc, num, card, table, pager, loading, modal, closeModal,
+  const { t, esc, num, table, pager, loading, modal, closeModal,
           field, input, select, textarea, checkbox, val, numVal, intVal, checked, can } = UI;
 
   const [filters, setFilters] = useState(() => ({ ...DEFAULT_FILTERS, ...(App.takeNavigationIntent('items')?.filters || {}) }));

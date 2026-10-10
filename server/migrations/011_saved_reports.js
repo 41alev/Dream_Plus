@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * BI/raporlama derinliği — 9 sabit rapordan sonra kullanıcının KENDİ
  * kesişimini kurabilmesi (rakip ERP'lerin "esnek rapor" özelliğine karşılık).

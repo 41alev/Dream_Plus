@@ -1,7 +1,6 @@
-// @ts-nocheck
 const jwt = require('jsonwebtoken');
 const db = require('../db');
-const { AppError } = require('../lib/core');
+
 
 const JWT_SECRET = process.env.JWT_SECRET || 'depo-takip-dev-secret-change-me';
 const TOKEN_TTL_HOURS = Number(process.env.TOKEN_TTL_HOURS || 12);

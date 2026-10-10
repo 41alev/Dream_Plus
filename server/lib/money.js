@@ -1,9 +1,9 @@
-// @ts-nocheck
 /**
  * Posted monetary totals are stored as integer minor units (kuruş/cents).
  * Rates and quantities may have more precision, but every ledger amount crosses
  * this boundary exactly once using half-away-from-zero rounding.
  */
+/** @param {number|string} value @returns {{negative: boolean, digits: bigint, scale: number}} */
 function decimalParts(value) {
   if (typeof value !== 'number' && typeof value !== 'string') throw new TypeError('Money value must be a number or decimal string');
   const text = String(value).trim();
@@ -15,8 +15,10 @@ function decimalParts(value) {
   return { negative, digits: BigInt((match[2] + fraction).replace(/^0+(?=\d)/, '')), scale: fraction.length - exponent };
 }
 
+/** @param {{negative: boolean, digits: bigint, scale: number}} parts @param {number} targetScale @returns {bigint} */
 function roundedInteger({ negative, digits, scale }, targetScale) {
   const shift = targetScale - scale;
+  /** @type {bigint} */
   let result;
   if (shift >= 0) {
     result = digits * (10n ** BigInt(shift));
@@ -29,22 +31,27 @@ function roundedInteger({ negative, digits, scale }, targetScale) {
   return negative ? -result : result;
 }
 
+/** @param {bigint} integer @param {string} label @returns {number} */
 function safeNumber(integer, label) {
   const number = Number(integer);
   if (!Number.isSafeInteger(number)) throw new RangeError(`${label} exceeds safe integer range`);
   return number;
 }
 
+/** @param {number|string} value @returns {number} */
 function toMinor(value) {
   return safeNumber(roundedInteger(decimalParts(value), 2), 'Money amount');
 }
 
+/** @param {number} value @returns {number} */
 function fromMinor(value) {
   if (!Number.isSafeInteger(value)) throw new TypeError('Minor amount must be a safe integer');
   return value / 100;
 }
 
-/** Convert an amount in minor units through a decimal FX/rate, returning minor units. */
+/** Convert an amount in minor units through a decimal FX/rate, returning minor units.
+ * @param {number} minor @param {number|string} rate @returns {number}
+ */
 function multiplyMinor(minor, rate) {
   if (!Number.isSafeInteger(minor)) throw new TypeError('Minor amount must be a safe integer');
   const parsed = decimalParts(rate);
