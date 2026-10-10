@@ -129,4 +129,3 @@ async function main() {
   console.log('PASS real dataset: over 300 items and over 100 lots remain searchable');
 }
 main().catch(error => { console.error(error); process.exitCode = 1; }).finally(() => db.close());
-
