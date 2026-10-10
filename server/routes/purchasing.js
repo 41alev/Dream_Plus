@@ -1248,6 +1248,7 @@ router.post('/returns', requirePermission('purchase.write'), validate(returnSche
       stock.consume([{ lotId: lot.id, qty: b.qty }], {
         itemId: lot.item_id, itemName, warehouseId: lot.warehouse_id,
         allowedStatuses: ['available', 'quarantine', 'blocked', 'rejected'],
+        allowExpired: true,
         refType: 'supplier_return', refId: retId, note: `Tedarikçi iadesi ${no}`, userId: req.user.id
       });
 

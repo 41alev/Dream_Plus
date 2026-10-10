@@ -257,7 +257,10 @@ export default function SalesView() {
     document.getElementById('shNew')?.addEventListener('click', () => shipmentForm(null));
     body.querySelectorAll('[data-open]').forEach(b => b.onclick = () => openShipment(b.dataset.open));
     body.querySelectorAll('[data-adv]').forEach(b => b.onclick = async () => {
-      try { await Api.advanceShipment(b.dataset.adv); UI.ok(t('saved')); reload(); } catch (e) { UI.err(e); }
+      if (b.disabled) return;
+      b.disabled = true;
+      try { await Api.advanceShipment(b.dataset.adv, rows.find(r => r.id === b.dataset.adv).status); UI.ok(t('saved')); reload(); }
+      catch (e) { UI.err(e); b.disabled = false; }
     });
     body.querySelectorAll('[data-print]').forEach(b => b.onclick = async () => printPackingList(await Api.shipment(b.dataset.print)));
     body.querySelectorAll('[data-del]').forEach(b => b.onclick = () => UI.confirmDialog(UI.getLang() === 'tr' ? 'Sevkiyat iptal edilip stok geri alınacak. Belge geçmişi korunacak. Devam edilsin mi?' : 'Cancel this shipment and restore stock while preserving its history?', async () => {

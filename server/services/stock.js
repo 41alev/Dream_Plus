@@ -106,8 +106,8 @@ function receiveLot({ itemId, warehouseId, qty, lotNo, serialNo, expiryDate, uni
  * quarantined or blocked stock can never be silently consumed.
  */
 function pickLotsFEFO(itemId, qty, warehouseId = null) {
-  const params = [itemId];
-  let where = `item_id = ? AND status = 'available' AND qty > 0`;
+  const params = [itemId, today()];
+  let where = `item_id = ? AND status = 'available' AND qty > 0 AND (expiry_date IS NULL OR expiry_date >= ?)`;
   if (warehouseId) { where += ' AND warehouse_id = ?'; params.push(warehouseId); }
   const lots = db.prepare(
     `SELECT * FROM stock_lots WHERE ${where}
@@ -126,8 +126,8 @@ function pickLotsFEFO(itemId, qty, warehouseId = null) {
 }
 
 function availableQty(itemId, warehouseId = null) {
-  const params = [itemId];
-  let where = `item_id = ? AND status = 'available'`;
+  const params = [itemId, today()];
+  let where = `item_id = ? AND status = 'available' AND (expiry_date IS NULL OR expiry_date >= ?)`;
   if (warehouseId) { where += ' AND warehouse_id = ?'; params.push(warehouseId); }
   return db.prepare(`SELECT COALESCE(SUM(qty),0) q FROM stock_lots WHERE ${where}`).get(...params).q;
 }
@@ -171,7 +171,8 @@ function changeLotStatus({ lotId, toStatus, qty, note, userId, refType, refId })
     throw new AppError('Geçersiz durum / Invalid status');
   }
   const moveQty = qty != null ? Number(qty) : lot.qty;
-  if (moveQty <= 0 || moveQty > lot.qty + 1e-9) throw new AppError('Geçersiz miktar / Invalid quantity');
+  if (!Number.isFinite(moveQty) || moveQty <= 0 || moveQty > lot.qty + 1e-9) throw new AppError('Geçersiz miktar / Invalid quantity');
+  if (toStatus === lot.status) return lotId;
 
   const item = db.prepare('SELECT name FROM items WHERE id = ?').get(lot.item_id);
 
@@ -198,6 +199,12 @@ function changeLotStatus({ lotId, toStatus, qty, note, userId, refType, refId })
   });
 
   recalcItemQty(lot.item_id);
+  if (toStatus === 'available' && lot.status !== 'available') {
+    // The lot is already available: updateAverageCost subtracts moveQty to obtain the prior quantity.
+    updateAverageCost(lot.item_id, moveQty, lot.unit_cost);
+  } else if (lot.status === 'available' && toStatus !== 'available') {
+    recalcAverageCost(lot.item_id);
+  }
   return targetLotId;
 }
 
@@ -284,7 +291,9 @@ function allocate(itemId, qty, warehouseId = null, strategy = 'FEFO') {
 }
 
 /** Consume lots already picked by allocate() or chosen explicitly by the caller. */
-function consume(picks, { itemId, itemName, note, refType, refId, userId, warehouseId = null, allowedStatuses = ['available'] }) {
+/** @param {{lotId: string, qty: number}[]} picks
+ * @param {{itemId: string|number, itemName?: string, note?: string, refType?: string, refId?: string|number, userId?: string|number, warehouseId?: string|number, allowedStatuses?: string[], allowExpired?: boolean}} options */
+function consume(picks, { itemId, itemName, note, refType, refId, userId, warehouseId = null, allowedStatuses = ['available'], allowExpired = false }) {
   return db.txImmediate(() => {
   for (const p of picks) {
     const lot = db.prepare('SELECT * FROM stock_lots WHERE id = ?').get(p.lotId);
@@ -292,6 +301,7 @@ function consume(picks, { itemId, itemName, note, refType, refId, userId, wareho
     if (lot.item_id !== itemId) throw new AppError('Ürün ile lot eşleşmiyor / Lot does not belong to item', 422);
     if (warehouseId != null && Number(warehouseId) !== lot.warehouse_id) throw new AppError('Lot seçilen depoda değil / Lot warehouse mismatch', 422);
     if (!allowedStatuses.includes(lot.status)) throw new AppError('Lot bu işlem için uygun değil / Lot status is not eligible', 409);
+    if (!allowExpired && lot.expiry_date && lot.expiry_date < today()) throw new AppError('Partinin son kullanma tarihi geçmiş / Lot has expired', 409);
     if (!Number.isFinite(p.qty) || p.qty <= 0 || p.qty > lot.qty + 1e-9) throw new AppError('Geçersiz veya yetersiz miktar / Invalid or insufficient quantity', 422);
     const newQty = lot.qty - p.qty;
     db.prepare('UPDATE stock_lots SET qty = ?, status = CASE WHEN ? <= 0 THEN ? ELSE status END WHERE id = ?')

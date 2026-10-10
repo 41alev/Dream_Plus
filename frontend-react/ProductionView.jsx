@@ -13,6 +13,7 @@ export default function ProductionView() {
 
   const [filters, setFilters] = useState(DEFAULT_FILTERS);
   const [phase, setPhase] = useState({ status: 'loading', res: null, error: null });
+  const hostRef = useRef(null);
   const itemsRef = useRef([]);
   const warehousesRef = useRef([]);
   const settingsRef = useRef({});
@@ -24,17 +25,21 @@ export default function ProductionView() {
     let cancelled = false;
     (async () => {
       if (firstLoadRef.current) {
-        firstLoadRef.current = false;
         try {
           const [it, wh, st] = await Promise.all([
             Api.items({ pageSize: 300 }), Api.warehouses(), Api.publicSettings().catch(() => ({}))
           ]);
+          if (cancelled) return;
           itemsRef.current = it.data; warehousesRef.current = wh; settingsRef.current = st;
-        } catch (e) { UI.err(e); }
+          firstLoadRef.current = false;
+        } catch (e) {
+          if (!cancelled) setPhase({ status: 'error', res: null, error: e });
+          return;
+        }
       }
       if (cancelled) return;
       let res;
-      try { res = await Api.production({ ...filters, pageSize: 25 }); } catch (e) { UI.errorState(null, e, typeof reload === 'function' ? reload : null); return; }
+      try { res = await Api.production({ ...filters, pageSize: 25 }); } catch (e) { if (!cancelled) setPhase({ status: 'error', res: null, error: e }); return; }
       if (cancelled) return;
       setPhase({ status: 'ready', res, error: null });
     })();
@@ -45,9 +50,9 @@ export default function ProductionView() {
     if (phase.status !== 'ready') return;
     document.getElementById('pStatus').onchange = e => setFilters(f => ({ ...f, status: e.target.value, page: 1 }));
     document.getElementById('pNew')?.addEventListener('click', () => newProd());
-    document.querySelectorAll('[data-open]').forEach(b => b.onclick = () => openProd(b.dataset.open));
-    document.querySelectorAll('[data-complete]').forEach(b => b.onclick = () => completeDialog(b.dataset.complete));
-    document.querySelectorAll('[data-del]').forEach(b => b.onclick = () => {
+    hostRef.current.querySelectorAll('[data-open]').forEach(b => b.onclick = () => openProd(b.dataset.open));
+    hostRef.current.querySelectorAll('[data-complete]').forEach(b => b.onclick = () => completeDialog(b.dataset.complete));
+    hostRef.current.querySelectorAll('[data-del]').forEach(b => b.onclick = () => {
       UI.confirmDialog(t('confirmDelete'), async () => {
         try { await Api.deleteProduction(b.dataset.del); UI.ok(t('deleted')); reload(); } catch (e) { UI.err(e); }
       }, { danger: true, confirmLabel: t('del') });
@@ -207,8 +212,14 @@ export default function ProductionView() {
     });
   }
 
+  if (phase.status === 'error') {
+    return <div ref={hostRef} role="alert" className="empty">{phase.error.message}
+      <button className="btn btn-primary" onClick={reload}>{t('retry')}</button>
+    </div>;
+  }
+
   if (phase.status === 'loading') {
-    return <div dangerouslySetInnerHTML={{ __html: loading() }} />;
+    return <div ref={hostRef} dangerouslySetInnerHTML={{ __html: loading() }} />;
   }
 
   const { res } = phase;
@@ -250,5 +261,5 @@ export default function ProductionView() {
       ${res.totalPages ? pager(res, p => setFilters(f => ({ ...f, page: p }))) : ''}
     </div>`;
 
-  return <div dangerouslySetInnerHTML={{ __html: html }} />;
+  return <div ref={hostRef} dangerouslySetInnerHTML={{ __html: html }} />;
 }

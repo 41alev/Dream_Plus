@@ -150,6 +150,8 @@ const App = (() => {
   /* ---------- session ---------- */
   function showLogin() {
     closeMobileNav();
+    UI.closeModal();
+    document.getElementById('modalBox').replaceChildren();
     document.getElementById('loginScreen').style.display = 'flex';
     document.getElementById('appShell').style.display = 'none';
   }

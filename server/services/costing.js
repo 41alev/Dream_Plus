@@ -98,7 +98,7 @@ function computeProductionCost(productionOrderId) {
   const labor = Number(po.labor_cost || 0);
   const overhead = Number(po.overhead_cost || 0);
   const total = materialCost + labor + overhead;
-  const goodQty = Number(po.produced_qty || po.qty || 0);
+  const goodQty = Number(po.produced_qty ?? po.qty ?? 0);
   const unitCost = goodQty > 0 ? total / goodQty : 0;
 
   db.prepare('UPDATE production_orders SET material_cost = ?, total_cost = ?, unit_cost = ? WHERE id = ?')

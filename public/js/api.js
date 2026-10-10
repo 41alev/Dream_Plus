@@ -18,35 +18,40 @@ const Api = (() => {
     if (tok) headers.Authorization = 'Bearer ' + tok;
     const write = method !== 'GET';
     if (write) pendingWrites++;
-    let res;
     try {
-      res = await fetch('/api' + path, {
-        method, headers,
-        body: body === undefined ? undefined : (isForm ? body : JSON.stringify(body))
-      });
-    } catch (networkError) {
-      const err = new Error('Sunucuya ulaşılamadı; bağlantıyı kontrol edip tekrar deneyin / Server unreachable, check the connection and retry');
-      err.network = true;
-      err.cause = networkError;
-      throw err;
+      let res;
+      try {
+        res = await fetch('/api' + path, {
+          method, headers,
+          body: body === undefined ? undefined : (isForm ? body : JSON.stringify(body))
+        });
+      } catch (networkError) {
+        const err = new Error('Sunucuya ulaşılamadı; bağlantıyı kontrol edip tekrar deneyin / Server unreachable, check the connection and retry');
+        err.network = true;
+        err.cause = networkError;
+        throw err;
+      }
+      if (res.status === 401) {
+        clearSession();
+        window.dispatchEvent(new CustomEvent('session-expired'));
+        throw new Error('Unauthorized');
+      }
+      if (res.status === 204) return null;
+      let data = null;
+      try { data = await res.json(); } catch {}
+      if (!res.ok) {
+        const err = new Error((data && data.error) || `HTTP ${res.status}`);
+        err.status = res.status;
+        err.payload = data;
+        throw err;
+      }
+      if (data && typeof data === 'object' && res.headers.get('ETag')) {
+        Object.defineProperty(data, 'revision', { value: res.headers.get('ETag') });
+      }
+      return data;
     } finally {
       if (write) pendingWrites--;
     }
-    if (res.status === 401) {
-      clearSession();
-      window.dispatchEvent(new CustomEvent('session-expired'));
-      throw new Error('Unauthorized');
-    }
-    if (res.status === 204) return null;
-    let data = null;
-    try { data = await res.json(); } catch {}
-    if (!res.ok) {
-      const err = new Error((data && data.error) || `HTTP ${res.status}`);
-      err.status = res.status;
-      err.payload = data;
-      throw err;
-    }
-    return data;
   }
 
   const qs = (o = {}) => {
@@ -175,7 +180,7 @@ const Api = (() => {
     shipments: (p) => req('GET', '/sales/shipments' + qs(p)),
     shipment: (id) => req('GET', '/sales/shipments/' + id),
     createShipment: (d) => req('POST', '/sales/shipments', d),
-    advanceShipment: (id) => req('PATCH', `/sales/shipments/${id}/status`),
+    advanceShipment: (id, expectedStatus) => req('PATCH', `/sales/shipments/${id}/status`, { expectedStatus }),
     deleteShipment: (id) => req('DELETE', '/sales/shipments/' + id),
     customerInvoices: (p) => req('GET', '/sales/invoices' + qs(p)),
     customerInvoice: (id) => req('GET', '/sales/invoices/' + id),
@@ -278,7 +283,7 @@ const Api = (() => {
     createCalendarException: (d) => req('POST', '/planning/calendar-exceptions', d),
     deleteCalendarException: (id) => req('DELETE', '/planning/calendar-exceptions/' + id),
     routings: (itemId) => req('GET', '/planning/routings/' + itemId),
-    saveRouting: (itemId, operations) => req('PUT', '/planning/routings/' + itemId, { operations }),
+    saveRouting: (itemId, operations, expectedRevision, clear = false) => req('PUT', '/planning/routings/' + itemId, { operations, expectedRevision, clear }),
     capacity: (p) => req('GET', '/planning/capacity' + qs(p)),
     scheduleOrder: (orderId, d) => req('POST', '/planning/schedule/' + orderId, d || {}),
     operations: (p) => req('GET', '/planning/operations' + qs(p)),

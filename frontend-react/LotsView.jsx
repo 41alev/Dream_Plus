@@ -138,6 +138,7 @@ export default function LotsView() {
 
   const [filters, setFilters] = useState(() => ({ ...DEFAULT_FILTERS, ...(App.takeNavigationIntent('lots')?.filters || {}) }));
   const [phase, setPhase] = useState({ status: 'loading', res: null, error: null });
+  const hostRef = useRef(null);
   const warehousesRef = useRef([]);
   const firstLoadRef = useRef(true);
 
@@ -145,12 +146,17 @@ export default function LotsView() {
     let cancelled = false;
     (async () => {
       if (firstLoadRef.current) {
-        firstLoadRef.current = false;
-        try { warehousesRef.current = await Api.warehouses(); } catch { warehousesRef.current = []; }
+        try {
+          warehousesRef.current = await Api.warehouses();
+          firstLoadRef.current = false;
+        } catch (error) {
+          if (!cancelled) setPhase({ status: 'error', res: null, error });
+          return;
+        }
       }
       if (cancelled) return;
       let res;
-      try { res = await Api.lots({ ...filters, pageSize: 25 }); } catch (e) { UI.errorState(null, e, typeof reload === 'function' ? reload : null); return; }
+      try { res = await Api.lots({ ...filters, pageSize: 25 }); } catch (e) { if (!cancelled) setPhase({ status: 'error', res: null, error: e }); return; }
       if (cancelled) return;
       setPhase({ status: 'ready', res, error: null });
     })();
@@ -169,10 +175,10 @@ export default function LotsView() {
       [t('itemName'), t('lotNo'), t('warehouse'), t('qty'), t('unit'), t('status'), t('expiryDate'), t('unitCost')],
       res.data.map(r => [r.itemName, r.lotNo, r.warehouse, r.qty, r.unit, r.status, r.expiryDate, r.unitCost]));
 
-    document.querySelectorAll('[data-trace]').forEach(b => b.onclick = () => traceDialog(b.dataset.trace));
-    document.querySelectorAll('[data-status]').forEach(b => b.onclick = () => statusDialog(res.data.find(x => x.id === b.dataset.status)));
-    document.querySelectorAll('[data-transfer]').forEach(b => b.onclick = () => transferDialog(res.data.find(x => x.id === b.dataset.transfer)));
-    document.querySelectorAll('[data-label]').forEach(b => b.onclick = () => {
+    hostRef.current.querySelectorAll('[data-trace]').forEach(b => b.onclick = () => traceDialog(b.dataset.trace));
+    hostRef.current.querySelectorAll('[data-status]').forEach(b => b.onclick = () => statusDialog(res.data.find(x => x.id === b.dataset.status)));
+    hostRef.current.querySelectorAll('[data-transfer]').forEach(b => b.onclick = () => transferDialog(res.data.find(x => x.id === b.dataset.transfer)));
+    hostRef.current.querySelectorAll('[data-label]').forEach(b => b.onclick = () => {
       const lot = res.data.find(x => x.id === b.dataset.label);
       openLabelPrintDialog('lot', lot.id, `${lot.itemName} · ${lot.lotNo || '—'}`);
     });
@@ -224,8 +230,14 @@ export default function LotsView() {
     });
   }
 
+  if (phase.status === 'error') {
+    return <div ref={hostRef} role="alert" className="empty">{phase.error.message}
+      <button className="btn btn-primary" onClick={reload}>{t('retry')}</button>
+    </div>;
+  }
+
   if (phase.status === 'loading') {
-    return <div dangerouslySetInnerHTML={{ __html: loading() }} />;
+    return <div ref={hostRef} dangerouslySetInnerHTML={{ __html: loading() }} />;
   }
 
   const { res } = phase;
@@ -276,5 +288,5 @@ export default function LotsView() {
       ${pager(res, p => setFilters(f => ({ ...f, page: p })))}
     </div>`;
 
-  return <div dangerouslySetInnerHTML={{ __html: html }} />;
+  return <div ref={hostRef} dangerouslySetInnerHTML={{ __html: html }} />;
 }

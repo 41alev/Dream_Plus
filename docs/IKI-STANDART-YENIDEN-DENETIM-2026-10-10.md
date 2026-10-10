@@ -1,5 +1,9 @@
 # engineering.md + ORTAK_AI.md yeniden denetimi — 10 Ekim 2026
 
+> Bu belgedeki FAIL sonuçları eski kaynak sürümünün tarihsel kanıtıdır.
+> 2.0.3 düzeltmeleri ve yeniden doğrulama durumu:
+> [Düzeltmeler ve yeniden tarama](DUZELTMELER-VE-YENIDEN-TARAMA-2026-10-10.md).
+
 ## Sonuç ve kapsam
 
 Kaynak: `8ff6e2a981600a03bb27306eceb49ed75d6615a8`, sürüm 2.0.2.

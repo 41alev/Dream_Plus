@@ -543,6 +543,18 @@ yönetici Bildirimler panelinden test e-postası gönderebilir.
 
 ## Yardım
 
+### 2.0.3 işlem korumaları
+
+Rota yüklenemediğinde tekrar deneyin; yükleme tamamlanmadan rota kaydedilemez.
+Son operasyonu kaldırıp kaydederken rotanın silinmesi ayrıca onay ister.
+Başka bir kullanıcı rotayı değiştirdiyse güncel rotayı yeniden yükleyin.
+Aktif sevkiyatı olan sipariş iptal edilemez; gerekiyorsa önce izin verilen
+sevkiyat iptal/iade sürecini tamamlayın. Son kullanma tarihi geçmiş stok,
+normal sevk ve üretimde kullanılamaz; ürün kartı fiziksel ve kullanılabilir
+miktar farkını gösterir. Ürün ve parti seçicilerindeki arama kutusuyla ilk
+listede görünmeyen kayıtları bulun. Oturum bitince açık formlar kapanır;
+yeniden giriş yaptıktan sonra işlemi yeniden açın.
+
 Bu kılavuzda cevabını bulamadığınız bir durumda önce **denetim kaydına** bakın: bir kaydın ne
 zaman, kim tarafından, hangi değerden hangi değere değiştirildiğini orada görebilirsiniz.
 Çoğu "bu neden böyle oldu" sorusunun cevabı oradadır.

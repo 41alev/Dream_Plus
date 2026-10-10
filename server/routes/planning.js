@@ -1,4 +1,5 @@
 const express = require('express');
+const { createHash } = require('node:crypto');
 const db = require('../db');
 const { requireAuth, requireRole } = require('../middleware/auth');
 const { validate, validatePartial, z, localDate, optionalDate } = require('../middleware/validate');
@@ -202,7 +203,13 @@ router.delete('/calendar-exceptions/:id', MANAGER, (req, res) => {
 
 /* ============================ ROTALAR ============================ */
 
+function routingRevision(itemId) {
+  const rows = db.prepare('SELECT * FROM routings WHERE item_id=? ORDER BY operation_no').all(itemId);
+  return '"' + createHash('sha256').update(JSON.stringify(rows)).digest('hex') + '"';
+}
+
 router.get('/routings/:itemId', (req, res) => {
+  res.set('ETag', routingRevision(req.params.itemId));
   const rows = db.prepare(`SELECT r.*, wc.name AS work_center_name, wc.code AS work_center_code
     FROM routings r JOIN work_centers wc ON wc.id = r.work_center_id
     WHERE r.item_id = ? ORDER BY r.operation_no`).all(req.params.itemId);
@@ -216,6 +223,8 @@ router.get('/routings/:itemId', (req, res) => {
 
 /** Rotanın tamamı tek seferde yazılır: yarım rota planlamayı bozar. */
 router.put('/routings/:itemId', MANAGER, validate(z.object({
+  expectedRevision: z.string().max(100).optional(),
+  clear: z.boolean().default(false),
   operations: z.array(z.object({
     operationNo: z.coerce.number().int().min(1),
     operationName: z.string().min(1).max(200),
@@ -235,7 +244,9 @@ router.put('/routings/:itemId', MANAGER, validate(z.object({
   if (new Set(nos).size !== nos.length) throw new AppError('Operasyon numaraları tekrarlanamaz / Duplicate operation numbers', 400);
   req.valid.operations.forEach(o => activeWorkCenter(o.workCenterId));
 
-  db.tx(() => {
+  db.txImmediate(() => {
+    if (req.valid.expectedRevision != null && req.valid.expectedRevision.replace(/^W\//, '') !== routingRevision(itemId)) throw new AppError('Rota değişmiş; yeniden yükleyin / Routing changed; reload before saving', 409);
+    if (!req.valid.operations.length && !req.valid.clear) throw new AppError('Rotayı silmek için açık onay gerekli / Explicit confirmation required to clear routing', 422);
     db.prepare('DELETE FROM routings WHERE item_id = ?').run(itemId);
     const ins = db.prepare(`INSERT INTO routings (item_id,operation_no,operation_name,work_center_id,
       setup_minutes,run_minutes_per_unit,queue_minutes,scrap_pct,notes) VALUES (?,?,?,?,?,?,?,?,?)`);

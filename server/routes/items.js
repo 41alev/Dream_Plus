@@ -19,6 +19,7 @@ function serializeItem(row, { withBom = true, withLots = false } = {}) {
     itemType: row.item_type, origin: row.origin, warehouseId: row.default_warehouse_id,
     warehouse: row.warehouse_name || null, location: row.location, unit: row.unit,
     qty: row.qty_cache, minStock: row.min_stock, reorderQty: row.reorder_qty,
+    usableQty: stock.availableQty(row.id),
     costingMethod: row.costing_method, avgCost: row.avg_cost, standardCost: row.standard_cost,
     salePrice: row.sale_price, saleCurrency: row.sale_currency,
     isLotTracked: !!row.is_lot_tracked, isSerialTracked: !!row.is_serial_tracked,

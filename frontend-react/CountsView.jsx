@@ -17,6 +17,7 @@ export default function CountsView() {
 
   const [reloadToken, setReloadToken] = useState(0);
   const [phase, setPhase] = useState({ status: 'loading', res: null, error: null });
+  const hostRef = useRef(null);
   const warehousesRef = useRef([]);
   const firstLoadRef = useRef(true);
   // T08: each list keeps its own page; the pager used to always reload page 1.
@@ -28,12 +29,17 @@ export default function CountsView() {
     let cancelled = false;
     (async () => {
       if (firstLoadRef.current) {
-        firstLoadRef.current = false;
-        try { warehousesRef.current = await Api.warehouses(); } catch { warehousesRef.current = []; }
+        try {
+          warehousesRef.current = await Api.warehouses();
+          firstLoadRef.current = false;
+        } catch (error) {
+          if (!cancelled) setPhase({ status: 'error', res: null, error });
+          return;
+        }
       }
       if (cancelled) return;
       let res;
-      try { res = await Api.counts({ page: pagesRef.current.counts || 1, pageSize: 25 }); } catch (e) { UI.errorState(null, e, typeof reload === 'function' ? reload : null); return; }
+      try { res = await Api.counts({ page: pagesRef.current.counts || 1, pageSize: 25 }); } catch (e) { if (!cancelled) setPhase({ status: 'error', res: null, error: e }); return; }
       if (cancelled) return;
       setPhase({ status: 'ready', res, error: null });
     })();
@@ -43,7 +49,7 @@ export default function CountsView() {
   useEffect(() => {
     if (phase.status !== 'ready') return;
     document.getElementById('cNew')?.addEventListener('click', () => newCount());
-    document.querySelectorAll('[data-open]').forEach(b => b.onclick = () => openCount(b.dataset.open));
+    hostRef.current.querySelectorAll('[data-open]').forEach(b => b.onclick = () => openCount(b.dataset.open));
   }, [phase]);
 
   const statusBadge = (s) => {
@@ -162,8 +168,14 @@ export default function CountsView() {
     return `<span style="color:${d < 0 ? 'var(--danger)' : 'var(--accent)'}">${d > 0 ? '+' : ''}${num(d)}</span>`;
   };
 
+  if (phase.status === 'error') {
+    return <div ref={hostRef} role="alert" className="empty">{phase.error.message}
+      <button className="btn btn-primary" onClick={reload}>{t('retry')}</button>
+    </div>;
+  }
+
   if (phase.status === 'loading') {
-    return <div dangerouslySetInnerHTML={{ __html: loading() }} />;
+    return <div ref={hostRef} dangerouslySetInnerHTML={{ __html: loading() }} />;
   }
 
   const { res } = phase;
@@ -187,5 +199,5 @@ export default function CountsView() {
       ${pager(res, p => { pagesRef.current.counts = p; reload(); })}
     </div>`;
 
-  return <div dangerouslySetInnerHTML={{ __html: html }} />;
+  return <div ref={hostRef} dangerouslySetInnerHTML={{ __html: html }} />;
 }

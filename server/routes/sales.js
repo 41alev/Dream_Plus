@@ -161,11 +161,14 @@ router.post('/orders', WRITE, validate(soSchema), (req, res) => {
 });
 
 router.post('/orders/:id/cancel', ADMIN, (req, res) => {
+  db.txImmediate(() => {
   const so = db.prepare('SELECT * FROM sales_orders WHERE id = ?').get(req.params.id);
   if (!so) throw new AppError('Sipariş bulunamadı / Order not found', 404);
-  if (so.status === 'shipped' || so.status === 'invoiced') throw new AppError('Sevk edilmiş sipariş iptal edilemez / Cannot cancel a shipped order');
+  const shipment = db.prepare("SELECT id FROM shipments WHERE so_id=? AND status!='İptal Edildi' AND cancelled_at IS NULL LIMIT 1").get(so.id);
+  if (shipment || ['partially_shipped', 'shipped', 'invoiced'].includes(so.status)) throw new AppError('Sevk edilmiş sipariş iptal edilemez / Cannot cancel a shipped order', 409);
   db.prepare("UPDATE sales_orders SET status = 'cancelled' WHERE id = ?").run(so.id);
   logAudit(req, 'auditSalesOrderCancel', { entityType: 'sales_order', entityId: so.id, detail: so.so_no });
+  });
   res.json({ ok: true });
 });
 
@@ -309,6 +312,7 @@ router.patch('/shipments/:id/status', WRITE, (req, res) => {
   const serialized = db.txImmediate(() => {
   const s = db.prepare('SELECT * FROM shipments WHERE id = ?').get(req.params.id);
   if (!s) throw new AppError('Sevkiyat bulunamadı / Shipment not found', 404);
+  if (req.body?.expectedStatus != null && req.body.expectedStatus !== s.status) throw new AppError('Sevkiyat durumu değişmiş; listeyi yenileyin / Shipment status changed; reload the list', 409);
   const order = ['Hazırlanıyor', 'Yolda', 'Teslim Edildi'];
   if (!order.includes(s.status)) throw new AppError('Sevkiyat durumu ilerletilemez / Shipment status cannot advance', 409);
   const next = order[Math.min(order.indexOf(s.status) + 1, order.length - 1)];

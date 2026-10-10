@@ -60,22 +60,25 @@ export default function PlanningView() {
 
   useEffect(() => {
     if (!ready) return;
+    let cancelled = false;
     const body = document.getElementById('planBody');
     const actions = document.getElementById('planActions');
     if (!body || !actions) return;
     const fns = { mrp: mrpTab, capacity: capacityTab, workcenters: wcTab, routings: routingTab, shifts: shiftTab };
     (async () => {
-      try { await fns[tab](body, actions); }
-      catch (e) { UI.errorState(body, e, reload); }
+      try { await fns[tab](body, actions, () => !cancelled); }
+      catch (e) { if (!cancelled) UI.errorState(body, e, reload); }
     })();
+    return () => { cancelled = true; };
   }, [ready, tab, reloadToken]);
 
   /* ================= MRP ================= */
-  async function mrpTab(body, actions) {
+  async function mrpTab(body, actions, isCurrent) {
     const [runs, sugg] = await Promise.all([
-      Api.mrpRuns().catch(() => []),
-      Api.mrpSuggestions({ status: 'open' }).catch(() => ({ data: [] }))
+      Api.mrpRuns(),
+      Api.mrpSuggestions({ status: 'open' })
     ]);
+    if (!isCurrent()) return;
     const latest = runs[0];
 
     if (can('approve')) {
@@ -188,9 +191,10 @@ export default function PlanningView() {
   }
 
   /* ================= KAPASİTE ================= */
-  async function capacityTab(body, actions) {
+  async function capacityTab(body, actions, isCurrent) {
     const capFrom = capFromRef.current, capTo = capToRef.current;
     const cap = await Api.capacity({ from: capFrom, to: capTo });
+    if (!isCurrent()) return;
     actions.innerHTML = `<button class="btn btn-ghost btn-sm" id="capCsv">${UI.icon(UI.ICONS.download)}CSV</button>`;
 
     body.innerHTML = `
@@ -253,9 +257,10 @@ export default function PlanningView() {
   }
 
   /* ================= İŞ MERKEZLERİ ================= */
-  async function wcTab(body, actions) {
+  async function wcTab(body, actions, isCurrent) {
     const workCenters = workCentersRef.current, shifts = shiftsRef.current;
-    const exceptions = await Api.calendarExceptions().catch(() => []);
+    const exceptions = await Api.calendarExceptions();
+    if (!isCurrent()) return;
     if (can('approve')) {
       actions.innerHTML = `<button class="btn btn-ghost btn-sm" id="shNew2">${UI.icon(UI.ICONS.plus)}${t('newShift')}</button>
         <button class="btn btn-primary btn-sm" id="wcNew">${UI.icon(UI.ICONS.plus)}${t('newWorkCenter')}</button>`;
@@ -441,20 +446,21 @@ export default function PlanningView() {
   }
 
   /* ================= ROTALAR ================= */
-  async function routingTab(body, actions) {
+  async function routingTab(body, actions, isCurrent) {
     const items = itemsRef.current, workCenters = workCentersRef.current;
     actions.innerHTML = '';
     const producible = items.filter(i => i.itemType === 'finished' || i.itemType === 'semi');
     if (!routingItemIdRef.current && producible.length) routingItemIdRef.current = producible[0].id;
     const routingItemId = routingItemIdRef.current;
-    const ops = routingItemId ? await Api.routings(routingItemId).catch(() => []) : [];
+    const ops = routingItemId ? await Api.routings(routingItemId) : [];
+    if (!isCurrent()) return;
 
     body.innerHTML = `
       <div class="alert info">${UI.getLang() === 'tr'
         ? 'Reçete NE gerektiğini söyler, rota NASIL yapıldığını. Çizelgeleme rotasız çalışmaz.'
         : 'The BOM says what is needed; the routing says how it is made. Scheduling needs a routing.'}</div>
       <div class="filters">
-        ${select('rtItem', producible.map(i => ({ v: i.id, l: `${i.name} (${i.code || ''})` })), routingItemId)}
+        ${select('rtItem', producible.map(i => ({ v: i.id, l: `${i.name} (${i.code || ''})` })), routingItemId, { search: 'producibleItems' })}
       </div>
       <div class="card">
         <div class="card-head"><h3>${t('routing')}</h3>
@@ -497,6 +503,7 @@ export default function PlanningView() {
     draw();
 
     document.getElementById('rtItem').onchange = e => { routingItemIdRef.current = e.target.value; reload(); };
+    UI.enhanceSelects(body);
     document.getElementById('rtAdd')?.addEventListener('click', () => {
       const nextNo = rows.length ? Math.max(...rows.map(r => r.operationNo)) + 10 : 10;
       rows.push({ operationNo: nextNo, operationName: '', workCenterId: workCenters[0]?.id,
@@ -504,25 +511,31 @@ export default function PlanningView() {
       draw();
     });
     document.getElementById('rtSave')?.addEventListener('click', async () => {
+      const saveButton = document.getElementById('rtSave');
+      if (saveButton.disabled) return;
+      const clear = rows.length === 0;
+      if (clear && !window.confirm(UI.getLang() === 'tr' ? 'Bu ürünün rotası silinecek. Devam edilsin mi?' : 'Clear this item routing?')) return;
+      saveButton.disabled = true;
       try {
         await Api.saveRouting(routingItemId, rows.map(r => ({
           operationNo: r.operationNo, operationName: r.operationName, workCenterId: r.workCenterId,
           setupMinutes: r.setupMinutes, runMinutesPerUnit: r.runMinutesPerUnit,
           queueMinutes: r.queueMinutes, scrapPct: r.scrapPct
-        })));
+        })), ops.revision, clear);
         UI.ok(t('saved')); reload();
-      } catch (e) { UI.err(e); }
+      } catch (e) { UI.err(e); saveButton.disabled = false; }
     });
   }
 
   /* ================= VARDİYA & OEE ================= */
-  async function shiftTab(body, actions) {
+  async function shiftTab(body, actions, isCurrent) {
     const to = UI.today();
     const from = UI.addDays(to, -30);
     const [logs, oee] = await Promise.all([
       Api.shiftLogs({ from, to, page: pagesRef.current.logs || 1, pageSize: 50 }),
       Api.oee({ from, to })
     ]);
+    if (!isCurrent()) return;
     if (can('write')) actions.innerHTML = `<button class="btn btn-primary btn-sm" id="slNew">${UI.icon(UI.ICONS.plus)}${t('newShiftLog')}</button>`;
     else actions.innerHTML = '';
 

@@ -7,6 +7,40 @@
  */
 import { useEffect, useState, useRef } from 'react';
 
+function bindLotSelector(box, itemId, lotId, saveId) {
+  const item = box.querySelector('#' + itemId);
+  const sel = box.querySelector('#' + lotId);
+  const save = box.querySelector('#' + saveId);
+  let version = 0;
+  const load = async () => {
+    const mine = ++version, selectedItem = item.value;
+    box.querySelector('#' + lotId + 'Retry')?.remove();
+    sel.dataset.itemId = selectedItem;
+    sel.innerHTML = `<option value="">${UI.t('none')}</option>`;
+    sel.disabled = true;
+    save.disabled = true;
+    try {
+      const result = selectedItem ? await Api.lots({ itemId: selectedItem, pageSize: 100 }) : { data: [] };
+      if (mine !== version || !sel.isConnected) return;
+      result.data.forEach(lot => sel.add(new Option(`${lot.lotNo || '—'} · ${UI.num(lot.qty)} · ${lot.status}`, lot.id)));
+      sel.disabled = false;
+      save.disabled = false;
+    } catch (error) {
+      if (mine !== version || !sel.isConnected) return;
+      UI.err(error);
+      const retry = document.createElement('button');
+      retry.id = lotId + 'Retry';
+      retry.type = 'button';
+      retry.className = 'btn btn-ghost';
+      retry.textContent = UI.t('retry');
+      retry.onclick = load;
+      sel.after(retry);
+    }
+  };
+  item.onchange = load;
+  load();
+}
+
 export default function QualityView() {
   const { t, esc, num, dt, ts, table, pager, loading, modal, closeModal,
           field, input, select, textarea, val, numVal, intVal, can } = UI;
@@ -102,7 +136,7 @@ export default function QualityView() {
             { v: 'incoming', l: t('inspIncoming') }, { v: 'in_process', l: t('inspInProcess') }, { v: 'final', l: t('inspFinal') }]))}
           ${field(t('itemName'), select('inItem', items.map(i => ({ v: i.id, l: i.name })), undefined, { search: 'items' }))}
         </div>
-        ${field(t('lotNo'), select('inLot', [{ v: '', l: t('none') }]), UI.getLang() === 'tr' ? 'Ürün seçildiğinde partiler yüklenir.' : 'Lots load once you pick an item.')}
+        ${field(t('lotNo'), select('inLot', [{ v: '', l: t('none') }], undefined, { search: 'lots' }), UI.getLang() === 'tr' ? 'Ürün seçildiğinde partiler yüklenir.' : 'Lots load once you pick an item.')}
         <div class="field-row three">
           ${field(t('sampleSize'), input('inSample', { type: 'number', min: 0, value: 5 }))}
           ${field(t('inspectedQty'), input('inQty', { type: 'number', min: 0, step: '0.0001', value: 0 }))}
@@ -113,21 +147,7 @@ export default function QualityView() {
       footer: `<button class="btn btn-ghost" data-close>${t('cancel')}</button>
                <button class="btn btn-primary" id="inGo">${t('save')}</button>`,
       onOpen: (box) => {
-        const loadLots = async () => {
-          const sel = box.querySelector('#inLot');
-          sel.innerHTML = `<option value="">${t('none')}</option>`;
-          try {
-            const r = await Api.lots({ itemId: val('inItem'), pageSize: 100 });
-            (r.data || []).forEach(l => {
-              const o = document.createElement('option');
-              o.value = l.id;
-              o.textContent = `${l.lotNo || '—'} · ${num(l.qty)} · ${l.status}`;
-              sel.appendChild(o);
-            });
-          } catch {}
-        };
-        box.querySelector('#inItem').onchange = loadLots;
-        loadLots();
+        bindLotSelector(box, 'inItem', 'inLot', 'inGo');
 
         box.querySelector('#inGo').onclick = async () => {
           try {
@@ -345,26 +365,13 @@ export default function QualityView() {
           ${field(t('itemName'), select('ncItem', [{ v: '', l: t('none') }, ...items.map(i => ({ v: i.id, l: i.name }))]))}
           ${field(t('qtyAffected'), input('ncQty', { type: 'number', min: 0, step: '0.0001', value: 0 }))}
         </div>
-        ${field(t('lotNo'), select('ncLot', [{ v: '', l: t('none') }]))}
+        ${field(t('lotNo'), select('ncLot', [{ v: '', l: t('none') }], undefined, { search: 'lots' }))}
         ${field(t('supplierName'), select('ncSup', [{ v: '', l: t('none') }, ...suppliers.map(s => ({ v: s.id, l: s.name }))]))}
         ${field(t('description'), textarea('ncDesc', { placeholder: UI.getLang() === 'tr' ? 'Uygunsuzluğun ne olduğunu açıkça yazın.' : 'Describe the non-conformance clearly.' }))}`,
       footer: `<button class="btn btn-ghost" data-close>${t('cancel')}</button>
                <button class="btn btn-primary" id="ncGo">${t('save')}</button>`,
       onOpen: (box) => {
-        const loadLots = async () => {
-          const sel = box.querySelector('#ncLot');
-          sel.innerHTML = `<option value="">${t('none')}</option>`;
-          if (!val('ncItem')) return;
-          try {
-            const r = await Api.lots({ itemId: val('ncItem'), pageSize: 100 });
-            (r.data || []).forEach(l => {
-              const o = document.createElement('option');
-              o.value = l.id; o.textContent = `${l.lotNo || '—'} · ${num(l.qty)} · ${l.status}`;
-              sel.appendChild(o);
-            });
-          } catch {}
-        };
-        box.querySelector('#ncItem').onchange = loadLots;
+        bindLotSelector(box, 'ncItem', 'ncLot', 'ncGo');
 
         box.querySelector('#ncGo').onclick = async () => {
           try {

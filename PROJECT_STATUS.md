@@ -1,5 +1,30 @@
 # PROJECT_STATUS.md
 
+## 10 Ekim 2026 — 2.0.3, yeniden denetimde bulunan hatalar düzeltildi
+
+**Tamamlanan kapsam:** Önceki denetimde yeniden üretilen 9 hata kapatıldı.
+Rota kaybı ve sürüm çakışması, kısmi sevk iptali, kalite maliyeti, tarihi
+geçmiş stok, tam fire, lisans bitişi, çift durum ilerletme, yükleme hatası
+ve oturum modalı için kalıcı regresyonlar var. Ürün/parti sunucu araması,
+bileşene sınırlı eylemler, gecikmiş parti/planlama yanıtı, yazma kilidi ve
+fiziksel/kullanılabilir stok ayrımı da düzeltildi. Müşteri verisi değiştirilmedi.
+
+**Doğrulama:** build/typecheck/lint PASS; 42/42 takım, son ilgili tekrarlar
+PASS; Chromium/WebKit 65/65 PASS; dependency audit 0 bilinen açık. Ayrı
+2.0.3 paketinde temiz production kurulum, setup/giriş/health, ürün yazımı,
+tam DB+dosya yedek/restore ve tekrar giriş/okuma PASS. Plan ve review gerçek
+çağrılardı; Gemini review zaman aşımı ve bağlam sınırları tam model onayı
+olarak gösterilmedi. Ayrıntı:
+[`DUZELTMELER-VE-YENIDEN-TARAMA-2026-10-10.md`](docs/DUZELTMELER-VE-YENIDEN-TARAMA-2026-10-10.md).
+
+**Kalan sınırlar:** frontend tip borcu, Firefox yerel başlatma, Docker/Linux/
+Node 22, uzak CI ve gerçek müşteri saha/TLS/tesis dışı kurtarma kabulü
+doğrulanmadı. Eski kayıtlar aşağıda tarihsel olarak korunur. Yeni API'de
+boş rota silme clear:true ister; güncel istemci sürüm/durum kontrolü gönderir.
+
+**Sonraki tek somut dış kabul adımı:** Gerçek müşteri test kurulumunda saha
+kabul kartını proxy/TLS ve tesis dışı kurtarma provasıyla tamamlamak.
+
 ## 10 Ekim 2026 — iki standarda göre yeniden denetim; açık hatalar
 
 **Aktif durum:** engineering.md v8.3 + ORTAK_AI.md ile kaynak 8ff6e2a yeniden

@@ -31,6 +31,7 @@ export default function ItemsView() {
   const [filters, setFilters] = useState(() => ({ ...DEFAULT_FILTERS, ...(App.takeNavigationIntent('items')?.filters || {}) }));
   const [reloadToken, setReloadToken] = useState(0);
   const [phase, setPhase] = useState({ status: 'loading', res: null, error: null });
+  const hostRef = useRef(null);
 
   const warehousesRef = useRef([]);
   const suppliersRef = useRef([]);
@@ -46,7 +47,6 @@ export default function ItemsView() {
     let cancelled = false;
     (async () => {
       if (firstLoadRef.current) {
-        firstLoadRef.current = false;
         try {
           const [wh, sup] = await Promise.all([
             Api.warehouses(),
@@ -55,15 +55,16 @@ export default function ItemsView() {
           if (cancelled) return;
           warehousesRef.current = wh;
           suppliersRef.current = sup;
+          firstLoadRef.current = false;
         } catch (e) {
-          warehousesRef.current = [];
-          suppliersRef.current = [];
+          if (!cancelled) setPhase({ status: 'error', res: null, error: e });
+          return;
         }
       }
       if (cancelled) return;
       let res;
       try { res = await Api.items({ ...filters, pageSize: 25 }); }
-      catch (e) { UI.errorState(null, e, typeof reload === 'function' ? reload : null); return; }
+      catch (e) { if (!cancelled) setPhase({ status: 'error', res: null, error: e }); return; }
       if (cancelled) return;
       allItemsRef.current = res.data;
       setPhase({ status: 'ready', res, error: null });
@@ -89,14 +90,14 @@ export default function ItemsView() {
     document.getElementById('itScan').onclick = () => scanDialog();
     document.getElementById('itNew')?.addEventListener('click', () => itemForm(null));
 
-    document.querySelectorAll('[data-open]').forEach(b => b.onclick = () => openCard(b.dataset.open));
-    document.querySelectorAll('[data-edit]').forEach(b => b.onclick = async () => itemForm(await Api.item(b.dataset.edit)));
-    document.querySelectorAll('[data-in]').forEach(b => b.onclick = () => stockInDialog(res.data.find(x => x.id === b.dataset.in)));
-    document.querySelectorAll('[data-label]').forEach(b => b.onclick = () => {
+    hostRef.current.querySelectorAll('[data-open]').forEach(b => b.onclick = () => openCard(b.dataset.open));
+    hostRef.current.querySelectorAll('[data-edit]').forEach(b => b.onclick = async () => itemForm(await Api.item(b.dataset.edit)));
+    hostRef.current.querySelectorAll('[data-in]').forEach(b => b.onclick = () => stockInDialog(res.data.find(x => x.id === b.dataset.in)));
+    hostRef.current.querySelectorAll('[data-label]').forEach(b => b.onclick = () => {
       const it = res.data.find(x => x.id === b.dataset.label);
       openLabelPrintDialog('item', it.id, it.name);
     });
-    document.querySelectorAll('[data-del]').forEach(b => b.onclick = () => {
+    hostRef.current.querySelectorAll('[data-del]').forEach(b => b.onclick = () => {
       const it = res.data.find(x => x.id === b.dataset.del);
       UI.confirmDialog(`"${it.name}" — ${t('confirmDelete')}`, async () => {
         try { await Api.deleteItem(it.id); UI.ok(t('deleted')); reload(); } catch (e) { UI.err(e); }
@@ -355,7 +356,7 @@ export default function ItemsView() {
         </div>
 
         <div class="kv-grid">
-          <div class="kv"><div class="k">${t('available')}</div><div class="v">${num(item.qty)} ${esc(item.unit)}</div></div>
+          <div class="kv"><div class="k">${t('available')}</div><div class="v">${num(item.usableQty ?? item.qty)} ${esc(item.unit)}</div></div>
           <div class="kv"><div class="k">${t('minStock')}</div><div class="v">${num(item.minStock)} ${esc(item.unit)}</div></div>
           <div class="kv"><div class="k">${t('avgCost')}</div><div class="v">₺${num(item.avgCost, 2)}</div></div>
           <div class="kv"><div class="k">${t('salePrice')}</div><div class="v">${item.salePrice ? '₺' + num(item.salePrice, 2) : '—'}</div></div>
@@ -363,6 +364,7 @@ export default function ItemsView() {
           <div class="kv"><div class="k">${t('defaultSupplier')}</div><div class="v">${esc(item.supplierName || item.supplier || '—')}</div></div>
         </div>
 
+        ${(item.usableQty ?? item.qty) < item.qty ? `<div class="alert warn">${UI.getLang() === 'tr' ? 'Son kullanma tarihi geçmiş miktar sevk veya üretimde kullanılamaz. Fiziksel miktar:' : 'Expired stock cannot be shipped or consumed in production. Physical quantity:'} ${num(item.qty)} ${esc(item.unit)}</div>` : ''}
         <div class="section-title">${t('stockByStatus')}</div>
         <div class="totals-row">
           <span class="total-chip ok">${t('available')}: ${num(st.available || 0)}</span>
@@ -432,8 +434,14 @@ export default function ItemsView() {
     return m.type;
   };
 
+  if (phase.status === 'error') {
+    return <div ref={hostRef} role="alert" className="empty">{phase.error.message}
+      <button className="btn btn-primary" onClick={reload}>{t('retry')}</button>
+    </div>;
+  }
+
   if (phase.status === 'loading') {
-    return <div dangerouslySetInnerHTML={{ __html: loading() }} />;
+    return <div ref={hostRef} dangerouslySetInnerHTML={{ __html: loading() }} />;
   }
 
   const { res } = phase;
@@ -466,7 +474,7 @@ export default function ItemsView() {
         { key: 'itemType', label: t('itemType'), render: r => `<span class="badge plain">${t('type' + r.itemType.charAt(0).toUpperCase() + r.itemType.slice(1))}</span>` },
         { key: 'origin', label: t('origin'), render: r => UI.originBadge(r.origin) },
         { key: 'category', label: t('category'), render: r => esc(r.category || '—') },
-        { key: 'qty', label: t('available'), num: true, render: r => `${num(r.qty)} <span style="color:var(--text-faint);font-size:11px">${esc(r.unit)}</span>` },
+        { key: 'qty', label: t('available'), num: true, render: r => `${num(r.usableQty ?? r.qty)} <span style="color:var(--text-faint);font-size:11px">${esc(r.unit)}</span>${(r.usableQty ?? r.qty) < r.qty ? `<div class="sub-line">${UI.getLang() === 'tr' ? 'Fiziksel' : 'Physical'}: ${num(r.qty)}</div>` : ''}` },
         { key: 'quarantineQty', label: t('quarantine'), num: true, render: r => r.quarantineQty ? `<span style="color:var(--accent)">${num(r.quarantineQty)}</span>` : '—' },
         { key: 'avgCost', label: t('avgCost'), num: true, render: r => '₺' + num(r.avgCost, 2) },
         { key: 'status', label: t('status'), render: r => UI.stockStatus(r.qty, r.minStock) },
@@ -480,5 +488,5 @@ export default function ItemsView() {
       ${pager(res, p => setFilters(f => ({ ...f, page: p })))}
     </div>`;
 
-  return <div dangerouslySetInnerHTML={{ __html: html }} />;
+  return <div ref={hostRef} dangerouslySetInnerHTML={{ __html: html }} />;
 }

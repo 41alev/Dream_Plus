@@ -25,7 +25,7 @@ const SERVER_SUITES = [
   'e2e', 'contract', 'import', 'templates',
   'data-health', 'planning', 'ui-smoke', 'security', 'load',
   'multitenancy', 'accounting-export', 'labels', 'webhooks', 'openapi', 'crm', 'pivot', 'support', 'visits', 'kvkk',
-  'approval-limit', 'concurrency-races', 'search', 'release-hardening', 'stock-integrity', 'finance-integrity', 'invoice-settlement', 'planning-integrity', 'pilot-flow'
+  'approval-limit', 'concurrency-races', 'search', 'release-hardening', 'stock-integrity', 'finance-integrity', 'invoice-settlement', 'planning-integrity', 'pilot-flow', 'audit-regressions'
 ];
 // Sunucu gerektirmez — kendi geçici durumunu kendi kurar/söker.
 const STANDALONE_SUITES = ['visual-audit', 'backup-restore', 'email', 'barcode', 'dates', 'sandbox-safety', 'maintenance-safety', 'proxy-rate-limit', 'release-package', 'money'];

@@ -704,7 +704,30 @@ function buildOpenApiSpec() {
         }
       },
       '/sales/shipments/{id}/status': {
-        patch: { tags: ['Sales'], summary: 'Sevkiyat durumunu ilerlet / Advance shipment status', security: bearerAuth, parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'string' } }], responses: { 200: jsonResponse('Güncellendi — webhook: shipment.status_changed', ref('Shipment')), 404: errorResponse } }
+        patch: { tags: ['Sales'], summary: 'Sevkiyat durumunu ilerlet / Advance shipment status', security: bearerAuth,
+          parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'string' } }],
+          requestBody: { required: false, content: { 'application/json': { schema: { type: 'object', properties: {
+            expectedStatus: { type: 'string', description: 'Listed current status. Stale status returns 409; current clients should always send this.' }
+          } } } } },
+          responses: { 200: jsonResponse('Güncellendi — webhook: shipment.status_changed', ref('Shipment')), 404: errorResponse, 409: errorResponse } }
+      },
+      '/planning/routings/{itemId}': {
+        get: { tags: ['Planning'], summary: 'Read item routing and revision', security: bearerAuth,
+          parameters: [{ name: 'itemId', in: 'path', required: true, schema: { type: 'string' } }],
+          responses: { 200: { ...jsonResponse('Operations', { type: 'array', items: { type: 'object' } }),
+            headers: { ETag: { description: 'Send this revision as expectedRevision when saving.', schema: { type: 'string' } } } } } },
+        put: { tags: ['Planning'], summary: 'Replace routing; manager/admin required', security: bearerAuth,
+          parameters: [{ name: 'itemId', in: 'path', required: true, schema: { type: 'string' } }],
+          requestBody: { required: true, content: { 'application/json': { schema: { type: 'object', required: ['operations'], properties: {
+            expectedRevision: { type: 'string', description: 'GET ETag; conflicts return 409. Optional for legacy clients.' },
+            clear: { type: 'boolean', default: false, description: 'Explicit deletion consent; required for empty operations.' },
+            operations: { type: 'array', items: { type: 'object', required: ['operationNo', 'operationName', 'workCenterId'], properties: {
+              operationNo: { type: 'integer', minimum: 1 }, operationName: { type: 'string', minLength: 1, maxLength: 200 },
+              workCenterId: { type: 'integer' }, setupMinutes: { type: 'number', minimum: 0 },
+              runMinutesPerUnit: { type: 'number', minimum: 0 }, queueMinutes: { type: 'number', minimum: 0 },
+              scrapPct: { type: 'number', minimum: 0, maximum: 100 }, notes: { type: 'string', maxLength: 5000 }
+            } } }
+          } } } } }, responses: { 200: jsonResponse('Saved', { type: 'object' }), 403: errorResponse, 404: errorResponse, 409: errorResponse, 422: errorResponse } }
       },
       '/sales/invoices/{id}/payments': {
         get: { tags: ['Sales'], summary: 'Tahsilat geçmişi ve kalan tutar / Payment history and open amount', security: bearerAuth, parameters: [idParam], responses: { 200: jsonResponse('Tahsilatlar', ref('InvoiceSettlement')), 404: errorResponse } },

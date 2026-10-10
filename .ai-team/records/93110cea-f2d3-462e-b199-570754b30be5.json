@@ -1,0 +1,530 @@
+{
+  "schema_version": "2.0",
+  "version": "1.1.1",
+  "run_id": "93110cea-f2d3-462e-b199-570754b30be5",
+  "timestamp_utc": "2026-10-10T19:19:27.273433+00:00",
+  "host": "codex",
+  "phase": "review",
+  "task": "Previous review unusable because source filter skipped files. Here are three smaller sanitized real diff/test contexts with auth statements removed. Review all actual fixes for correctness and compatibility, name concrete file and claim; mark unsupported hypotheses. Target nine prior failures, list/selector bounds, hidden view handler and stale lot response protection. Source coordinator only, no edits. Current final validation ongoing.",
+  "project": "C:\\Projelerim\\Dream\\dream-plus",
+  "included_files": [
+    "ORTAK_AI.md",
+    ".ai-team\\fix-review-server-2026-10-10.md",
+    ".ai-team\\fix-review-ui-2026-10-10.md",
+    ".ai-team\\fix-review-tests-2026-10-10.md",
+    "PROJECT_STATUS.md"
+  ],
+  "notices": [
+    "Silinen/bulunamayan dosya; i\u00e7erik payla\u015f\u0131lmad\u0131: AGENTS.md",
+    "Dosya k\u0131salt\u0131ld\u0131: PROJECT_STATUS.md"
+  ],
+  "selection": [
+    {
+      "file": "ORTAK_AI.md",
+      "reason": "explicit_or_git_change"
+    },
+    {
+      "file": ".ai-team/fix-review-server-2026-10-10.md",
+      "reason": "explicit_or_git_change"
+    },
+    {
+      "file": ".ai-team/fix-review-ui-2026-10-10.md",
+      "reason": "explicit_or_git_change"
+    },
+    {
+      "file": ".ai-team/fix-review-tests-2026-10-10.md",
+      "reason": "explicit_or_git_change"
+    }
+  ],
+  "privacy_policy_loaded": false,
+  "reviews": {
+    "claude": {
+      "status": "ok",
+      "message": "{\"findings\": [{\"claim\": \"Rota veri kayb\u0131 d\u00fczeltmesi do\u011fru g\u00f6r\u00fcn\u00fcyor: GET hatas\u0131 art\u0131k bo\u015f liste say\u0131lm\u0131yor; bo\u015f kay\u0131t a\u00e7\u0131k 'clear' olmadan 422 al\u0131yor; ETag ile e\u015fzamanl\u0131l\u0131k kontrol\u00fc yap\u0131l\u0131yor.\", \"evidence\": \"frontend-react/PlanningView.jsx: Api.routings(...).catch(()=>[]) kald\u0131r\u0131ld\u0131; server/routes/planning.js PUT: txImmediate i\u00e7inde expectedRevision ve clear kontrol\u00fc\", \"severity\": \"info\", \"uncertainty\": \"Testler son korumalardan sonra yeniden ko\u015fulmad\u0131. Sonu\u00e7 ba\u011flamda bildirilmedi.\", \"recommendation\": \"Final ko\u015fuda audit-regressions 'routing revision conflict and explicit clear' ve taray\u0131c\u0131daki 'routing outage' sonu\u00e7lar\u0131n\u0131 kaydedin.\"}, {\"claim\": \"Uyumluluk k\u0131r\u0131lmas\u0131: bo\u015f operations g\u00f6nderen eski istemci veya entegrasyonlar art\u0131k 422 al\u0131yor. 'expectedRevision' iste\u011fe ba\u011fl\u0131 olsa da 'clear' zorunlu hale geldi.\", \"evidence\": \"server/routes/planning.js: if (!operations.length && !clear) throw 422\", \"severity\": \"low\", \"uncertainty\": \"Bu davran\u0131\u015f bilin\u00e7li bir karar olarak belgelenmi\u015f ('Empty route requires explicit clear'). Harici istemci olup olmad\u0131\u011f\u0131 bilinmiyor.\", \"recommendation\": \"Bu de\u011fi\u015fikli\u011fi s\u00fcr\u00fcm notuna API davran\u0131\u015f de\u011fi\u015fikli\u011fi olarak ekleyin.\"}, {\"claim\": \"ETag kar\u015f\u0131la\u015ft\u0131rmas\u0131 g\u00fc\u00e7l\u00fc ETag de\u011ferinin birebir e\u015fle\u015fmesine dayan\u0131yor. Bir proxy veya s\u0131k\u0131\u015ft\u0131rma katman\u0131 ETag'i zay\u0131f (W/) yaparsa her kay\u0131t kal\u0131c\u0131 olarak 409 al\u0131r.\", \"evidence\": \"public/js/api.js: revision = res.headers.get('ETag'); planning.js: expectedRevision !== routingRevision(itemId)\", \"severity\": \"low\", \"uncertainty\": \"Bu bir hipotez. Da\u011f\u0131t\u0131mda ters proxy kullan\u0131l\u0131p kullan\u0131lmad\u0131\u011f\u0131 bilinmiyor.\", \"recommendation\": \"Kar\u015f\u0131la\u015ft\u0131rmadan \u00f6nce 'W/' \u00f6nekini normalize edin ya da revizyonu ayr\u0131ca g\u00f6vdede d\u00f6nd\u00fcr\u00fcn.\"}, {\"claim\": \"S\u00fcresi dolmu\u015f lot korumas\u0131 ve geri alma do\u011fru: consume i\u015flemi txImmediate i\u00e7inde. FEFO ile availableQty ayn\u0131 tarih ko\u015fulunu kullan\u0131yor.\", \"evidence\": \"server/services/stock.js consume/pickLotsFEFO/availableQty; testte rollback snapshot kar\u015f\u0131la\u015ft\u0131rmas\u0131 var\", \"severity\": \"info\", \"uncertainty\": \"Bu durum expiry_date de\u011ferinin today() ile ayn\u0131 'YYYY-MM-DD' bi\u00e7iminde ve ayn\u0131 saat diliminde sakland\u0131\u011f\u0131n\u0131 varsay\u0131yor.\", \"recommendation\": \"expiry_date bi\u00e7imini veritaban\u0131nda do\u011frulay\u0131n veya bir k\u0131s\u0131tla g\u00fcvenceye al\u0131n.\"}, {\"claim\": \"Di\u011fer consume \u00e7a\u011f\u0131ranlar\u0131 s\u00fcresi dolmu\u015f lotlarda k\u0131r\u0131labilir. allowExpired yaln\u0131z tedarik\u00e7i iadesi ve NCR hurdas\u0131 i\u00e7in eklendi; say\u0131m d\u00fczeltmesi, transfer veya NCR'nin di\u011fer karar t\u00fcrleri art\u0131k 409 verebilir.\", \"evidence\": \"Kan\u0131t yok. Diff yaln\u0131z purchasing.js:1250 ve quality.js:339'u g\u00f6steriyor; di\u011fer consume \u00e7a\u011fr\u0131lar\u0131 ba\u011flamda yok.\", \"severity\": \"medium\", \"uncertainty\": \"Do\u011frulanmam\u0131\u015f hipotez. Bu yollar consume kullanm\u0131yor olabilir.\", \"recommendation\": \"consume( \u00e7a\u011fr\u0131lar\u0131n\u0131 taray\u0131n. Say\u0131m azaltma ve transfer i\u00e7in s\u00fcresi dolmu\u015f lot senaryosuna test ekleyin.\"}, {\"claim\": \"availableQty s\u00fcresi dolmu\u015f lotlar\u0131 d\u0131\u015fl\u0131yor, ancak items.qty (recalcItemQty) b\u00fcy\u00fck olas\u0131l\u0131kla d\u0131\u015flam\u0131yor. Aray\u00fcz stok g\u00f6sterirken \u00e7\u0131k\u0131\u015f 'Insufficient' hatas\u0131 verebilir.\", \"evidence\": \"server/services/stock.js availableQty de\u011fi\u015fti; recalcItemQty diff'te yok\", \"severity\": \"medium\", \"uncertainty\": \"recalcItemQty kayna\u011f\u0131 g\u00f6r\u00fclmedi.\", \"recommendation\": \"G\u00f6sterilen stok ile kullan\u0131labilir stok fark\u0131n\u0131 aray\u00fczde belirtin veya ayr\u0131 bir alan olarak sunun.\"}, {\"claim\": \"Kalite kabul\u00fcnde ortalama maliyet d\u00fczeltmesi var. Ancak do\u011frulu\u011fu, updateAverageCost'un recalcItemQty'den sonra \u00e7a\u011fr\u0131lmas\u0131na ra\u011fmen eski miktar\u0131 do\u011fru almas\u0131na ba\u011fl\u0131 ve k\u0131r\u0131lgan.\", \"evidence\": \"server/services/stock.js changeLotStatus: recalcItemQty sonras\u0131 updateAverageCost(lot.item_id, moveQty, lot.unit_cost); test 40/55/40 bekliyor\", \"severity\": \"low\", \"uncertainty\": \"updateAverageCost kayna\u011f\u0131 g\u00f6r\u00fclmedi. Test ge\u00e7erse s\u0131ra tutarl\u0131d\u0131r.\", \"recommendation\": \"S\u0131ra ba\u011f\u0131ml\u0131l\u0131\u011f\u0131n\u0131 yorum veya bir assert ile sabitleyin.\"}, {\"claim\": \"available durumundan \u00e7\u0131k\u0131\u015fta recalcAverageCost, hareketli ortalama ge\u00e7mi\u015fini lot a\u011f\u0131rl\u0131kl\u0131 de\u011ferle ezebilir.\", \"evidence\": \"server/services/stock.js: else if (lot.status==='available' && toStatus!=='available') recalcAverageCost\", \"severity\": \"low\", \"uncertainty\": \"Hipotez. recalcAverageCost'un nas\u0131l hesaplad\u0131\u011f\u0131 bilinmiyor.\", \"recommendation\": \"Lotsuz eski stok bulunan bir \u00fcr\u00fcn i\u00e7in regresyon testi ekleyin.\"}, {\"claim\": \"'produced_qty ?? qty' de\u011fi\u015fikli\u011fi tam fire durumunu d\u00fczeltiyor. Ancak \u015femada produced_qty varsay\u0131lan\u0131 0 ise, a\u00e7\u0131k ve tamamlanmam\u0131\u015f emirlerde tahmini birim maliyet art\u0131k 0 olur.\", \"evidence\": \"server/services/costing.js:102\", \"severity\": \"medium\", \"uncertainty\": \"\u015eema varsay\u0131lan\u0131 ve a\u00e7\u0131k emir maliyet ekranlar\u0131 g\u00f6r\u00fclmedi.\", \"recommendation\": \"Birim maliyeti yaln\u0131z tamamlanm\u0131\u015f emirde produced_qty ile, di\u011ferlerinde qty ile hesaplay\u0131n ya da \u015femay\u0131 do\u011frulay\u0131n.\"}, {\"claim\": \"K\u0131smi sevkli sipari\u015f iptali txImmediate i\u00e7inde 409 ile engelleniyor. Durum ilerletme expectedStatus ile korunuyor ve eski istemci uyumlulu\u011fu s\u00fcr\u00fcyor.\", \"evidence\": \"server/routes/sales.js cancel ve PATCH status; SalesView.jsx \u00e7ift t\u0131klama kilidi\", \"severity\": \"info\", \"uncertainty\": \"shipments.cancelled_at s\u00fctununun varl\u0131\u011f\u0131 yaln\u0131z testin ge\u00e7mesine dayanarak \u00e7\u0131kar\u0131l\u0131yor. \u0130ptal edilmi\u015f sevkiyat\u0131 olan sipari\u015fin iptal edilebildi\u011fini do\u011frulayan test yok.\", \"recommendation\": \"\u0130ptal edilmi\u015f sevkiyat sonras\u0131 iptalin 200 d\u00f6nd\u00fc\u011f\u00fcn\u00fc test edin.\"}, {\"claim\": \"Gizli g\u00f6r\u00fcn\u00fcm handler sorunu yaln\u0131z Counts, Items, Lots ve Production i\u00e7in d\u00fczeltildi. cNew/pNew h\u00e2l\u00e2 document.getElementById ile ba\u011flan\u0131yor. Di\u011fer g\u00f6r\u00fcn\u00fcmlerde document.querySelectorAll('[data-...]') kalm\u0131\u015f olabilir.\", \"evidence\": \"frontend-react/CountsView.jsx:51, ProductionView.jsx:52; di\u011fer g\u00f6r\u00fcn\u00fcmler ba\u011flamda yok\", \"severity\": \"medium\", \"uncertainty\": \"Di\u011fer dosyalar g\u00f6r\u00fclmedi.\", \"recommendation\": \"frontend-react i\u00e7inde document.querySelectorAll('[data- aramas\u0131yla kalan yerleri hostRef'e ta\u015f\u0131y\u0131n.\"}, {\"claim\": \"Sekme yar\u0131\u015f\u0131 korumas\u0131 yaln\u0131z routingTab'da var. Di\u011fer planlama sekmeleri isCurrent'i yok say\u0131yor; ge\u00e7 gelen yan\u0131tlar\u0131 ortak #planBody'yi ezebilir.\", \"evidence\": \"PlanningView.jsx: fns[tab](body, actions, () => !cancelled); yaln\u0131z routingTab kontrol ediyor\", \"severity\": \"medium\", \"uncertainty\": \"Di\u011fer sekme fonksiyonlar\u0131 g\u00f6r\u00fclmedi. \u00d6nceki denetimde benzer bir hipotez taray\u0131c\u0131da yeniden \u00fcretilememi\u015fti.\", \"recommendation\": \"Her sekmede await sonras\u0131na isCurrent() kontrol\u00fc ekleyin.\"}, {\"claim\": \"Hata durumunda onClick={reload} korumas\u0131z kullan\u0131l\u0131yor. Eski kod 'typeof reload === function' kontrol\u00fc yap\u0131yordu, yani reload baz\u0131 g\u00f6r\u00fcn\u00fcmlerde tan\u0131ms\u0131z olabilir.\", \"evidence\": \"Counts/Items/Lots/ProductionView error dal\u0131\", \"severity\": \"low\", \"uncertainty\": \"D\u00f6rt g\u00f6r\u00fcn\u00fcm i\u00e7in taray\u0131c\u0131 testi retry'\u0131 t\u0131kl\u0131yor. Test ge\u00e7erse sorun yoktur.\", \"recommendation\": \"Final ko\u015fuda '... outage is retried' testlerinin sonucunu do\u011frulay\u0131n.\"}, {\"claim\": \"Lot se\u00e7icideki eski yan\u0131t korumas\u0131 do\u011fru: version sayac\u0131, isConnected ve ui.js'teki itemId ba\u011flam kontrol\u00fc var. Y\u00fckleme hatas\u0131nda kay\u0131t engelleniyor ve retry sunuluyor.\", \"evidence\": \"QualityView.jsx bindLotSelector; ui.js SEARCH_SOURCES.lots ve context kontrol\u00fc\", \"severity\": \"info\", \"uncertainty\": \"Lot alan\u0131 iste\u011fe ba\u011fl\u0131 oldu\u011fu halde, lot y\u00fckleme hatas\u0131 NCR kayd\u0131n\u0131 da engelliyor; bu bir davran\u0131\u015f de\u011fi\u015fikli\u011fi. UI.num ve UI.t'nin d\u0131\u015fa aktar\u0131ld\u0131\u011f\u0131 g\u00f6r\u00fclmedi.\", \"recommendation\": \"Bu engellemenin iste\u011fe ba\u011fl\u0131 lot i\u00e7in istenip istenmedi\u011fini netle\u015ftirin. UI.num ve UI.t'nin export edildi\u011fini do\u011frulay\u0131n.\"}, {\"claim\": \"Liste ve se\u00e7ici s\u0131n\u0131rlar\u0131 sunucu aramas\u0131yla a\u015f\u0131l\u0131yor (300 \u00fcr\u00fcn, 100 lot). lots kayna\u011f\u0131nda 'one' \u00e7\u00f6z\u00fcc\u00fc yok, bu y\u00fczden listede olmayan \u00f6nse\u00e7ili bir lot etiketlenemez.\", \"evidence\": \"public/js/ui.js SEARCH_SOURCES.lots; test/audit-regressions.js paging b\u00f6l\u00fcm\u00fc\", \"severity\": \"low\", \"uncertainty\": \"\u00d6nse\u00e7ili lot senaryosunun var olup olmad\u0131\u011f\u0131 bilinmiyor.\", \"recommendation\": \"Gerekirse lots i\u00e7in 'one' ekleyin.\"}, {\"claim\": \"pendingWrites art\u0131k g\u00f6vde ayr\u0131\u015ft\u0131r\u0131lana kadar tutuluyor. Express varsay\u0131lan ETag'i nedeniyle neredeyse t\u00fcm JSON nesnelerine say\u0131lamayan bir 'revision' alan\u0131 ekleniyor; bu zarars\u0131z.\", \"evidence\": \"public/js/api.js try/finally ve defineProperty\", \"severity\": \"info\", \"uncertainty\": \"\u0130\u00e7 try blo\u011funun catch yap\u0131s\u0131n\u0131n s\u00f6zdizimi a\u00e7\u0131s\u0131ndan do\u011fru kald\u0131\u011f\u0131, k\u0131smi diff'ten tam do\u011frulanam\u0131yor.\", \"recommendation\": \"Lint ve build \u00e7\u0131kt\u0131s\u0131yla do\u011frulay\u0131n; girintiyi d\u00fczeltin.\"}, {\"claim\": \"Lisans s\u0131n\u0131r\u0131 ve oturum sonu modal d\u00fczeltmeleri do\u011fru ve k\u00fc\u00e7\u00fck kapsaml\u0131.\", \"evidence\": \"server/lib/license.js:75; public/js/app.js:153\", \"severity\": \"info\", \"uncertainty\": \"Lisans testi license.js fikst\u00fcr\u00fcn\u00fc regex ile okuyor; bu k\u0131r\u0131lgan.\", \"recommendation\": \"Fikst\u00fcr\u00fc mod\u00fcl olarak export edin.\"}, {\"claim\": \"Do\u011frulama durumu: 42 tak\u0131m ve 58 taray\u0131c\u0131 testi yaln\u0131z son korumalardan \u00f6nce ge\u00e7ti. Final ko\u015fu s\u00fcr\u00fcyor, bu y\u00fczden 9 hatan\u0131n kapand\u0131\u011f\u0131 hen\u00fcz kan\u0131tlanm\u0131\u015f say\u0131lmaz.\", \"evidence\": \"fix-review-server/ui ba\u015fl\u0131klar\u0131\", \"severity\": \"high\", \"uncertainty\": \"Test sonucu uydurulmad\u0131. Final sonu\u00e7 bilinmiyor.\", \"recommendation\": \"Final \u00e7\u0131kt\u0131y\u0131 (Chromium ve WebKit dahil) kaydetmeden PROJECT_STATUS.md'de hatalar\u0131 kapatmay\u0131n.\"}]}",
+      "findings": [
+        {
+          "id": "1",
+          "claim": "Rota veri kayb\u0131 d\u00fczeltmesi do\u011fru g\u00f6r\u00fcn\u00fcyor: GET hatas\u0131 art\u0131k bo\u015f liste say\u0131lm\u0131yor; bo\u015f kay\u0131t a\u00e7\u0131k 'clear' olmadan 422 al\u0131yor; ETag ile e\u015fzamanl\u0131l\u0131k kontrol\u00fc yap\u0131l\u0131yor.",
+          "evidence": "frontend-react/PlanningView.jsx: Api.routings(...).catch(()=>[]) kald\u0131r\u0131ld\u0131; server/routes/planning.js PUT: txImmediate i\u00e7inde expectedRevision ve clear kontrol\u00fc",
+          "uncertainty": "Testler son korumalardan sonra yeniden ko\u015fulmad\u0131. Sonu\u00e7 ba\u011flamda bildirilmedi.",
+          "recommendation": "Final ko\u015fuda audit-regressions 'routing revision conflict and explicit clear' ve taray\u0131c\u0131daki 'routing outage' sonu\u00e7lar\u0131n\u0131 kaydedin.",
+          "severity": "info",
+          "verification": "unverified_model_claim"
+        },
+        {
+          "id": "2",
+          "claim": "Uyumluluk k\u0131r\u0131lmas\u0131: bo\u015f operations g\u00f6nderen eski istemci veya entegrasyonlar art\u0131k 422 al\u0131yor. 'expectedRevision' iste\u011fe ba\u011fl\u0131 olsa da 'clear' zorunlu hale geldi.",
+          "evidence": "server/routes/planning.js: if (!operations.length && !clear) throw 422",
+          "uncertainty": "Bu davran\u0131\u015f bilin\u00e7li bir karar olarak belgelenmi\u015f ('Empty route requires explicit clear'). Harici istemci olup olmad\u0131\u011f\u0131 bilinmiyor.",
+          "recommendation": "Bu de\u011fi\u015fikli\u011fi s\u00fcr\u00fcm notuna API davran\u0131\u015f de\u011fi\u015fikli\u011fi olarak ekleyin.",
+          "severity": "low",
+          "verification": "unverified_model_claim"
+        },
+        {
+          "id": "3",
+          "claim": "ETag kar\u015f\u0131la\u015ft\u0131rmas\u0131 g\u00fc\u00e7l\u00fc ETag de\u011ferinin birebir e\u015fle\u015fmesine dayan\u0131yor. Bir proxy veya s\u0131k\u0131\u015ft\u0131rma katman\u0131 ETag'i zay\u0131f (W/) yaparsa her kay\u0131t kal\u0131c\u0131 olarak 409 al\u0131r.",
+          "evidence": "public/js/api.js: revision = res.headers.get('ETag'); planning.js: expectedRevision !== routingRevision(itemId)",
+          "uncertainty": "Bu bir hipotez. Da\u011f\u0131t\u0131mda ters proxy kullan\u0131l\u0131p kullan\u0131lmad\u0131\u011f\u0131 bilinmiyor.",
+          "recommendation": "Kar\u015f\u0131la\u015ft\u0131rmadan \u00f6nce 'W/' \u00f6nekini normalize edin ya da revizyonu ayr\u0131ca g\u00f6vdede d\u00f6nd\u00fcr\u00fcn.",
+          "severity": "low",
+          "verification": "unverified_model_claim"
+        },
+        {
+          "id": "4",
+          "claim": "S\u00fcresi dolmu\u015f lot korumas\u0131 ve geri alma do\u011fru: consume i\u015flemi txImmediate i\u00e7inde. FEFO ile availableQty ayn\u0131 tarih ko\u015fulunu kullan\u0131yor.",
+          "evidence": "server/services/stock.js consume/pickLotsFEFO/availableQty; testte rollback snapshot kar\u015f\u0131la\u015ft\u0131rmas\u0131 var",
+          "uncertainty": "Bu durum expiry_date de\u011ferinin today() ile ayn\u0131 'YYYY-MM-DD' bi\u00e7iminde ve ayn\u0131 saat diliminde sakland\u0131\u011f\u0131n\u0131 varsay\u0131yor.",
+          "recommendation": "expiry_date bi\u00e7imini veritaban\u0131nda do\u011frulay\u0131n veya bir k\u0131s\u0131tla g\u00fcvenceye al\u0131n.",
+          "severity": "info",
+          "verification": "unverified_model_claim"
+        },
+        {
+          "id": "5",
+          "claim": "Di\u011fer consume \u00e7a\u011f\u0131ranlar\u0131 s\u00fcresi dolmu\u015f lotlarda k\u0131r\u0131labilir. allowExpired yaln\u0131z tedarik\u00e7i iadesi ve NCR hurdas\u0131 i\u00e7in eklendi; say\u0131m d\u00fczeltmesi, transfer veya NCR'nin di\u011fer karar t\u00fcrleri art\u0131k 409 verebilir.",
+          "evidence": "Kan\u0131t yok. Diff yaln\u0131z purchasing.js:1250 ve quality.js:339'u g\u00f6steriyor; di\u011fer consume \u00e7a\u011fr\u0131lar\u0131 ba\u011flamda yok.",
+          "uncertainty": "Do\u011frulanmam\u0131\u015f hipotez. Bu yollar consume kullanm\u0131yor olabilir.",
+          "recommendation": "consume( \u00e7a\u011fr\u0131lar\u0131n\u0131 taray\u0131n. Say\u0131m azaltma ve transfer i\u00e7in s\u00fcresi dolmu\u015f lot senaryosuna test ekleyin.",
+          "severity": "medium",
+          "verification": "unverified_model_claim"
+        },
+        {
+          "id": "6",
+          "claim": "availableQty s\u00fcresi dolmu\u015f lotlar\u0131 d\u0131\u015fl\u0131yor, ancak items.qty (recalcItemQty) b\u00fcy\u00fck olas\u0131l\u0131kla d\u0131\u015flam\u0131yor. Aray\u00fcz stok g\u00f6sterirken \u00e7\u0131k\u0131\u015f 'Insufficient' hatas\u0131 verebilir.",
+          "evidence": "server/services/stock.js availableQty de\u011fi\u015fti; recalcItemQty diff'te yok",
+          "uncertainty": "recalcItemQty kayna\u011f\u0131 g\u00f6r\u00fclmedi.",
+          "recommendation": "G\u00f6sterilen stok ile kullan\u0131labilir stok fark\u0131n\u0131 aray\u00fczde belirtin veya ayr\u0131 bir alan olarak sunun.",
+          "severity": "medium",
+          "verification": "unverified_model_claim"
+        },
+        {
+          "id": "7",
+          "claim": "Kalite kabul\u00fcnde ortalama maliyet d\u00fczeltmesi var. Ancak do\u011frulu\u011fu, updateAverageCost'un recalcItemQty'den sonra \u00e7a\u011fr\u0131lmas\u0131na ra\u011fmen eski miktar\u0131 do\u011fru almas\u0131na ba\u011fl\u0131 ve k\u0131r\u0131lgan.",
+          "evidence": "server/services/stock.js changeLotStatus: recalcItemQty sonras\u0131 updateAverageCost(lot.item_id, moveQty, lot.unit_cost); test 40/55/40 bekliyor",
+          "uncertainty": "updateAverageCost kayna\u011f\u0131 g\u00f6r\u00fclmedi. Test ge\u00e7erse s\u0131ra tutarl\u0131d\u0131r.",
+          "recommendation": "S\u0131ra ba\u011f\u0131ml\u0131l\u0131\u011f\u0131n\u0131 yorum veya bir assert ile sabitleyin.",
+          "severity": "low",
+          "verification": "unverified_model_claim"
+        },
+        {
+          "id": "8",
+          "claim": "available durumundan \u00e7\u0131k\u0131\u015fta recalcAverageCost, hareketli ortalama ge\u00e7mi\u015fini lot a\u011f\u0131rl\u0131kl\u0131 de\u011ferle ezebilir.",
+          "evidence": "server/services/stock.js: else if (lot.status==='available' && toStatus!=='available') recalcAverageCost",
+          "uncertainty": "Hipotez. recalcAverageCost'un nas\u0131l hesaplad\u0131\u011f\u0131 bilinmiyor.",
+          "recommendation": "Lotsuz eski stok bulunan bir \u00fcr\u00fcn i\u00e7in regresyon testi ekleyin.",
+          "severity": "low",
+          "verification": "unverified_model_claim"
+        },
+        {
+          "id": "9",
+          "claim": "'produced_qty ?? qty' de\u011fi\u015fikli\u011fi tam fire durumunu d\u00fczeltiyor. Ancak \u015femada produced_qty varsay\u0131lan\u0131 0 ise, a\u00e7\u0131k ve tamamlanmam\u0131\u015f emirlerde tahmini birim maliyet art\u0131k 0 olur.",
+          "evidence": "server/services/costing.js:102",
+          "uncertainty": "\u015eema varsay\u0131lan\u0131 ve a\u00e7\u0131k emir maliyet ekranlar\u0131 g\u00f6r\u00fclmedi.",
+          "recommendation": "Birim maliyeti yaln\u0131z tamamlanm\u0131\u015f emirde produced_qty ile, di\u011ferlerinde qty ile hesaplay\u0131n ya da \u015femay\u0131 do\u011frulay\u0131n.",
+          "severity": "medium",
+          "verification": "unverified_model_claim"
+        },
+        {
+          "id": "10",
+          "claim": "K\u0131smi sevkli sipari\u015f iptali txImmediate i\u00e7inde 409 ile engelleniyor. Durum ilerletme expectedStatus ile korunuyor ve eski istemci uyumlulu\u011fu s\u00fcr\u00fcyor.",
+          "evidence": "server/routes/sales.js cancel ve PATCH status; SalesView.jsx \u00e7ift t\u0131klama kilidi",
+          "uncertainty": "shipments.cancelled_at s\u00fctununun varl\u0131\u011f\u0131 yaln\u0131z testin ge\u00e7mesine dayanarak \u00e7\u0131kar\u0131l\u0131yor. \u0130ptal edilmi\u015f sevkiyat\u0131 olan sipari\u015fin iptal edilebildi\u011fini do\u011frulayan test yok.",
+          "recommendation": "\u0130ptal edilmi\u015f sevkiyat sonras\u0131 iptalin 200 d\u00f6nd\u00fc\u011f\u00fcn\u00fc test edin.",
+          "severity": "info",
+          "verification": "unverified_model_claim"
+        },
+        {
+          "id": "11",
+          "claim": "Gizli g\u00f6r\u00fcn\u00fcm handler sorunu yaln\u0131z Counts, Items, Lots ve Production i\u00e7in d\u00fczeltildi. cNew/pNew h\u00e2l\u00e2 document.getElementById ile ba\u011flan\u0131yor. Di\u011fer g\u00f6r\u00fcn\u00fcmlerde document.querySelectorAll('[data-...]') kalm\u0131\u015f olabilir.",
+          "evidence": "frontend-react/CountsView.jsx:51, ProductionView.jsx:52; di\u011fer g\u00f6r\u00fcn\u00fcmler ba\u011flamda yok",
+          "uncertainty": "Di\u011fer dosyalar g\u00f6r\u00fclmedi.",
+          "recommendation": "frontend-react i\u00e7inde document.querySelectorAll('[data- aramas\u0131yla kalan yerleri hostRef'e ta\u015f\u0131y\u0131n.",
+          "severity": "medium",
+          "verification": "unverified_model_claim"
+        },
+        {
+          "id": "12",
+          "claim": "Sekme yar\u0131\u015f\u0131 korumas\u0131 yaln\u0131z routingTab'da var. Di\u011fer planlama sekmeleri isCurrent'i yok say\u0131yor; ge\u00e7 gelen yan\u0131tlar\u0131 ortak #planBody'yi ezebilir.",
+          "evidence": "PlanningView.jsx: fns[tab](body, actions, () => !cancelled); yaln\u0131z routingTab kontrol ediyor",
+          "uncertainty": "Di\u011fer sekme fonksiyonlar\u0131 g\u00f6r\u00fclmedi. \u00d6nceki denetimde benzer bir hipotez taray\u0131c\u0131da yeniden \u00fcretilememi\u015fti.",
+          "recommendation": "Her sekmede await sonras\u0131na isCurrent() kontrol\u00fc ekleyin.",
+          "severity": "medium",
+          "verification": "unverified_model_claim"
+        },
+        {
+          "id": "13",
+          "claim": "Hata durumunda onClick={reload} korumas\u0131z kullan\u0131l\u0131yor. Eski kod 'typeof reload === function' kontrol\u00fc yap\u0131yordu, yani reload baz\u0131 g\u00f6r\u00fcn\u00fcmlerde tan\u0131ms\u0131z olabilir.",
+          "evidence": "Counts/Items/Lots/ProductionView error dal\u0131",
+          "uncertainty": "D\u00f6rt g\u00f6r\u00fcn\u00fcm i\u00e7in taray\u0131c\u0131 testi retry'\u0131 t\u0131kl\u0131yor. Test ge\u00e7erse sorun yoktur.",
+          "recommendation": "Final ko\u015fuda '... outage is retried' testlerinin sonucunu do\u011frulay\u0131n.",
+          "severity": "low",
+          "verification": "unverified_model_claim"
+        },
+        {
+          "id": "14",
+          "claim": "Lot se\u00e7icideki eski yan\u0131t korumas\u0131 do\u011fru: version sayac\u0131, isConnected ve ui.js'teki itemId ba\u011flam kontrol\u00fc var. Y\u00fckleme hatas\u0131nda kay\u0131t engelleniyor ve retry sunuluyor.",
+          "evidence": "QualityView.jsx bindLotSelector; ui.js SEARCH_SOURCES.lots ve context kontrol\u00fc",
+          "uncertainty": "Lot alan\u0131 iste\u011fe ba\u011fl\u0131 oldu\u011fu halde, lot y\u00fckleme hatas\u0131 NCR kayd\u0131n\u0131 da engelliyor; bu bir davran\u0131\u015f de\u011fi\u015fikli\u011fi. UI.num ve UI.t'nin d\u0131\u015fa aktar\u0131ld\u0131\u011f\u0131 g\u00f6r\u00fclmedi.",
+          "recommendation": "Bu engellemenin iste\u011fe ba\u011fl\u0131 lot i\u00e7in istenip istenmedi\u011fini netle\u015ftirin. UI.num ve UI.t'nin export edildi\u011fini do\u011frulay\u0131n.",
+          "severity": "info",
+          "verification": "unverified_model_claim"
+        },
+        {
+          "id": "15",
+          "claim": "Liste ve se\u00e7ici s\u0131n\u0131rlar\u0131 sunucu aramas\u0131yla a\u015f\u0131l\u0131yor (300 \u00fcr\u00fcn, 100 lot). lots kayna\u011f\u0131nda 'one' \u00e7\u00f6z\u00fcc\u00fc yok, bu y\u00fczden listede olmayan \u00f6nse\u00e7ili bir lot etiketlenemez.",
+          "evidence": "public/js/ui.js SEARCH_SOURCES.lots; test/audit-regressions.js paging b\u00f6l\u00fcm\u00fc",
+          "uncertainty": "\u00d6nse\u00e7ili lot senaryosunun var olup olmad\u0131\u011f\u0131 bilinmiyor.",
+          "recommendation": "Gerekirse lots i\u00e7in 'one' ekleyin.",
+          "severity": "low",
+          "verification": "unverified_model_claim"
+        },
+        {
+          "id": "16",
+          "claim": "pendingWrites art\u0131k g\u00f6vde ayr\u0131\u015ft\u0131r\u0131lana kadar tutuluyor. Express varsay\u0131lan ETag'i nedeniyle neredeyse t\u00fcm JSON nesnelerine say\u0131lamayan bir 'revision' alan\u0131 ekleniyor; bu zarars\u0131z.",
+          "evidence": "public/js/api.js try/finally ve defineProperty",
+          "uncertainty": "\u0130\u00e7 try blo\u011funun catch yap\u0131s\u0131n\u0131n s\u00f6zdizimi a\u00e7\u0131s\u0131ndan do\u011fru kald\u0131\u011f\u0131, k\u0131smi diff'ten tam do\u011frulanam\u0131yor.",
+          "recommendation": "Lint ve build \u00e7\u0131kt\u0131s\u0131yla do\u011frulay\u0131n; girintiyi d\u00fczeltin.",
+          "severity": "info",
+          "verification": "unverified_model_claim"
+        },
+        {
+          "id": "17",
+          "claim": "Lisans s\u0131n\u0131r\u0131 ve oturum sonu modal d\u00fczeltmeleri do\u011fru ve k\u00fc\u00e7\u00fck kapsaml\u0131.",
+          "evidence": "server/lib/license.js:75; public/js/app.js:153",
+          "uncertainty": "Lisans testi license.js fikst\u00fcr\u00fcn\u00fc regex ile okuyor; bu k\u0131r\u0131lgan.",
+          "recommendation": "Fikst\u00fcr\u00fc mod\u00fcl olarak export edin.",
+          "severity": "info",
+          "verification": "unverified_model_claim"
+        },
+        {
+          "id": "18",
+          "claim": "Do\u011frulama durumu: 42 tak\u0131m ve 58 taray\u0131c\u0131 testi yaln\u0131z son korumalardan \u00f6nce ge\u00e7ti. Final ko\u015fu s\u00fcr\u00fcyor, bu y\u00fczden 9 hatan\u0131n kapand\u0131\u011f\u0131 hen\u00fcz kan\u0131tlanm\u0131\u015f say\u0131lmaz.",
+          "evidence": "fix-review-server/ui ba\u015fl\u0131klar\u0131",
+          "uncertainty": "Test sonucu uydurulmad\u0131. Final sonu\u00e7 bilinmiyor.",
+          "recommendation": "Final \u00e7\u0131kt\u0131y\u0131 (Chromium ve WebKit dahil) kaydetmeden PROJECT_STATUS.md'de hatalar\u0131 kapatmay\u0131n.",
+          "severity": "high",
+          "verification": "unverified_model_claim"
+        }
+      ],
+      "findings_schema_valid": true,
+      "usage": {
+        "tokens": {
+          "input_tokens": 2,
+          "cache_creation_input_tokens": 27465,
+          "cache_read_input_tokens": 1467,
+          "output_tokens": 11287,
+          "output_tokens_details": {
+            "thinking_tokens": 6966
+          },
+          "server_tool_use": {
+            "web_search_requests": 0,
+            "web_fetch_requests": 0
+          },
+          "cache_creation": {
+            "ephemeral_1h_input_tokens": 27465,
+            "ephemeral_5m_input_tokens": 0
+          }
+        },
+        "cost_usd": 0.4457614,
+        "models": [
+          "claude-opus-5-5"
+        ],
+        "tools": "unknown"
+      },
+      "requested_model": "claude-opus-5-5",
+      "requested_effort": "medium",
+      "effort_observed": "unknown",
+      "model_verified": true,
+      "report_truncated": false,
+      "exit_code": 0,
+      "elapsed_seconds": 117.33,
+      "context_chars": 60309,
+      "cli": {
+        "path": "C:\\Users\\ilker\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Anthropic.ClaudeCode_Microsoft.Winget.Source_8wekyb3d8bbwe\\claude.exe",
+        "version": "2.1.292 (Claude Code)",
+        "profile_supported": true,
+        "missing_flags": [],
+        "authentication": "unknown",
+        "selected_model": "claude-opus-5-5",
+        "requested_effort": "medium",
+        "model_observed": "unknown"
+      },
+      "provider": "claude",
+      "round": 1,
+      "call_attempted": true
+    },
+    "gemini": {
+      "status": "error",
+      "message": "120 saniyelik zaman a\u015f\u0131m\u0131",
+      "error_type": "timeout",
+      "timeout_seconds": 120,
+      "elapsed_seconds": 120.0,
+      "provider": "gemini",
+      "round": 1,
+      "call_attempted": true
+    }
+  },
+  "round_history": [
+    {
+      "claude": {
+        "status": "ok",
+        "message": "{\"findings\": [{\"claim\": \"Rota veri kayb\u0131 d\u00fczeltmesi do\u011fru g\u00f6r\u00fcn\u00fcyor: GET hatas\u0131 art\u0131k bo\u015f liste say\u0131lm\u0131yor; bo\u015f kay\u0131t a\u00e7\u0131k 'clear' olmadan 422 al\u0131yor; ETag ile e\u015fzamanl\u0131l\u0131k kontrol\u00fc yap\u0131l\u0131yor.\", \"evidence\": \"frontend-react/PlanningView.jsx: Api.routings(...).catch(()=>[]) kald\u0131r\u0131ld\u0131; server/routes/planning.js PUT: txImmediate i\u00e7inde expectedRevision ve clear kontrol\u00fc\", \"severity\": \"info\", \"uncertainty\": \"Testler son korumalardan sonra yeniden ko\u015fulmad\u0131. Sonu\u00e7 ba\u011flamda bildirilmedi.\", \"recommendation\": \"Final ko\u015fuda audit-regressions 'routing revision conflict and explicit clear' ve taray\u0131c\u0131daki 'routing outage' sonu\u00e7lar\u0131n\u0131 kaydedin.\"}, {\"claim\": \"Uyumluluk k\u0131r\u0131lmas\u0131: bo\u015f operations g\u00f6nderen eski istemci veya entegrasyonlar art\u0131k 422 al\u0131yor. 'expectedRevision' iste\u011fe ba\u011fl\u0131 olsa da 'clear' zorunlu hale geldi.\", \"evidence\": \"server/routes/planning.js: if (!operations.length && !clear) throw 422\", \"severity\": \"low\", \"uncertainty\": \"Bu davran\u0131\u015f bilin\u00e7li bir karar olarak belgelenmi\u015f ('Empty route requires explicit clear'). Harici istemci olup olmad\u0131\u011f\u0131 bilinmiyor.\", \"recommendation\": \"Bu de\u011fi\u015fikli\u011fi s\u00fcr\u00fcm notuna API davran\u0131\u015f de\u011fi\u015fikli\u011fi olarak ekleyin.\"}, {\"claim\": \"ETag kar\u015f\u0131la\u015ft\u0131rmas\u0131 g\u00fc\u00e7l\u00fc ETag de\u011ferinin birebir e\u015fle\u015fmesine dayan\u0131yor. Bir proxy veya s\u0131k\u0131\u015ft\u0131rma katman\u0131 ETag'i zay\u0131f (W/) yaparsa her kay\u0131t kal\u0131c\u0131 olarak 409 al\u0131r.\", \"evidence\": \"public/js/api.js: revision = res.headers.get('ETag'); planning.js: expectedRevision !== routingRevision(itemId)\", \"severity\": \"low\", \"uncertainty\": \"Bu bir hipotez. Da\u011f\u0131t\u0131mda ters proxy kullan\u0131l\u0131p kullan\u0131lmad\u0131\u011f\u0131 bilinmiyor.\", \"recommendation\": \"Kar\u015f\u0131la\u015ft\u0131rmadan \u00f6nce 'W/' \u00f6nekini normalize edin ya da revizyonu ayr\u0131ca g\u00f6vdede d\u00f6nd\u00fcr\u00fcn.\"}, {\"claim\": \"S\u00fcresi dolmu\u015f lot korumas\u0131 ve geri alma do\u011fru: consume i\u015flemi txImmediate i\u00e7inde. FEFO ile availableQty ayn\u0131 tarih ko\u015fulunu kullan\u0131yor.\", \"evidence\": \"server/services/stock.js consume/pickLotsFEFO/availableQty; testte rollback snapshot kar\u015f\u0131la\u015ft\u0131rmas\u0131 var\", \"severity\": \"info\", \"uncertainty\": \"Bu durum expiry_date de\u011ferinin today() ile ayn\u0131 'YYYY-MM-DD' bi\u00e7iminde ve ayn\u0131 saat diliminde sakland\u0131\u011f\u0131n\u0131 varsay\u0131yor.\", \"recommendation\": \"expiry_date bi\u00e7imini veritaban\u0131nda do\u011frulay\u0131n veya bir k\u0131s\u0131tla g\u00fcvenceye al\u0131n.\"}, {\"claim\": \"Di\u011fer consume \u00e7a\u011f\u0131ranlar\u0131 s\u00fcresi dolmu\u015f lotlarda k\u0131r\u0131labilir. allowExpired yaln\u0131z tedarik\u00e7i iadesi ve NCR hurdas\u0131 i\u00e7in eklendi; say\u0131m d\u00fczeltmesi, transfer veya NCR'nin di\u011fer karar t\u00fcrleri art\u0131k 409 verebilir.\", \"evidence\": \"Kan\u0131t yok. Diff yaln\u0131z purchasing.js:1250 ve quality.js:339'u g\u00f6steriyor; di\u011fer consume \u00e7a\u011fr\u0131lar\u0131 ba\u011flamda yok.\", \"severity\": \"medium\", \"uncertainty\": \"Do\u011frulanmam\u0131\u015f hipotez. Bu yollar consume kullanm\u0131yor olabilir.\", \"recommendation\": \"consume( \u00e7a\u011fr\u0131lar\u0131n\u0131 taray\u0131n. Say\u0131m azaltma ve transfer i\u00e7in s\u00fcresi dolmu\u015f lot senaryosuna test ekleyin.\"}, {\"claim\": \"availableQty s\u00fcresi dolmu\u015f lotlar\u0131 d\u0131\u015fl\u0131yor, ancak items.qty (recalcItemQty) b\u00fcy\u00fck olas\u0131l\u0131kla d\u0131\u015flam\u0131yor. Aray\u00fcz stok g\u00f6sterirken \u00e7\u0131k\u0131\u015f 'Insufficient' hatas\u0131 verebilir.\", \"evidence\": \"server/services/stock.js availableQty de\u011fi\u015fti; recalcItemQty diff'te yok\", \"severity\": \"medium\", \"uncertainty\": \"recalcItemQty kayna\u011f\u0131 g\u00f6r\u00fclmedi.\", \"recommendation\": \"G\u00f6sterilen stok ile kullan\u0131labilir stok fark\u0131n\u0131 aray\u00fczde belirtin veya ayr\u0131 bir alan olarak sunun.\"}, {\"claim\": \"Kalite kabul\u00fcnde ortalama maliyet d\u00fczeltmesi var. Ancak do\u011frulu\u011fu, updateAverageCost'un recalcItemQty'den sonra \u00e7a\u011fr\u0131lmas\u0131na ra\u011fmen eski miktar\u0131 do\u011fru almas\u0131na ba\u011fl\u0131 ve k\u0131r\u0131lgan.\", \"evidence\": \"server/services/stock.js changeLotStatus: recalcItemQty sonras\u0131 updateAverageCost(lot.item_id, moveQty, lot.unit_cost); test 40/55/40 bekliyor\", \"severity\": \"low\", \"uncertainty\": \"updateAverageCost kayna\u011f\u0131 g\u00f6r\u00fclmedi. Test ge\u00e7erse s\u0131ra tutarl\u0131d\u0131r.\", \"recommendation\": \"S\u0131ra ba\u011f\u0131ml\u0131l\u0131\u011f\u0131n\u0131 yorum veya bir assert ile sabitleyin.\"}, {\"claim\": \"available durumundan \u00e7\u0131k\u0131\u015fta recalcAverageCost, hareketli ortalama ge\u00e7mi\u015fini lot a\u011f\u0131rl\u0131kl\u0131 de\u011ferle ezebilir.\", \"evidence\": \"server/services/stock.js: else if (lot.status==='available' && toStatus!=='available') recalcAverageCost\", \"severity\": \"low\", \"uncertainty\": \"Hipotez. recalcAverageCost'un nas\u0131l hesaplad\u0131\u011f\u0131 bilinmiyor.\", \"recommendation\": \"Lotsuz eski stok bulunan bir \u00fcr\u00fcn i\u00e7in regresyon testi ekleyin.\"}, {\"claim\": \"'produced_qty ?? qty' de\u011fi\u015fikli\u011fi tam fire durumunu d\u00fczeltiyor. Ancak \u015femada produced_qty varsay\u0131lan\u0131 0 ise, a\u00e7\u0131k ve tamamlanmam\u0131\u015f emirlerde tahmini birim maliyet art\u0131k 0 olur.\", \"evidence\": \"server/services/costing.js:102\", \"severity\": \"medium\", \"uncertainty\": \"\u015eema varsay\u0131lan\u0131 ve a\u00e7\u0131k emir maliyet ekranlar\u0131 g\u00f6r\u00fclmedi.\", \"recommendation\": \"Birim maliyeti yaln\u0131z tamamlanm\u0131\u015f emirde produced_qty ile, di\u011ferlerinde qty ile hesaplay\u0131n ya da \u015femay\u0131 do\u011frulay\u0131n.\"}, {\"claim\": \"K\u0131smi sevkli sipari\u015f iptali txImmediate i\u00e7inde 409 ile engelleniyor. Durum ilerletme expectedStatus ile korunuyor ve eski istemci uyumlulu\u011fu s\u00fcr\u00fcyor.\", \"evidence\": \"server/routes/sales.js cancel ve PATCH status; SalesView.jsx \u00e7ift t\u0131klama kilidi\", \"severity\": \"info\", \"uncertainty\": \"shipments.cancelled_at s\u00fctununun varl\u0131\u011f\u0131 yaln\u0131z testin ge\u00e7mesine dayanarak \u00e7\u0131kar\u0131l\u0131yor. \u0130ptal edilmi\u015f sevkiyat\u0131 olan sipari\u015fin iptal edilebildi\u011fini do\u011frulayan test yok.\", \"recommendation\": \"\u0130ptal edilmi\u015f sevkiyat sonras\u0131 iptalin 200 d\u00f6nd\u00fc\u011f\u00fcn\u00fc test edin.\"}, {\"claim\": \"Gizli g\u00f6r\u00fcn\u00fcm handler sorunu yaln\u0131z Counts, Items, Lots ve Production i\u00e7in d\u00fczeltildi. cNew/pNew h\u00e2l\u00e2 document.getElementById ile ba\u011flan\u0131yor. Di\u011fer g\u00f6r\u00fcn\u00fcmlerde document.querySelectorAll('[data-...]') kalm\u0131\u015f olabilir.\", \"evidence\": \"frontend-react/CountsView.jsx:51, ProductionView.jsx:52; di\u011fer g\u00f6r\u00fcn\u00fcmler ba\u011flamda yok\", \"severity\": \"medium\", \"uncertainty\": \"Di\u011fer dosyalar g\u00f6r\u00fclmedi.\", \"recommendation\": \"frontend-react i\u00e7inde document.querySelectorAll('[data- aramas\u0131yla kalan yerleri hostRef'e ta\u015f\u0131y\u0131n.\"}, {\"claim\": \"Sekme yar\u0131\u015f\u0131 korumas\u0131 yaln\u0131z routingTab'da var. Di\u011fer planlama sekmeleri isCurrent'i yok say\u0131yor; ge\u00e7 gelen yan\u0131tlar\u0131 ortak #planBody'yi ezebilir.\", \"evidence\": \"PlanningView.jsx: fns[tab](body, actions, () => !cancelled); yaln\u0131z routingTab kontrol ediyor\", \"severity\": \"medium\", \"uncertainty\": \"Di\u011fer sekme fonksiyonlar\u0131 g\u00f6r\u00fclmedi. \u00d6nceki denetimde benzer bir hipotez taray\u0131c\u0131da yeniden \u00fcretilememi\u015fti.\", \"recommendation\": \"Her sekmede await sonras\u0131na isCurrent() kontrol\u00fc ekleyin.\"}, {\"claim\": \"Hata durumunda onClick={reload} korumas\u0131z kullan\u0131l\u0131yor. Eski kod 'typeof reload === function' kontrol\u00fc yap\u0131yordu, yani reload baz\u0131 g\u00f6r\u00fcn\u00fcmlerde tan\u0131ms\u0131z olabilir.\", \"evidence\": \"Counts/Items/Lots/ProductionView error dal\u0131\", \"severity\": \"low\", \"uncertainty\": \"D\u00f6rt g\u00f6r\u00fcn\u00fcm i\u00e7in taray\u0131c\u0131 testi retry'\u0131 t\u0131kl\u0131yor. Test ge\u00e7erse sorun yoktur.\", \"recommendation\": \"Final ko\u015fuda '... outage is retried' testlerinin sonucunu do\u011frulay\u0131n.\"}, {\"claim\": \"Lot se\u00e7icideki eski yan\u0131t korumas\u0131 do\u011fru: version sayac\u0131, isConnected ve ui.js'teki itemId ba\u011flam kontrol\u00fc var. Y\u00fckleme hatas\u0131nda kay\u0131t engelleniyor ve retry sunuluyor.\", \"evidence\": \"QualityView.jsx bindLotSelector; ui.js SEARCH_SOURCES.lots ve context kontrol\u00fc\", \"severity\": \"info\", \"uncertainty\": \"Lot alan\u0131 iste\u011fe ba\u011fl\u0131 oldu\u011fu halde, lot y\u00fckleme hatas\u0131 NCR kayd\u0131n\u0131 da engelliyor; bu bir davran\u0131\u015f de\u011fi\u015fikli\u011fi. UI.num ve UI.t'nin d\u0131\u015fa aktar\u0131ld\u0131\u011f\u0131 g\u00f6r\u00fclmedi.\", \"recommendation\": \"Bu engellemenin iste\u011fe ba\u011fl\u0131 lot i\u00e7in istenip istenmedi\u011fini netle\u015ftirin. UI.num ve UI.t'nin export edildi\u011fini do\u011frulay\u0131n.\"}, {\"claim\": \"Liste ve se\u00e7ici s\u0131n\u0131rlar\u0131 sunucu aramas\u0131yla a\u015f\u0131l\u0131yor (300 \u00fcr\u00fcn, 100 lot). lots kayna\u011f\u0131nda 'one' \u00e7\u00f6z\u00fcc\u00fc yok, bu y\u00fczden listede olmayan \u00f6nse\u00e7ili bir lot etiketlenemez.\", \"evidence\": \"public/js/ui.js SEARCH_SOURCES.lots; test/audit-regressions.js paging b\u00f6l\u00fcm\u00fc\", \"severity\": \"low\", \"uncertainty\": \"\u00d6nse\u00e7ili lot senaryosunun var olup olmad\u0131\u011f\u0131 bilinmiyor.\", \"recommendation\": \"Gerekirse lots i\u00e7in 'one' ekleyin.\"}, {\"claim\": \"pendingWrites art\u0131k g\u00f6vde ayr\u0131\u015ft\u0131r\u0131lana kadar tutuluyor. Express varsay\u0131lan ETag'i nedeniyle neredeyse t\u00fcm JSON nesnelerine say\u0131lamayan bir 'revision' alan\u0131 ekleniyor; bu zarars\u0131z.\", \"evidence\": \"public/js/api.js try/finally ve defineProperty\", \"severity\": \"info\", \"uncertainty\": \"\u0130\u00e7 try blo\u011funun catch yap\u0131s\u0131n\u0131n s\u00f6zdizimi a\u00e7\u0131s\u0131ndan do\u011fru kald\u0131\u011f\u0131, k\u0131smi diff'ten tam do\u011frulanam\u0131yor.\", \"recommendation\": \"Lint ve build \u00e7\u0131kt\u0131s\u0131yla do\u011frulay\u0131n; girintiyi d\u00fczeltin.\"}, {\"claim\": \"Lisans s\u0131n\u0131r\u0131 ve oturum sonu modal d\u00fczeltmeleri do\u011fru ve k\u00fc\u00e7\u00fck kapsaml\u0131.\", \"evidence\": \"server/lib/license.js:75; public/js/app.js:153\", \"severity\": \"info\", \"uncertainty\": \"Lisans testi license.js fikst\u00fcr\u00fcn\u00fc regex ile okuyor; bu k\u0131r\u0131lgan.\", \"recommendation\": \"Fikst\u00fcr\u00fc mod\u00fcl olarak export edin.\"}, {\"claim\": \"Do\u011frulama durumu: 42 tak\u0131m ve 58 taray\u0131c\u0131 testi yaln\u0131z son korumalardan \u00f6nce ge\u00e7ti. Final ko\u015fu s\u00fcr\u00fcyor, bu y\u00fczden 9 hatan\u0131n kapand\u0131\u011f\u0131 hen\u00fcz kan\u0131tlanm\u0131\u015f say\u0131lmaz.\", \"evidence\": \"fix-review-server/ui ba\u015fl\u0131klar\u0131\", \"severity\": \"high\", \"uncertainty\": \"Test sonucu uydurulmad\u0131. Final sonu\u00e7 bilinmiyor.\", \"recommendation\": \"Final \u00e7\u0131kt\u0131y\u0131 (Chromium ve WebKit dahil) kaydetmeden PROJECT_STATUS.md'de hatalar\u0131 kapatmay\u0131n.\"}]}",
+        "findings": [
+          {
+            "id": "1",
+            "claim": "Rota veri kayb\u0131 d\u00fczeltmesi do\u011fru g\u00f6r\u00fcn\u00fcyor: GET hatas\u0131 art\u0131k bo\u015f liste say\u0131lm\u0131yor; bo\u015f kay\u0131t a\u00e7\u0131k 'clear' olmadan 422 al\u0131yor; ETag ile e\u015fzamanl\u0131l\u0131k kontrol\u00fc yap\u0131l\u0131yor.",
+            "evidence": "frontend-react/PlanningView.jsx: Api.routings(...).catch(()=>[]) kald\u0131r\u0131ld\u0131; server/routes/planning.js PUT: txImmediate i\u00e7inde expectedRevision ve clear kontrol\u00fc",
+            "uncertainty": "Testler son korumalardan sonra yeniden ko\u015fulmad\u0131. Sonu\u00e7 ba\u011flamda bildirilmedi.",
+            "recommendation": "Final ko\u015fuda audit-regressions 'routing revision conflict and explicit clear' ve taray\u0131c\u0131daki 'routing outage' sonu\u00e7lar\u0131n\u0131 kaydedin.",
+            "severity": "info",
+            "verification": "unverified_model_claim"
+          },
+          {
+            "id": "2",
+            "claim": "Uyumluluk k\u0131r\u0131lmas\u0131: bo\u015f operations g\u00f6nderen eski istemci veya entegrasyonlar art\u0131k 422 al\u0131yor. 'expectedRevision' iste\u011fe ba\u011fl\u0131 olsa da 'clear' zorunlu hale geldi.",
+            "evidence": "server/routes/planning.js: if (!operations.length && !clear) throw 422",
+            "uncertainty": "Bu davran\u0131\u015f bilin\u00e7li bir karar olarak belgelenmi\u015f ('Empty route requires explicit clear'). Harici istemci olup olmad\u0131\u011f\u0131 bilinmiyor.",
+            "recommendation": "Bu de\u011fi\u015fikli\u011fi s\u00fcr\u00fcm notuna API davran\u0131\u015f de\u011fi\u015fikli\u011fi olarak ekleyin.",
+            "severity": "low",
+            "verification": "unverified_model_claim"
+          },
+          {
+            "id": "3",
+            "claim": "ETag kar\u015f\u0131la\u015ft\u0131rmas\u0131 g\u00fc\u00e7l\u00fc ETag de\u011ferinin birebir e\u015fle\u015fmesine dayan\u0131yor. Bir proxy veya s\u0131k\u0131\u015ft\u0131rma katman\u0131 ETag'i zay\u0131f (W/) yaparsa her kay\u0131t kal\u0131c\u0131 olarak 409 al\u0131r.",
+            "evidence": "public/js/api.js: revision = res.headers.get('ETag'); planning.js: expectedRevision !== routingRevision(itemId)",
+            "uncertainty": "Bu bir hipotez. Da\u011f\u0131t\u0131mda ters proxy kullan\u0131l\u0131p kullan\u0131lmad\u0131\u011f\u0131 bilinmiyor.",
+            "recommendation": "Kar\u015f\u0131la\u015ft\u0131rmadan \u00f6nce 'W/' \u00f6nekini normalize edin ya da revizyonu ayr\u0131ca g\u00f6vdede d\u00f6nd\u00fcr\u00fcn.",
+            "severity": "low",
+            "verification": "unverified_model_claim"
+          },
+          {
+            "id": "4",
+            "claim": "S\u00fcresi dolmu\u015f lot korumas\u0131 ve geri alma do\u011fru: consume i\u015flemi txImmediate i\u00e7inde. FEFO ile availableQty ayn\u0131 tarih ko\u015fulunu kullan\u0131yor.",
+            "evidence": "server/services/stock.js consume/pickLotsFEFO/availableQty; testte rollback snapshot kar\u015f\u0131la\u015ft\u0131rmas\u0131 var",
+            "uncertainty": "Bu durum expiry_date de\u011ferinin today() ile ayn\u0131 'YYYY-MM-DD' bi\u00e7iminde ve ayn\u0131 saat diliminde sakland\u0131\u011f\u0131n\u0131 varsay\u0131yor.",
+            "recommendation": "expiry_date bi\u00e7imini veritaban\u0131nda do\u011frulay\u0131n veya bir k\u0131s\u0131tla g\u00fcvenceye al\u0131n.",
+            "severity": "info",
+            "verification": "unverified_model_claim"
+          },
+          {
+            "id": "5",
+            "claim": "Di\u011fer consume \u00e7a\u011f\u0131ranlar\u0131 s\u00fcresi dolmu\u015f lotlarda k\u0131r\u0131labilir. allowExpired yaln\u0131z tedarik\u00e7i iadesi ve NCR hurdas\u0131 i\u00e7in eklendi; say\u0131m d\u00fczeltmesi, transfer veya NCR'nin di\u011fer karar t\u00fcrleri art\u0131k 409 verebilir.",
+            "evidence": "Kan\u0131t yok. Diff yaln\u0131z purchasing.js:1250 ve quality.js:339'u g\u00f6steriyor; di\u011fer consume \u00e7a\u011fr\u0131lar\u0131 ba\u011flamda yok.",
+            "uncertainty": "Do\u011frulanmam\u0131\u015f hipotez. Bu yollar consume kullanm\u0131yor olabilir.",
+            "recommendation": "consume( \u00e7a\u011fr\u0131lar\u0131n\u0131 taray\u0131n. Say\u0131m azaltma ve transfer i\u00e7in s\u00fcresi dolmu\u015f lot senaryosuna test ekleyin.",
+            "severity": "medium",
+            "verification": "unverified_model_claim"
+          },
+          {
+            "id": "6",
+            "claim": "availableQty s\u00fcresi dolmu\u015f lotlar\u0131 d\u0131\u015fl\u0131yor, ancak items.qty (recalcItemQty) b\u00fcy\u00fck olas\u0131l\u0131kla d\u0131\u015flam\u0131yor. Aray\u00fcz stok g\u00f6sterirken \u00e7\u0131k\u0131\u015f 'Insufficient' hatas\u0131 verebilir.",
+            "evidence": "server/services/stock.js availableQty de\u011fi\u015fti; recalcItemQty diff'te yok",
+            "uncertainty": "recalcItemQty kayna\u011f\u0131 g\u00f6r\u00fclmedi.",
+            "recommendation": "G\u00f6sterilen stok ile kullan\u0131labilir stok fark\u0131n\u0131 aray\u00fczde belirtin veya ayr\u0131 bir alan olarak sunun.",
+            "severity": "medium",
+            "verification": "unverified_model_claim"
+          },
+          {
+            "id": "7",
+            "claim": "Kalite kabul\u00fcnde ortalama maliyet d\u00fczeltmesi var. Ancak do\u011frulu\u011fu, updateAverageCost'un recalcItemQty'den sonra \u00e7a\u011fr\u0131lmas\u0131na ra\u011fmen eski miktar\u0131 do\u011fru almas\u0131na ba\u011fl\u0131 ve k\u0131r\u0131lgan.",
+            "evidence": "server/services/stock.js changeLotStatus: recalcItemQty sonras\u0131 updateAverageCost(lot.item_id, moveQty, lot.unit_cost); test 40/55/40 bekliyor",
+            "uncertainty": "updateAverageCost kayna\u011f\u0131 g\u00f6r\u00fclmedi. Test ge\u00e7erse s\u0131ra tutarl\u0131d\u0131r.",
+            "recommendation": "S\u0131ra ba\u011f\u0131ml\u0131l\u0131\u011f\u0131n\u0131 yorum veya bir assert ile sabitleyin.",
+            "severity": "low",
+            "verification": "unverified_model_claim"
+          },
+          {
+            "id": "8",
+            "claim": "available durumundan \u00e7\u0131k\u0131\u015fta recalcAverageCost, hareketli ortalama ge\u00e7mi\u015fini lot a\u011f\u0131rl\u0131kl\u0131 de\u011ferle ezebilir.",
+            "evidence": "server/services/stock.js: else if (lot.status==='available' && toStatus!=='available') recalcAverageCost",
+            "uncertainty": "Hipotez. recalcAverageCost'un nas\u0131l hesaplad\u0131\u011f\u0131 bilinmiyor.",
+            "recommendation": "Lotsuz eski stok bulunan bir \u00fcr\u00fcn i\u00e7in regresyon testi ekleyin.",
+            "severity": "low",
+            "verification": "unverified_model_claim"
+          },
+          {
+            "id": "9",
+            "claim": "'produced_qty ?? qty' de\u011fi\u015fikli\u011fi tam fire durumunu d\u00fczeltiyor. Ancak \u015femada produced_qty varsay\u0131lan\u0131 0 ise, a\u00e7\u0131k ve tamamlanmam\u0131\u015f emirlerde tahmini birim maliyet art\u0131k 0 olur.",
+            "evidence": "server/services/costing.js:102",
+            "uncertainty": "\u015eema varsay\u0131lan\u0131 ve a\u00e7\u0131k emir maliyet ekranlar\u0131 g\u00f6r\u00fclmedi.",
+            "recommendation": "Birim maliyeti yaln\u0131z tamamlanm\u0131\u015f emirde produced_qty ile, di\u011ferlerinde qty ile hesaplay\u0131n ya da \u015femay\u0131 do\u011frulay\u0131n.",
+            "severity": "medium",
+            "verification": "unverified_model_claim"
+          },
+          {
+            "id": "10",
+            "claim": "K\u0131smi sevkli sipari\u015f iptali txImmediate i\u00e7inde 409 ile engelleniyor. Durum ilerletme expectedStatus ile korunuyor ve eski istemci uyumlulu\u011fu s\u00fcr\u00fcyor.",
+            "evidence": "server/routes/sales.js cancel ve PATCH status; SalesView.jsx \u00e7ift t\u0131klama kilidi",
+            "uncertainty": "shipments.cancelled_at s\u00fctununun varl\u0131\u011f\u0131 yaln\u0131z testin ge\u00e7mesine dayanarak \u00e7\u0131kar\u0131l\u0131yor. \u0130ptal edilmi\u015f sevkiyat\u0131 olan sipari\u015fin iptal edilebildi\u011fini do\u011frulayan test yok.",
+            "recommendation": "\u0130ptal edilmi\u015f sevkiyat sonras\u0131 iptalin 200 d\u00f6nd\u00fc\u011f\u00fcn\u00fc test edin.",
+            "severity": "info",
+            "verification": "unverified_model_claim"
+          },
+          {
+            "id": "11",
+            "claim": "Gizli g\u00f6r\u00fcn\u00fcm handler sorunu yaln\u0131z Counts, Items, Lots ve Production i\u00e7in d\u00fczeltildi. cNew/pNew h\u00e2l\u00e2 document.getElementById ile ba\u011flan\u0131yor. Di\u011fer g\u00f6r\u00fcn\u00fcmlerde document.querySelectorAll('[data-...]') kalm\u0131\u015f olabilir.",
+            "evidence": "frontend-react/CountsView.jsx:51, ProductionView.jsx:52; di\u011fer g\u00f6r\u00fcn\u00fcmler ba\u011flamda yok",
+            "uncertainty": "Di\u011fer dosyalar g\u00f6r\u00fclmedi.",
+            "recommendation": "frontend-react i\u00e7inde document.querySelectorAll('[data- aramas\u0131yla kalan yerleri hostRef'e ta\u015f\u0131y\u0131n.",
+            "severity": "medium",
+            "verification": "unverified_model_claim"
+          },
+          {
+            "id": "12",
+            "claim": "Sekme yar\u0131\u015f\u0131 korumas\u0131 yaln\u0131z routingTab'da var. Di\u011fer planlama sekmeleri isCurrent'i yok say\u0131yor; ge\u00e7 gelen yan\u0131tlar\u0131 ortak #planBody'yi ezebilir.",
+            "evidence": "PlanningView.jsx: fns[tab](body, actions, () => !cancelled); yaln\u0131z routingTab kontrol ediyor",
+            "uncertainty": "Di\u011fer sekme fonksiyonlar\u0131 g\u00f6r\u00fclmedi. \u00d6nceki denetimde benzer bir hipotez taray\u0131c\u0131da yeniden \u00fcretilememi\u015fti.",
+            "recommendation": "Her sekmede await sonras\u0131na isCurrent() kontrol\u00fc ekleyin.",
+            "severity": "medium",
+            "verification": "unverified_model_claim"
+          },
+          {
+            "id": "13",
+            "claim": "Hata durumunda onClick={reload} korumas\u0131z kullan\u0131l\u0131yor. Eski kod 'typeof reload === function' kontrol\u00fc yap\u0131yordu, yani reload baz\u0131 g\u00f6r\u00fcn\u00fcmlerde tan\u0131ms\u0131z olabilir.",
+            "evidence": "Counts/Items/Lots/ProductionView error dal\u0131",
+            "uncertainty": "D\u00f6rt g\u00f6r\u00fcn\u00fcm i\u00e7in taray\u0131c\u0131 testi retry'\u0131 t\u0131kl\u0131yor. Test ge\u00e7erse sorun yoktur.",
+            "recommendation": "Final ko\u015fuda '... outage is retried' testlerinin sonucunu do\u011frulay\u0131n.",
+            "severity": "low",
+            "verification": "unverified_model_claim"
+          },
+          {
+            "id": "14",
+            "claim": "Lot se\u00e7icideki eski yan\u0131t korumas\u0131 do\u011fru: version sayac\u0131, isConnected ve ui.js'teki itemId ba\u011flam kontrol\u00fc var. Y\u00fckleme hatas\u0131nda kay\u0131t engelleniyor ve retry sunuluyor.",
+            "evidence": "QualityView.jsx bindLotSelector; ui.js SEARCH_SOURCES.lots ve context kontrol\u00fc",
+            "uncertainty": "Lot alan\u0131 iste\u011fe ba\u011fl\u0131 oldu\u011fu halde, lot y\u00fckleme hatas\u0131 NCR kayd\u0131n\u0131 da engelliyor; bu bir davran\u0131\u015f de\u011fi\u015fikli\u011fi. UI.num ve UI.t'nin d\u0131\u015fa aktar\u0131ld\u0131\u011f\u0131 g\u00f6r\u00fclmedi.",
+            "recommendation": "Bu engellemenin iste\u011fe ba\u011fl\u0131 lot i\u00e7in istenip istenmedi\u011fini netle\u015ftirin. UI.num ve UI.t'nin export edildi\u011fini do\u011frulay\u0131n.",
+            "severity": "info",
+            "verification": "unverified_model_claim"
+          },
+          {
+            "id": "15",
+            "claim": "Liste ve se\u00e7ici s\u0131n\u0131rlar\u0131 sunucu aramas\u0131yla a\u015f\u0131l\u0131yor (300 \u00fcr\u00fcn, 100 lot). lots kayna\u011f\u0131nda 'one' \u00e7\u00f6z\u00fcc\u00fc yok, bu y\u00fczden listede olmayan \u00f6nse\u00e7ili bir lot etiketlenemez.",
+            "evidence": "public/js/ui.js SEARCH_SOURCES.lots; test/audit-regressions.js paging b\u00f6l\u00fcm\u00fc",
+            "uncertainty": "\u00d6nse\u00e7ili lot senaryosunun var olup olmad\u0131\u011f\u0131 bilinmiyor.",
+            "recommendation": "Gerekirse lots i\u00e7in 'one' ekleyin.",
+            "severity": "low",
+            "verification": "unverified_model_claim"
+          },
+          {
+            "id": "16",
+            "claim": "pendingWrites art\u0131k g\u00f6vde ayr\u0131\u015ft\u0131r\u0131lana kadar tutuluyor. Express varsay\u0131lan ETag'i nedeniyle neredeyse t\u00fcm JSON nesnelerine say\u0131lamayan bir 'revision' alan\u0131 ekleniyor; bu zarars\u0131z.",
+            "evidence": "public/js/api.js try/finally ve defineProperty",
+            "uncertainty": "\u0130\u00e7 try blo\u011funun catch yap\u0131s\u0131n\u0131n s\u00f6zdizimi a\u00e7\u0131s\u0131ndan do\u011fru kald\u0131\u011f\u0131, k\u0131smi diff'ten tam do\u011frulanam\u0131yor.",
+            "recommendation": "Lint ve build \u00e7\u0131kt\u0131s\u0131yla do\u011frulay\u0131n; girintiyi d\u00fczeltin.",
+            "severity": "info",
+            "verification": "unverified_model_claim"
+          },
+          {
+            "id": "17",
+            "claim": "Lisans s\u0131n\u0131r\u0131 ve oturum sonu modal d\u00fczeltmeleri do\u011fru ve k\u00fc\u00e7\u00fck kapsaml\u0131.",
+            "evidence": "server/lib/license.js:75; public/js/app.js:153",
+            "uncertainty": "Lisans testi license.js fikst\u00fcr\u00fcn\u00fc regex ile okuyor; bu k\u0131r\u0131lgan.",
+            "recommendation": "Fikst\u00fcr\u00fc mod\u00fcl olarak export edin.",
+            "severity": "info",
+            "verification": "unverified_model_claim"
+          },
+          {
+            "id": "18",
+            "claim": "Do\u011frulama durumu: 42 tak\u0131m ve 58 taray\u0131c\u0131 testi yaln\u0131z son korumalardan \u00f6nce ge\u00e7ti. Final ko\u015fu s\u00fcr\u00fcyor, bu y\u00fczden 9 hatan\u0131n kapand\u0131\u011f\u0131 hen\u00fcz kan\u0131tlanm\u0131\u015f say\u0131lmaz.",
+            "evidence": "fix-review-server/ui ba\u015fl\u0131klar\u0131",
+            "uncertainty": "Test sonucu uydurulmad\u0131. Final sonu\u00e7 bilinmiyor.",
+            "recommendation": "Final \u00e7\u0131kt\u0131y\u0131 (Chromium ve WebKit dahil) kaydetmeden PROJECT_STATUS.md'de hatalar\u0131 kapatmay\u0131n.",
+            "severity": "high",
+            "verification": "unverified_model_claim"
+          }
+        ],
+        "findings_schema_valid": true,
+        "usage": {
+          "tokens": {
+            "input_tokens": 2,
+            "cache_creation_input_tokens": 27465,
+            "cache_read_input_tokens": 1467,
+            "output_tokens": 11287,
+            "output_tokens_details": {
+              "thinking_tokens": 6966
+            },
+            "server_tool_use": {
+              "web_search_requests": 0,
+              "web_fetch_requests": 0
+            },
+            "cache_creation": {
+              "ephemeral_1h_input_tokens": 27465,
+              "ephemeral_5m_input_tokens": 0
+            }
+          },
+          "cost_usd": 0.4457614,
+          "models": [
+            "claude-opus-5-5"
+          ],
+          "tools": "unknown"
+        },
+        "requested_model": "claude-opus-5-5",
+        "requested_effort": "medium",
+        "effort_observed": "unknown",
+        "model_verified": true,
+        "report_truncated": false,
+        "exit_code": 0,
+        "elapsed_seconds": 117.33,
+        "context_chars": 60309,
+        "cli": {
+          "path": "C:\\Users\\ilker\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Anthropic.ClaudeCode_Microsoft.Winget.Source_8wekyb3d8bbwe\\claude.exe",
+          "version": "2.1.292 (Claude Code)",
+          "profile_supported": true,
+          "missing_flags": [],
+          "authentication": "unknown",
+          "selected_model": "claude-opus-5-5",
+          "requested_effort": "medium",
+          "model_observed": "unknown"
+        },
+        "provider": "claude",
+        "round": 1,
+        "call_attempted": true
+      },
+      "gemini": {
+        "status": "error",
+        "message": "120 saniyelik zaman a\u015f\u0131m\u0131",
+        "error_type": "timeout",
+        "timeout_seconds": 120,
+        "elapsed_seconds": 120.0,
+        "provider": "gemini",
+        "round": 1,
+        "call_attempted": true
+      }
+    }
+  ],
+  "rounds": [
+    {
+      "round": 1,
+      "executed_providers": [
+        "claude",
+        "gemini"
+      ],
+      "skipped_providers": {},
+      "status": "executed"
+    },
+    {
+      "round": 2,
+      "executed_providers": [],
+      "skipped_providers": {
+        "claude": "first_round_incomplete",
+        "gemini": "first_round_incomplete"
+      },
+      "status": "skipped"
+    }
+  ],
+  "fingerprint": "6073837dec8945c66db03d735bdaa59783f92d91bd44fa98f0376ebce3bca966",
+  "coordinator_decisions": [],
+  "observed_test_evidence": [],
+  "usage": {
+    "calls": 2,
+    "successful_responses": 1,
+    "reported_cost_usd": 0.4457614,
+    "cost_complete": false,
+    "quota": "unknown",
+    "work_contribution": "not_measured",
+    "tokens": "see_per_call_usage"
+  },
+  "elapsed_seconds": 120.08,
+  "transport_complete": false,
+  "complete": false,
+  "record_origin": "ai_team_managed"
+}

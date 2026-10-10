@@ -102,7 +102,7 @@ check({
   severity: 'critical',
   title: 'Süresi geçmiş ama kullanılabilir parti',
   explanation: 'Son kullanma tarihi geçtiği halde hâlâ kullanılabilir durumda olan partiler. ' +
-    'FEFO bunları sevk edebilir veya üretimde tüketebilir.',
+    'Tarih kontrolü normal sevk ve üretim tüketimini engeller. Fiziksel stokta bulunan bu partiler bloke edilerek ayrılmalıdır.',
   fixable: true,
   fixAction: 'Bu partiler bloke durumuna alınır ve hareket kaydı bırakılır.',
   run() {

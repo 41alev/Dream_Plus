@@ -337,6 +337,7 @@ router.post('/ncrs/:id/disposition', requirePermission('quality.write'), validat
           stock.consume([{ lotId: lot.id, qty }], {
             itemId: ncr.item_id, itemName: ncr.item_name, warehouseId: lot.warehouse_id,
             allowedStatuses: ['available', 'quarantine', 'blocked', 'rejected'],
+            allowExpired: true,
             refType: 'ncr', refId: ncr.id, note: `${ncr.ncr_no} · hurdaya ayrıldı`, userId: req.user.id
           });
         } else if (b.disposition === 'rework' || b.disposition === 'return_to_supplier') {

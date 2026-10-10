@@ -71,7 +71,7 @@ function verify(licenseFile) {
     const expiryMs = new Date(expiresAt + 'T23:59:59').getTime();
     if (Number.isNaN(expiryMs)) return { valid: false, reason: `Geçersiz son kullanma tarihi / Invalid expiry date: ${expiresAt}` };
     const daysRemaining = Math.ceil((expiryMs - Date.now()) / 86400000);
-    if (daysRemaining < 0) {
+    if (Date.now() > expiryMs) {
       return { valid: false, reason: `Lisans süresi doldu / License expired on ${expiresAt}`, expired: true, license: licenseFile.payload };
     }
     return { valid: true, license: licenseFile.payload, expired: false, daysRemaining };

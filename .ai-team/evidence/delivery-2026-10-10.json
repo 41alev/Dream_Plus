@@ -1,0 +1,14 @@
+{
+  "version": "2.0.3",
+  "status": "PASS",
+  "checks": [
+    "clean production setup",
+    "initial login",
+    "health migrations",
+    "item write",
+    "full backup verification",
+    "DB and uploaded document restoration",
+    "post-restore login and item read"
+  ],
+  "customerDataUsed": false
+}

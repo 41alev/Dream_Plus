@@ -180,6 +180,15 @@ const UI = (() => {
 
   /* ---------- server-side searchable selects (T08) ---------- */
   const SEARCH_SOURCES = {
+    producibleItems: {
+      find: q => Promise.all(['finished', 'semi'].map(itemType => Api.items({ q, itemType, pageSize: 30 })))
+        .then(results => results.flatMap(r => r.data).map(i => ({ v: i.id, l: i.code ? `${i.name} (${i.code})` : i.name }))),
+      one: id => Api.item(id).then(i => i.code ? `${i.name} (${i.code})` : i.name)
+    },
+    lots: {
+      find: (q, sel) => !sel.dataset.itemId ? Promise.resolve([]) : Api.lots({ q, itemId: sel.dataset.itemId, pageSize: 30 })
+        .then(r => r.data.map(l => ({ v: l.id, l: `${l.lotNo || '—'} · ${num(l.qty)} · ${l.status}` })))
+    },
     items: {
       find: q => Api.items({ q, pageSize: 30 }).then(r => (r.data || r).map(i => ({ v: i.id, l: i.code ? `${i.name} (${i.code})` : i.name }))),
       one: id => Api.item(id).then(i => i.code ? `${i.name} (${i.code})` : i.name)
@@ -223,8 +232,9 @@ const UI = (() => {
       if (q.length < 2) return;
       const mine = ++version;
       try {
-        const found = await source.find(q);
-        if (mine !== version) return;
+        const context = sel.dataset.itemId;
+        const found = await source.find(q, sel);
+        if (mine !== version || context !== sel.dataset.itemId || !sel.isConnected) return;
         if (!found.length) return;
         // The first match becomes the choice; the previous choice stays in the
         // list (last) so the user can switch back without searching again.
@@ -241,7 +251,7 @@ const UI = (() => {
         }
       } catch (e) { if (mine === version) err(e); }
     }, 250);
-    box.addEventListener('input', run);
+    box.addEventListener('input', () => { version++; run(); });
   }
   /** Option for a selected id that is not in the preloaded list (resolved by enhanceSelect). */
   function missingOption(list, id) {
