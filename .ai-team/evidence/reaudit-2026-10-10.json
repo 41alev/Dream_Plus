@@ -1,0 +1,118 @@
+[
+  {
+    "id": "LICENSE_EXPIRY",
+    "expected": "Yesterday-expired signed license rejected",
+    "actual": {
+      "valid": true,
+      "license": {
+        "licenseId": "SNT-TEST-0003",
+        "licensee": "Test Firma A.S.",
+        "product": "Sentez ERP",
+        "issuedAt": "2020-01-01",
+        "expiresAt": "2020-06-30"
+      },
+      "expired": false,
+      "daysRemaining": 0
+    },
+    "status": "FAIL",
+    "sourceCommit": "8ff6e2a"
+  },
+  {
+    "id": "QUALITY_AVERAGE_COST",
+    "expected": "20 available units have weighted unit cost 55",
+    "actual": {
+      "qty_cache": 20,
+      "avg_cost": 10
+    },
+    "status": "FAIL",
+    "sourceCommit": "8ff6e2a"
+  },
+  {
+    "id": "EXPIRED_STOCK_CONSUMED",
+    "expected": "Expired lot consumption rejected before mutation",
+    "actual": {
+      "consumed": 1,
+      "remaining": 2
+    },
+    "status": "FAIL",
+    "sourceCommit": "8ff6e2a"
+  },
+  {
+    "id": "FULL_SCRAP_COST",
+    "expected": "Good quantity 0, total cost 100 retained",
+    "actual": {
+      "materialCost": 0,
+      "labor": 100,
+      "overhead": 0,
+      "total": 100,
+      "unitCost": 20,
+      "goodQty": 5
+    },
+    "status": "FAIL",
+    "sourceCommit": "8ff6e2a"
+  },
+  {
+    "id": "PARTIAL_SHIPMENT_CANCEL",
+    "expected": "Shipped stock remains invoiceable or cancellation is rejected",
+    "actual": {
+      "cancelAllowed": true,
+      "invoiceStatus": 409,
+      "invoiceError": {
+        "error": "İptal edilmiş belge faturalanamaz / Cancelled source cannot be invoiced",
+        "requestId": "fbadebbe-d137-4a45-ab78-a461903fb336"
+      }
+    },
+    "status": "FAIL",
+    "sourceCommit": "8ff6e2a"
+  },
+  {
+    "id": "SHIPMENT_DOUBLE_ADVANCE",
+    "expected": "Repeated immediate activation advances shipment at most once",
+    "actual": {
+      "status": "Teslim Edildi"
+    },
+    "status": "FAIL",
+    "sourceCommit": "8ff6e2a"
+  },
+  {
+    "id": "ROUTING_OUTAGE_DELETE",
+    "expected": "Failed GET cannot erase the saved operation",
+    "actual": {
+      "before": 1,
+      "after": 0
+    },
+    "status": "FAIL",
+    "sourceCommit": "8ff6e2a"
+  },
+  {
+    "id": "COUNTS_LOADING_ERROR",
+    "expected": "Visible retryable error replaces loading",
+    "actual": {
+      "text": "Yükleniyor...",
+      "retryButtons": 0
+    },
+    "status": "FAIL",
+    "sourceCommit": "8ff6e2a"
+  },
+  {
+    "id": "STALE_SALES_RESPONSE",
+    "expected": "Invoices tab keeps invoice content after delayed orders response",
+    "actual": {
+      "selectedTab": "Faturalar",
+      "orderActionPresent": 0,
+      "invoiceHeaderPresent": 1
+    },
+    "status": "NOT_REPRODUCED",
+    "sourceCommit": "8ff6e2a"
+  },
+  {
+    "id": "SESSION_MODAL_REMAINS",
+    "expected": "Expired session closes application dialogs",
+    "actual": {
+      "modalVisible": true,
+      "modalTextPresent": true
+    },
+    "status": "FAIL",
+    "sourceCommit": "8ff6e2a"
+  }
+]

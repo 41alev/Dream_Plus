@@ -1,5 +1,27 @@
 # PROJECT_STATUS.md
 
+## 10 Ekim 2026 — iki standarda göre yeniden denetim; açık hatalar
+
+**Aktif durum:** engineering.md v8.3 + ORTAK_AI.md ile kaynak 8ff6e2a yeniden
+incelendi. Uygulama kodu değiştirilmedi. İzole denemelerde 9 hata yeniden
+üretildi: rota GET hatasından sonra kayıtta veri kaybı, kısmi sevk iptalinin
+faturalamayı engellemesi, kalite kabulünde ortalama maliyetin güncellenmemesi,
+tarihi geçmiş stok tüketimi (P1); tam fire maliyeti, lisans bitiş sınırı,
+çift sevkiyat durum ilerletme, sayım hata yüklemesi ve oturum sonu modalı (P2).
+Mevcut 41/41 takım ve Chromium/WebKit 46/46 başarıları bu açıkları kapatmıyor.
+Koşulsuz satış/teslim onayı yok. Kaynakta seçici liste sınırları, araştırılması
+gereken yarışlar, tip borcu ve doğrulanmamış saha/dağıtım kapıları ayrıca var.
+
+Gerçek Claude/Gemini plan ve iki turlu review yapıldı; yanıtlar başarılı fakat
+bağlam kısaltmaları nedeniyle complete:false. Modellerin transaction açığı
+iddiası çağıran kodla reddedildi; gecikmiş satış sekmesi hipotezi tarayıcıda
+yeniden üretilemedi. Her hata için kanıt ve koordinatör kararları:
+[`IKI-STANDART-YENIDEN-DENETIM-2026-10-10.md`](docs/IKI-STANDART-YENIDEN-DENETIM-2026-10-10.md).
+
+**Sonraki tek somut adım:** Rota 503 → Kaydet veri kaybını regresyon testiyle
+kapatmak; sonra diğer P1 hatalarını sırayla düzeltmek. Bu kayıt denetim sonucudur,
+uygulama hatalarının düzeltildiğini iddia etmez. Gerçek müşteri verisi kullanılmadı.
+
 ## 10 Ekim 2026 — engineering v8.3 düzeltmeleri, sürüm 2.0.2
 
 Bağımlılık audit açıkları, lint hataları/uyarıları, cross-browser portu,
