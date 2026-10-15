@@ -63,7 +63,7 @@ jobs:
 
       - name: Upload Playwright report on failure
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: playwright-report-${{ matrix.os }}-node${{ matrix.node }}
           path: playwright-report/
@@ -87,7 +87,7 @@ jobs:
       - run: npx playwright test --config=playwright.cross-browser.config.js
       - name: Upload browser failure evidence
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: cross-browser-failures
           path: test-results/
