@@ -21,6 +21,12 @@ Dosya olarak `data/` klasöründe durur.
 
 ## Kurulum
 
+**Windows'ta en kısa yol:** paket klasöründeki `Kurulum.cmd` dosyasını çift
+tıklayın. Aşağıdaki 1–3. adımları, otomatik başlatma görevini ve isteğe bağlı
+güvenlik duvarı kuralını sizin yerinize yapar (bkz. `SAHA-KURULUM-KARTI.md` §3).
+Otomasyon için: `windows\kurulum.ps1 -Port 3000 -OpenFirewall -SetupArgs ...`
+(şifre `ADMIN_PASSWORD` ortam değişkeniyle).
+
 Satıcı müşteri paketini `npm run release` ile üretir; paket
 `dream-plus-<sürüm>/` klasörüdür ve içinde `RELEASE.json` ile
 `SHA256SUMS.txt` bulunur. Pakette `.env`, özel anahtar, veritabanı veya
@@ -159,6 +165,7 @@ indirip tam paket dizinini `npm run restore:full -- <indirilen-paket>` ile geri 
 
 ```bash
 # 1. Sunucuyu durdurun
+#    (Windows tek tık kurulumda: schtasks /End /TN DreamPlus — bitince /Run)
 # 2. Yeni sürümü açın (data/ klasörünü KORUYUN)
 # 3. Bağımlılıkları güncelleyin
 npm install --omit=dev

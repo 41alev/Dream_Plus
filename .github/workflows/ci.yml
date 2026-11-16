@@ -22,9 +22,9 @@ jobs:
         # prove behavior on an unsupported configuration.
         node: [22]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: ${{ matrix.node }}
           cache: npm
@@ -45,7 +45,7 @@ jobs:
         run: npm run test:all
 
       - name: Cache Playwright browsers
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: |
             ~/.cache/ms-playwright
@@ -63,7 +63,7 @@ jobs:
 
       - name: Upload Playwright report on failure
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: playwright-report-${{ matrix.os }}-node${{ matrix.node }}
           path: playwright-report/
@@ -76,18 +76,25 @@ jobs:
     name: Firefox and WebKit (Linux, node 22)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
         with:
           node-version: 22
           cache: npm
       - run: npm ci
       - run: npm run build
       - run: npx playwright install --with-deps firefox webkit
-      - run: npx playwright test --config=playwright.cross-browser.config.js
+      # Each engine gets its own server and fresh sandbox database. Running both
+      # projects in one invocation shared one webServer, so WebKit inherited the
+      # rows Firefox had created (duplicate fixture names, UNIQUE violations).
+      - name: Firefox (fresh sandbox)
+        run: npx playwright test --config=playwright.cross-browser.config.js --project=firefox --output=test-results/firefox
+      - name: WebKit (fresh sandbox)
+        if: success() || failure()
+        run: npx playwright test --config=playwright.cross-browser.config.js --project=webkit --output=test-results/webkit
       - name: Upload browser failure evidence
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: cross-browser-failures
           path: test-results/

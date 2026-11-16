@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * CRM / Satış Hunisi — sipariş oluşmadan ÖNCEKİ süreç. Sales.jsx'teki
  * yardımcı fonksiyon çağırma deseninin (UI.table/modal/tabs, Api.xxx)
@@ -248,7 +247,7 @@ export default function CrmView() {
               <button class="rm" data-rm="${i}">${UI.icon(UI.ICONS.x)}</button>
             </div>`).join('');
           box.querySelectorAll('#oppLines select,#oppLines input').forEach(inp => inp.oninput = () => {
-            lines[+inp.dataset.i][inp.dataset.f] = inp.dataset.f === 'itemId' ? inp.value : Number(inp.value);
+            lines[+inp.dataset.i][inp.dataset.f] = inp.dataset.f === 'itemId' ? /** @type {FormField} */ (inp).value : Number(/** @type {FormField} */ (inp).value);
           });
           box.querySelectorAll('[data-rm]').forEach(b => b.onclick = () => { lines.splice(+b.dataset.rm, 1); draw(); });
         };
@@ -257,7 +256,7 @@ export default function CrmView() {
 
         box.querySelector('#oppGo').onclick = async () => {
           const cusId = val('oppCus');
-          const cusName = cusId ? box.querySelector('#oppCus').selectedOptions[0]?.textContent : val('oppNewCus');
+          const cusName = cusId ? /** @type {HTMLSelectElement} */ (box.querySelector('#oppCus')).selectedOptions[0]?.textContent : val('oppNewCus');
           if (!cusName) return UI.toast(UI.getLang() === 'tr' ? 'Müşteri veya aday adı gerekli.' : 'Customer or lead name is required.', 'err');
           try {
             await Api.createOpportunity({
@@ -266,7 +265,7 @@ export default function CrmView() {
               estimatedCloseDate: val('oppClose') || undefined, notes: val('oppNote'),
               lines: lines.filter(l => l.itemId && l.qty > 0).map(l => ({
                 ...l, itemName: items.find(x => x.id === l.itemId)?.name
-                  || box.querySelector(`#oppLines select[data-i="${lines.indexOf(l)}"]`)?.selectedOptions[0]?.textContent || l.itemId
+                  || /** @type {HTMLSelectElement} */ (box.querySelector(`#oppLines select[data-i="${lines.indexOf(l)}"]`))?.selectedOptions[0]?.textContent || l.itemId
               }))
             });
             closeModal(); UI.ok(t('saved')); reload();

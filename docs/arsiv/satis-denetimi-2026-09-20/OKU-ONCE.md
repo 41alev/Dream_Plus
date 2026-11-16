@@ -3,7 +3,7 @@
 > **26 Eylül 2026 notu:** Bu belge yazıldığı günün fotoğrafıdır. T01–T16
 > ve T18'in kod/test kısmı sonradan kapatıldı; güncel durum, kalan saha
 > doğrulamaları ve K-01…K-15 için alınan varsayılan kararlar
-> [`PROJECT_STATUS.md`](../../PROJECT_STATUS.md) en üst bölümündedir.
+> [`PROJECT_STATUS.md`](../../../PROJECT_STATUS.md) en üst bölümündedir.
 
 20 Eylül 2026 · Koordinatör: Codex · Proje: `C:\Projelerim\Dream\dream-plus`
 

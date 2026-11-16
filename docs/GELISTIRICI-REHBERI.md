@@ -195,8 +195,9 @@ farklı karar verirse ilgili davranış oradan izlenebilir.
 - **`.env`** — `JWT_SECRET`, SMTP şifresi vb. içerir, asla commit etme
   (zaten `.gitignore`'da), üretimde uzun/rastgele bir `JWT_SECRET` üret.
 - **`license-signing-key.pem`** — bununla herkes geçerli lisans dosyası
-  üretebilir (N-14). Proje kökünde duruyor, `.gitignore`'da ama fiziksel
-  olarak dikkatli taşı, asla paylaşma.
+  üretebilir (N-14). Proje klasöründe DURMAZ: `~/.dream-plus/` altında veya
+  `LICENSE_KEY_FILE` ile gösterilen yerdedir (bkz. `LISANS-OPERASYONU.md`).
+  Asla paylaşma; şifreli ve çevrimdışı yedeği olsun.
 - **`data/`** — gerçek/demo veritabanı. Sunucu çalışırken düz dosya kopyası
   ALMA (WAL tutarsız kalır) — önce durdur, sonra kopyala veya `npm run backup`
   kullan.
@@ -211,7 +212,7 @@ farklı karar verirse ilgili davranış oradan izlenebilir.
 | `KURULUM.md` | Kurulum yapan kişi: gerçek kurulum, ortam değişkenleri, yedek, upgrade, Docker, lisans |
 | `LISANS-OPERASYONU.md` | Satıcı: lisans üretme, yenileme, süre dolumu, anahtar yönetimi |
 | `KULLANIM-KILAVUZU.md` | Son kullanıcı: rol bazlı günlük kullanım |
-| `PROJECT_STATUS.md` (kökte) | Güncel durum (en üst bölüm) ve kısa geçmiş; eski günlük `docs/PROJECT_STATUS-ARSIV-2026-09.md` |
+| `PROJECT_STATUS.md` (kökte) | Güncel durum (en üst bölüm) ve kısa geçmiş; eski günlük `docs/arsiv/PROJECT_STATUS-ARSIV-2026-09.md` |
 | `TAM-LISTE-2026-09-20.md` | Tüm bilinen eksik/hata/karar/özellik listesi (F/S/N/V/K/D kodları), önerilen çalışma sırası |
 | `DEVIR-VE-KALAN-ISLER-2026-09-20.md` | 20 Eylül devir notu (bu belgeden önceki durum) |
 | `analiz-2026-09-19/` | 19 Eylül bağımsız denetiminin orijinal raporu ve kanıtları (F01-F25, S01-S20 kaynağı) |

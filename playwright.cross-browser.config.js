@@ -12,7 +12,12 @@
  *     Chromium'dan farklıdır — bu farkı burada AYRICA gözlemlemek istiyoruz,
  *     varsayılan koşuyu yavaşlatıp kırılganlaştırmadan.
  *
- * Çalıştırma:  npx playwright test --config=playwright.cross-browser.config.js
+ * Çalıştırma:  npm run test:cross-browser
+ *
+ * Motorlar AYRI komutlarla (--project=firefox / --project=webkit) koşturulur:
+ * tek komutta iki proje aynı webServer'ı ve aynı sandbox veritabanını
+ * paylaşır; ikinci motor birincinin oluşturduğu kayıtları görür ve sabit
+ * adlı fixture'lar çakışır (Ekim 2026'da CI'ı kırmızıya çeviren hata).
  */
 const { defineConfig, devices } = require('@playwright/test');
 const baseURL = `http://127.0.0.1:${process.env.PLAYWRIGHT_PORT || '3301'}`;

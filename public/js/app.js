@@ -1,5 +1,4 @@
 /* exported App */
-// @ts-nocheck
 const App = (() => {
   // Ekran paketleri artık ayrı ayrı, isteğe bağlı (lazy) yükleniyor — bkz.
   // scripts/build-frontend.js'teki kod bölme notu. `dashboard` tek istisna:
@@ -26,7 +25,7 @@ const App = (() => {
     loadingPromises[view] = new Promise((resolve, reject) => {
       const script = document.createElement('script');
       script.src = `/dist/view-${view}.js`;
-      script.onload = () => { VIEWS[view] = window[VIEW_GLOBALS[view]]; resolve(); };
+      script.onload = () => { VIEWS[view] = window[VIEW_GLOBALS[view]]; resolve(undefined); };
       script.onerror = () => { delete loadingPromises[view]; reject(new Error('Ekran yüklenemedi / Failed to load screen: ' + view)); };
       document.head.appendChild(script);
     });
@@ -55,7 +54,7 @@ const App = (() => {
   /* ---------- i18n on static markup ---------- */
   function applyStaticI18n() {
     document.querySelectorAll('[data-i18n]').forEach(n => { n.textContent = UI.t(n.dataset.i18n); });
-    document.querySelectorAll('[data-i18n-placeholder]').forEach(n => { n.placeholder = UI.t(n.dataset.i18nPlaceholder); });
+    document.querySelectorAll('[data-i18n-placeholder]').forEach(n => { /** @type {HTMLInputElement} */ (n).placeholder = UI.t(n.dataset.i18nPlaceholder); });
     document.getElementById('htmlRoot').lang = UI.getLang();
     updateThemeControls();
     updateSidebarCollapseControl();
@@ -282,31 +281,31 @@ const App = (() => {
       results.querySelectorAll('.gs-item').forEach(el => el.onclick = () => {
         go(el.dataset.view);
         closeResults();
-        input.value = '';
+        /** @type {FormField} */ (input).value = '';
         input.blur();
       });
       results.classList.remove('hidden');
     }
 
     input.addEventListener('input', () => {
-      const q = input.value.trim();
+      const q = /** @type {FormField} */ (input).value.trim();
       clearTimeout(debounceTimer);
       if (q.length < 2) { closeResults(); return; }
       debounceTimer = setTimeout(async () => {
         try {
           const data = await Api.search(q);
           // Kullanıcı yazmaya devam ettiyse eski bir yanıtı gösterme.
-          if (input.value.trim() === q) renderResults(data, q);
+          if (/** @type {FormField} */ (input).value.trim() === q) renderResults(data, q);
         } catch { closeResults(); }
       }, 250);
     });
-    input.addEventListener('focus', () => { if (results.innerHTML && input.value.trim() === lastQuery) results.classList.remove('hidden'); });
+    input.addEventListener('focus', () => { if (results.innerHTML && /** @type {FormField} */ (input).value.trim() === lastQuery) results.classList.remove('hidden'); });
     input.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') { closeResults(); input.blur(); }
       else if (e.key === 'Enter') { results.querySelector('.gs-item')?.click(); }
     });
     document.addEventListener('click', (e) => {
-      if (!e.target.closest('.global-search')) closeResults();
+      if (!/** @type {Element} */ (e.target).closest('.global-search')) closeResults();
     });
   }
 
@@ -348,8 +347,8 @@ const App = (() => {
     }
     document.body.dataset.density = localStorage.getItem('dp_density') === 'compact' ? 'compact' : 'comfortable';
     const langSaved = UI.getLang();
-    document.getElementById('loginLang').value = langSaved;
-    document.getElementById('langSelect').value = langSaved;
+    /** @type {FormField} */ (document.getElementById('loginLang')).value = langSaved;
+    /** @type {FormField} */ (document.getElementById('langSelect')).value = langSaved;
     applyStaticI18n();
 
     document.querySelectorAll('.theme-toggle').forEach(b => b.onclick = toggleTheme);
@@ -381,11 +380,11 @@ const App = (() => {
       errEl.textContent = '';
       try {
         const r = await Api.login(
-          document.getElementById('loginUsername').value.trim(),
-          document.getElementById('loginPassword').value
+          /** @type {FormField} */ (document.getElementById('loginUsername')).value.trim(),
+          /** @type {FormField} */ (document.getElementById('loginPassword')).value
         );
         Api.setSession(r.token, r.user);
-        document.getElementById('loginPassword').value = '';
+        /** @type {FormField} */ (document.getElementById('loginPassword')).value = '';
         showApp();
       } catch (err) {
         errEl.textContent = err.message || UI.t('loginFailed');
@@ -393,10 +392,10 @@ const App = (() => {
     };
 
     document.getElementById('loginLang').onchange = (e) => {
-      UI.setLang(e.target.value); applyStaticI18n();
+      UI.setLang(/** @type {FormField} */ (e.target).value); applyStaticI18n();
     };
     document.getElementById('langSelect').onchange = (e) => {
-      UI.setLang(e.target.value); applyStaticI18n();
+      UI.setLang(/** @type {FormField} */ (e.target).value); applyStaticI18n();
       document.getElementById('userRole').textContent = UI.roleLabel(Api.getUser().role);
       go(current || 'dashboard');
     };

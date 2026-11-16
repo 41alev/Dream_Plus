@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Paylaşılan React çalışma zamanı — bkz. vite.config.js'teki kod bölme notu.
  *

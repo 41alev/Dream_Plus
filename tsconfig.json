@@ -10,11 +10,13 @@
     "strict": false,
     "noImplicitAny": false,
     "skipLibCheck": true,
+    "moduleDetection": "auto",
     "lib": ["ES2022", "DOM"]
   },
   "include": [
     "server/**/*.js",
     "server/types/**/*.d.ts",
+    "frontend-react/types/**/*.d.ts",
     "public/js/**/*.js",
     "test/**/*.js",
     "frontend-react/**/*.jsx",

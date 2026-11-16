@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Lotlar (Lots) — React'e kademeli geçişin bir sonraki ekranı.
  *
@@ -167,10 +166,10 @@ export default function LotsView() {
     if (phase.status !== 'ready') return;
     const res = phase.res;
     const s = document.getElementById('lqS');
-    s.oninput = UI.debounce(() => setFilters(f => ({ ...f, q: s.value, page: 1 })), 350);
-    document.getElementById('lStatus').onchange = e => setFilters(f => ({ ...f, status: e.target.value, page: 1 }));
-    document.getElementById('lWh').onchange = e => setFilters(f => ({ ...f, warehouseId: e.target.value, page: 1 }));
-    document.getElementById('lExp').onchange = e => setFilters(f => ({ ...f, expiringDays: e.target.value, page: 1 }));
+    s.oninput = UI.debounce(() => setFilters(f => ({ ...f, q: /** @type {FormField} */ (s).value, page: 1 })), 350);
+    document.getElementById('lStatus').onchange = e => setFilters(f => ({ ...f, status: /** @type {FormField} */ (e.target).value, page: 1 }));
+    document.getElementById('lWh').onchange = e => setFilters(f => ({ ...f, warehouseId: /** @type {FormField} */ (e.target).value, page: 1 }));
+    document.getElementById('lExp').onchange = e => setFilters(f => ({ ...f, expiringDays: /** @type {FormField} */ (e.target).value, page: 1 }));
     document.getElementById('lCsv').onclick = () => UI.exportCsv('partiler.csv',
       [t('itemName'), t('lotNo'), t('warehouse'), t('qty'), t('unit'), t('status'), t('expiryDate'), t('unitCost')],
       res.data.map(r => [r.itemName, r.lotNo, r.warehouse, r.qty, r.unit, r.status, r.expiryDate, r.unitCost]));
@@ -270,7 +269,7 @@ export default function LotsView() {
         { key: 'status', label: t('status'), render: r => UI.lotStatusBadge(r.status) },
         { key: 'expiryDate', label: t('expiryDate'), render: r => {
             if (!r.expiryDate) return '—';
-            const d = Math.floor((new Date(r.expiryDate) - Date.now()) / 86400000);
+            const d = Math.floor((new Date(r.expiryDate).getTime() - Date.now()) / 86400000);
             if (d < 0) return `<span class="badge crit">${t('expired')}</span>`;
             if (d <= 30) return `<span class="badge warn">${dt(r.expiryDate)} · ${d}g</span>`;
             return dt(r.expiryDate);

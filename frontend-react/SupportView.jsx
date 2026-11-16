@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Müşteri Destek — CrmView.jsx'teki AYNI desen (UI.table/modal, Api.xxx).
  * Kalite modülündeki NCR akışından KASITLI olarak ayrı bir modül (bkz.
@@ -119,7 +118,7 @@ export default function SupportView() {
 
         box.querySelector('#supGo').onclick = async () => {
           const cusId = val('supCus');
-          const cusName = cusId ? document.querySelector('#supCus').selectedOptions[0]?.textContent : val('supNewCus');
+          const cusName = cusId ? /** @type {HTMLSelectElement} */ (document.querySelector('#supCus')).selectedOptions[0]?.textContent : val('supNewCus');
           const subject = val('supSubject');
           if (!cusName) return UI.toast(UI.getLang() === 'tr' ? 'Müşteri adı gerekli.' : 'Customer name is required.', 'err');
           if (!subject) return UI.toast(t('ticketSubject'), 'err');

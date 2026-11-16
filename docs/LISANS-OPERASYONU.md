@@ -20,8 +20,16 @@ sözleşme ayrıca hazırlanmalıdır; bu belge teknik prosedürdür.
 
 ## Anahtar yönetimi
 
-- Özel anahtar yalnızca satıcıdadır: depo kökündeki `license-signing-key.pem`
-  (`.gitignore` kapsamında) veya `LICENSE_PRIVATE_KEY` ortam değişkeni.
+- Özel anahtar yalnızca satıcıdadır ve **proje klasörünün dışında** durur.
+  `npm run license:generate` anahtarı şu sırayla arar:
+  1. `LICENSE_PRIVATE_KEY` ortam değişkeni (PEM içeriği)
+  2. `LICENSE_KEY_FILE` ortam değişkeni (dosya yolu, ör. şifreli USB disk)
+  3. `~/.dream-plus/license-signing-key.pem` (Windows: `C:\Users\<kullanıcı>\.dream-plus\`)
+  4. Eski yer: depo kökü — çalışır ama taşımanız için uyarı verir
+- Bulunan anahtar `server/lib/license.js` içindeki genel anahtarla
+  eşleşmezse script durur. Anahtar hiç bulunamazsa yeni çift **yalnızca**
+  `--init-key` bayrağıyla üretilir; bu bayrak mevcut bütün müşteri
+  lisanslarını geçersiz kılar.
 - Bu dosyayı **şifreli ve çevrimdışı iki ayrı yerde** yedekleyin. Kaybolursa
   mevcut müşterilerin lisansları çalışmaya devam eder ama yeni/yenileme
   lisansı üretilemez; yeni anahtar üretmek `server/lib/license.js` içindeki

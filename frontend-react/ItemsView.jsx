@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Ürünler (Items) — React'e kademeli geçişin ikinci ekranı.
  *
@@ -80,11 +79,11 @@ export default function ItemsView() {
     const res = phase.res;
 
     const s = document.getElementById('itSearch');
-    s.oninput = UI.debounce(() => setFilters(f => ({ ...f, q: s.value, page: 1 })), 350);
-    document.getElementById('fCat').onchange = e => setFilters(f => ({ ...f, category: e.target.value, page: 1 }));
-    document.getElementById('fOrigin').onchange = e => setFilters(f => ({ ...f, origin: e.target.value, page: 1 }));
-    document.getElementById('fWh').onchange = e => setFilters(f => ({ ...f, warehouseId: e.target.value, page: 1 }));
-    document.getElementById('fType').onchange = e => setFilters(f => ({ ...f, itemType: e.target.value, page: 1 }));
+    s.oninput = UI.debounce(() => setFilters(f => ({ ...f, q: /** @type {FormField} */ (s).value, page: 1 })), 350);
+    document.getElementById('fCat').onchange = e => setFilters(f => ({ ...f, category: /** @type {FormField} */ (e.target).value, page: 1 }));
+    document.getElementById('fOrigin').onchange = e => setFilters(f => ({ ...f, origin: /** @type {FormField} */ (e.target).value, page: 1 }));
+    document.getElementById('fWh').onchange = e => setFilters(f => ({ ...f, warehouseId: /** @type {FormField} */ (e.target).value, page: 1 }));
+    document.getElementById('fType').onchange = e => setFilters(f => ({ ...f, itemType: /** @type {FormField} */ (e.target).value, page: 1 }));
     document.getElementById('fLow').onclick = () => setFilters(f => ({ ...f, lowOnly: !f.lowOnly, page: 1 }));
     document.getElementById('itCsv').onclick = () => exportCsv(res.data);
     document.getElementById('itScan').onclick = () => scanDialog();
@@ -127,9 +126,9 @@ export default function ItemsView() {
         const inp = box.querySelector('#scanInput');
         inp.dataset.barcodeTarget = '1';
         inp.focus();
-        inp.onkeydown = e => { if (e.key === 'Enter' && inp.value.trim()) { e.preventDefault(); lookup(inp.value.trim()); } };
+        inp.onkeydown = e => { if (e.key === 'Enter' && /** @type {FormField} */ (inp).value.trim()) { e.preventDefault(); lookup(/** @type {FormField} */ (inp).value.trim()); } };
         // USB okuyucu: alan odakta olmasa bile yakalanır
-        stopWedgeRef.current = UI.onBarcodeScan(code => { inp.value = code; lookup(code); });
+        stopWedgeRef.current = UI.onBarcodeScan(code => { /** @type {FormField} */ (inp).value = code; lookup(code); });
         startCamera(box.querySelector('#scanArea'), lookup);
       }
     });
@@ -414,7 +413,7 @@ export default function ItemsView() {
       onOpen: (box) => {
         box.querySelector('#cardEdit')?.addEventListener('click', () => { closeModal(); itemForm(item); });
         box.querySelector('#docUp')?.addEventListener('click', async () => {
-          const f = box.querySelector('#docFile').files[0];
+          const f = /** @type {HTMLInputElement} */ (box.querySelector('#docFile')).files[0];
           if (!f) return UI.toast(UI.getLang() === 'tr' ? 'Dosya seçin.' : 'Choose a file.');
           const fd = new FormData();
           fd.append('file', f); fd.append('title', f.name); fd.append('refType', 'item'); fd.append('refId', id); fd.append('docType', 'other');

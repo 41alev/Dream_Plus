@@ -11,6 +11,22 @@ Her adımı sırayla, atlamadan yap. Bir yerde takılırsan, en son doğru
 
 ---
 
+## En kolay yol — tek tık kurulum (önce bunu dene)
+
+1. **Node.js'i kur** (aşağıdaki Adım 1 — yalnızca o adım).
+2. Program klasörünü bilgisayara koy (Adım 2).
+3. Klasörün içindeki **`Kurulum.cmd`** dosyasına çift tıkla.
+4. "Bu uygulamanın değişiklik yapmasına izin verilsin mi?" diye sorarsa **Evet** de.
+5. Siyah pencere firma adını, yönetici kullanıcı adını ve şifresini sorar; yaz.
+6. "Diğer bilgisayarlar bu sunucuya bağlanacak mı?" sorusuna fabrikada
+   başka bilgisayarlardan da girilecekse **E**, yalnız bu bilgisayarsa **H** yaz.
+7. Sonunda tarayıcı kendiliğinden açılır. Giriş ekranını görüyorsan bitti.
+
+Bu yol Adım 3–9'un hepsini senin yerine yapar; program bilgisayar her
+açıldığında kendiliğinden başlar, kapanırsa birkaç saniye içinde yeniden açılır.
+Bir hata yazarsa, yazıyı fotoğrafla ve aşağıdaki adımlarla elle devam et.
+Programı otomatik başlatmadan çıkarmak için **`Kaldir.cmd`** (verileri silmez).
+
 ## Önce birkaç kelimeyi öğrenelim
 
 - **"Tıkla"** = fare ile bir kere sol tuşa bas.
