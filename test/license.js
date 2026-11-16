@@ -151,6 +151,34 @@ function writeLicense(dir, licenseFile) {
   ok('geçerli ileri tarihli lisansla sunucu normal açılıyor', r10.crashed === false, r10.output.slice(-300));
   if (!r10.crashed) r10.proc.kill();
 
+  console.log('\n=== LİSANS ÜRETİCİ ANAHTAR KORUMASI / GENERATOR KEY GUARDS ===');
+  const genDir = fs.mkdtempSync(path.join(os.tmpdir(), 'dp-licgen-'));
+  const fakeHome = path.join(genDir, 'home');
+  fs.mkdirSync(fakeHome);
+  const runGenerator = (env) => {
+    const childEnv = { ...process.env, HOME: fakeHome, USERPROFILE: fakeHome, ...env };
+    delete childEnv.LICENSE_PRIVATE_KEY;
+    if (!('LICENSE_KEY_FILE' in env)) delete childEnv.LICENSE_KEY_FILE;
+    try {
+      const out = execFileSync(process.execPath, [path.join(ROOT, 'server', 'scripts', 'license-generate.js'), '--licensee', 'Guard Test', '--out', path.join(genDir, 'out.json')],
+        { cwd: genDir, env: childEnv, encoding: 'utf8', stdio: 'pipe' });
+      return { code: 0, output: out };
+    } catch (e) { return { code: e.status, output: String(e.stdout) + String(e.stderr) }; }
+  };
+  const wrongKeyPath = path.join(genDir, 'wrong.pem');
+  fs.writeFileSync(wrongKeyPath, crypto.generateKeyPairSync('ed25519').privateKey.export({ type: 'pkcs8', format: 'pem' }));
+  const g1 = runGenerator({ LICENSE_KEY_FILE: wrongKeyPath });
+  ok('genel anahtarla eşleşmeyen özel anahtar reddediliyor', g1.code === 1 && /eşleşmiyor/.test(g1.output), g1.output.slice(-200));
+  ok('eşleşmeyen anahtarla lisans dosyası yazılmıyor', !fs.existsSync(path.join(genDir, 'out.json')));
+  if (fs.existsSync(path.join(ROOT, 'license-signing-key.pem'))) {
+    console.log('  - anahtar yok senaryosu atlandı: depo kökünde eski konumda bir anahtar var');
+  } else {
+    const g2 = runGenerator({});
+    ok('anahtar yokken --init-key olmadan sessizce yeni anahtar üretilmiyor', g2.code === 1 && /bulunamadı/.test(g2.output), g2.output.slice(-200));
+    ok('anahtar yokken kullanıcı klasörüne anahtar yazılmıyor', !fs.existsSync(path.join(fakeHome, '.dream-plus')));
+  }
+  fs.rmSync(genDir, { recursive: true, force: true });
+
   console.log(`\n${'='.repeat(52)}`);
   console.log(`GEÇTİ / PASSED: ${pass}    KALDI / FAILED: ${fail}`);
   if (failures.length) { console.log('\nBaşarısız / Failures:'); failures.forEach(f => console.log('  - ' + f)); }
