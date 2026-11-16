@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Üretim (Production) — React'e kademeli geçişin bir sonraki ekranı.
  * Items/Counts/Lots ile aynı desen — bkz. o dosyalardaki üst açıklamalar.
@@ -48,7 +47,7 @@ export default function ProductionView() {
 
   useEffect(() => {
     if (phase.status !== 'ready') return;
-    document.getElementById('pStatus').onchange = e => setFilters(f => ({ ...f, status: e.target.value, page: 1 }));
+    document.getElementById('pStatus').onchange = e => setFilters(f => ({ ...f, status: /** @type {FormField} */ (e.target).value, page: 1 }));
     document.getElementById('pNew')?.addEventListener('click', () => newProd());
     hostRef.current.querySelectorAll('[data-open]').forEach(b => b.onclick = () => openProd(b.dataset.open));
     hostRef.current.querySelectorAll('[data-complete]').forEach(b => b.onclick = () => completeDialog(b.dataset.complete));

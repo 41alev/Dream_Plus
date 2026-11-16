@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Kalite (Quality) — React'e kademeli geçişin bir sonraki ekranı.
  * Planning/Purchasing ile aynı sekmeli desen (6 sekme) + ön-koşul veri
@@ -259,20 +258,20 @@ export default function QualityView() {
         // Auto-judge pass/fail against the spec as the inspector types the measurement
         box.querySelectorAll('.ln-v').forEach(inp => inp.oninput = () => {
           const sel = box.querySelector(`.ln-p[data-id="${inp.dataset.id}"]`);
-          if (inp.value === '') { sel.value = ''; return; }
-          const v = Number(inp.value);
+          if (/** @type {FormField} */ (inp).value === '') { /** @type {FormField} */ (sel).value = ''; return; }
+          const v = Number(/** @type {FormField} */ (inp).value);
           const mn = inp.dataset.min === '' ? null : Number(inp.dataset.min);
           const mx = inp.dataset.max === '' ? null : Number(inp.dataset.max);
           const okv = (mn === null || v >= mn) && (mx === null || v <= mx);
-          sel.value = okv ? '1' : '0';
+          /** @type {FormField} */ (sel).value = okv ? '1' : '0';
         });
 
         // Keep the two quantities consistent with what was inspected
         const acc = box.querySelector('#rsAcc'), rej = box.querySelector('#rsRej'), res = box.querySelector('#rsRes');
         rej.oninput = () => {
-          const r = Number(rej.value) || 0;
-          acc.value = Math.max(0, inspected - r);
-          res.value = r <= 0 ? 'accepted' : (r >= inspected ? 'rejected' : 'conditional');
+          const r = Number(/** @type {FormField} */ (rej).value) || 0;
+          /** @type {FormField} */ (acc).value = String(Math.max(0, inspected - r));
+          /** @type {FormField} */ (res).value = r <= 0 ? 'accepted' : (r >= inspected ? 'rejected' : 'conditional');
         };
 
         box.querySelector('#rsGo').onclick = async () => {
@@ -280,11 +279,11 @@ export default function QualityView() {
           const lineResults = [];
           box.querySelectorAll('.ln-p').forEach(sel => {
             const vEl = box.querySelector(`.ln-v[data-id="${sel.dataset.id}"]`);
-            if (sel.value === '' && (!vEl || vEl.value === '')) return;
+            if (/** @type {FormField} */ (sel).value === '' && (!vEl || /** @type {FormField} */ (vEl).value === '')) return;
             lineResults.push({
               id: Number(sel.dataset.id),
-              measuredValue: vEl && vEl.value !== '' ? Number(vEl.value) : null,
-              result: sel.value === '' ? 'na' : (sel.value === '1' ? 'pass' : 'fail')
+              measuredValue: vEl && /** @type {FormField} */ (vEl).value !== '' ? Number(/** @type {FormField} */ (vEl).value) : null,
+              result: /** @type {FormField} */ (sel).value === '' ? 'na' : (/** @type {FormField} */ (sel).value === '1' ? 'pass' : 'fail')
             });
           });
           try {
@@ -559,7 +558,7 @@ export default function QualityView() {
       { key: 'next', label: t('nextCalibration'), render: r => {
           const d = r.next_calibration_date || r.nextCalibrationDate;
           if (!d) return '—';
-          const days = Math.floor((new Date(d) - Date.now()) / 86400000);
+          const days = Math.floor((new Date(d).getTime() - Date.now()) / 86400000);
           if (days < 0) return `<span class="badge crit">${dt(d)} · ${UI.getLang() === 'tr' ? 'geçti' : 'overdue'}</span>`;
           if (days <= 30) return `<span class="badge warn">${dt(d)} · ${days}g</span>`;
           return dt(d);
@@ -723,10 +722,10 @@ export default function QualityView() {
     const goBtn = document.getElementById('trGo');
     document.getElementById('trItem').onchange = async (e) => {
       lotSel.innerHTML = `<option value="">${t('none')}</option>`;
-      goBtn.disabled = true;
-      if (!e.target.value) return;
+      /** @type {FormControl} */ (goBtn).disabled = true;
+      if (!/** @type {FormField} */ (e.target).value) return;
       try {
-        const r = await Api.lots({ itemId: e.target.value, pageSize: 200 });
+        const r = await Api.lots({ itemId: /** @type {FormField} */ (e.target).value, pageSize: 200 });
         (r.data || []).forEach(l => {
           const o = document.createElement('option');
           o.value = l.id;
@@ -735,8 +734,8 @@ export default function QualityView() {
         });
       } catch (err) { UI.err(err); }
     };
-    lotSel.onchange = () => { goBtn.disabled = !lotSel.value; };
-    goBtn.onclick = () => { if (lotSel.value) App.traceLot(lotSel.value); };
+    lotSel.onchange = () => { /** @type {FormControl} */ (goBtn).disabled = !/** @type {FormField} */ (lotSel).value; };
+    goBtn.onclick = () => { if (/** @type {FormField} */ (lotSel).value) App.traceLot(/** @type {FormField} */ (lotSel).value); };
   }
 
   if (!ready) {

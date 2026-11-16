@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Satın Alma (Purchasing) — React'e kademeli geçişin bir sonraki ekranı.
  * Planning/Reports ile aynı sekmeli desen + Items/Production gibi bir
@@ -145,7 +144,7 @@ export default function PurchasingView() {
               <button class="rm" data-rm="${i}">${UI.icon(UI.ICONS.x)}</button>
             </div>`).join('');
           box.querySelectorAll('#poLines select,#poLines input').forEach(inp => inp.oninput = () => {
-            lines[+inp.dataset.i][inp.dataset.f] = inp.dataset.f === 'itemId' ? inp.value : Number(inp.value);
+            lines[+inp.dataset.i][inp.dataset.f] = inp.dataset.f === 'itemId' ? /** @type {FormField} */ (inp).value : Number(/** @type {FormField} */ (inp).value);
             totals();
           });
           box.querySelectorAll('[data-rm]').forEach(b => b.onclick = () => { lines.splice(+b.dataset.rm, 1); draw(); });
@@ -271,14 +270,14 @@ export default function PurchasingView() {
       onOpen: box => {
         const button = box.querySelector('#receiptRevGo');
         button.onclick = async () => {
-          if (button.disabled) return;
+          if (/** @type {FormControl} */ (button).disabled) return;
           const reason = val('receiptRevReason');
           if (reason.trim().length < 5) return UI.toast(tr ? 'En az 5 karakter gerekçe girin.' : 'Enter a reason of at least 5 characters.');
-          button.disabled = true;
+          /** @type {FormControl} */ (button).disabled = true;
           try {
             await Api.reverseReceipt(receiptId, { reason, requestKey });
             closeModal(); UI.ok(t('saved')); reload();
-          } catch (e) { UI.err(e); } finally { button.disabled = false; }
+          } catch (e) { UI.err(e); } finally { /** @type {FormControl} */ (button).disabled = false; }
         };
       }
     });
@@ -320,13 +319,13 @@ export default function PurchasingView() {
         box.querySelector('#rcGo').onclick = async () => {
           const lines = [];
           box.querySelectorAll('.rc-q').forEach(inp => {
-            const q = Number(inp.value);
+            const q = Number(/** @type {FormField} */ (inp).value);
             if (!(q > 0)) return;
             lines.push({
               poItemId: Number(inp.dataset.id), qty: q,
-              lotNo: box.querySelector(`.rc-lot[data-id="${inp.dataset.id}"]`)?.value || undefined,
-              expiryDate: box.querySelector(`.rc-exp[data-id="${inp.dataset.id}"]`)?.value || undefined,
-              toQuarantine: box.querySelector(`.rc-q2[data-id="${inp.dataset.id}"]`)?.checked || false
+              lotNo: /** @type {FormField} */ (box.querySelector(`.rc-lot[data-id="${inp.dataset.id}"]`))?.value || undefined,
+              expiryDate: /** @type {FormField} */ (box.querySelector(`.rc-exp[data-id="${inp.dataset.id}"]`))?.value || undefined,
+              toQuarantine: /** @type {HTMLInputElement} */ (box.querySelector(`.rc-q2[data-id="${inp.dataset.id}"]`))?.checked || false
             });
           });
           if (!lines.length) return UI.toast(UI.getLang() === 'tr' ? 'En az bir kalem girin.' : 'Enter at least one line.');
@@ -589,7 +588,7 @@ export default function PurchasingView() {
               <button class="rm" data-rm="${i}">${UI.icon(UI.ICONS.x)}</button>
             </div>`).join('');
           box.querySelectorAll('#rqLines select,#rqLines input').forEach(inp => inp.oninput = () => {
-            lines[+inp.dataset.i][inp.dataset.f] = inp.dataset.f === 'itemId' ? inp.value : Number(inp.value);
+            lines[+inp.dataset.i][inp.dataset.f] = inp.dataset.f === 'itemId' ? /** @type {FormField} */ (inp).value : Number(/** @type {FormField} */ (inp).value);
           });
           box.querySelectorAll('[data-rm]').forEach(b => b.onclick = () => { lines.splice(+b.dataset.rm, 1); draw(); });
         };
@@ -682,7 +681,7 @@ export default function PurchasingView() {
               <button class="rm" data-rm="${i}">${UI.icon(UI.ICONS.x)}</button>
             </div>`).join('');
           box.querySelectorAll('#rfLines select,#rfLines input').forEach(inp => inp.oninput = () => {
-            lines[+inp.dataset.i][inp.dataset.f] = inp.dataset.f === 'itemId' ? inp.value : Number(inp.value);
+            lines[+inp.dataset.i][inp.dataset.f] = inp.dataset.f === 'itemId' ? /** @type {FormField} */ (inp).value : Number(/** @type {FormField} */ (inp).value);
           });
           box.querySelectorAll('[data-rm]').forEach(b => b.onclick = () => { lines.splice(+b.dataset.rm, 1); draw(); });
         };
@@ -819,7 +818,7 @@ export default function PurchasingView() {
             const host = box.querySelector('#ivReceiptLines');
             const save = box.querySelector('#ivGo');
             availableLines = [];
-            save.disabled = true;
+            /** @type {FormControl} */ (save).disabled = true;
             host.textContent = UI.getLang() === 'tr' ? 'Teslim satırları yükleniyor…' : 'Loading receipt lines…';
             try {
               const result = await Api.supplierInvoiceReceivableLines(val('ivPo'));
@@ -836,7 +835,7 @@ export default function PurchasingView() {
                 host.textContent = UI.getLang() === 'tr'
                   ? 'Faturalanmamış teslim satırı yok. Fatura fark olarak kaydedilir.'
                   : 'No uninvoiced receipt lines. Invoice will be recorded as a discrepancy.';
-                save.disabled = false;
+                /** @type {FormControl} */ (save).disabled = false;
                 return;
               }
               host.innerHTML = `<p>${UI.getLang() === 'tr' ? 'Faturalandırılacak teslim miktarı' : 'Receipt quantity to invoice'}</p>
@@ -848,7 +847,7 @@ export default function PurchasingView() {
                   <input type="number" class="iv-line-vat" data-line-id="${line.receiptLineId}"
                     min="0" max="100" step="any" value="${line.vatRate ?? ''}">
                 </label>`).join('')}`;
-              save.disabled = false;
+              /** @type {FormControl} */ (save).disabled = false;
             } catch (e) { if (version === loadVersion) { availableLines = []; host.textContent = e.message; } }
           };
           box.querySelector('#ivPo').addEventListener('change', loadLines);
@@ -856,8 +855,8 @@ export default function PurchasingView() {
           box.querySelector('#ivGo').onclick = async () => {
             try {
               const lines = availableLines.map(line => {
-                const qty = Number(box.querySelector(`.iv-line-qty[data-line-id="${line.receiptLineId}"]`)?.value || 0);
-                const vatInput = box.querySelector(`.iv-line-vat[data-line-id="${line.receiptLineId}"]`)?.value;
+                const qty = Number(/** @type {FormField} */ (box.querySelector(`.iv-line-qty[data-line-id="${line.receiptLineId}"]`))?.value || 0);
+                const vatInput = /** @type {FormField} */ (box.querySelector(`.iv-line-vat[data-line-id="${line.receiptLineId}"]`))?.value;
                 if (qty > 0 && (vatInput === '' || !Number.isFinite(Number(vatInput)) || Number(vatInput) < 0 || Number(vatInput) > 100)) {
                   throw new Error(UI.getLang() === 'tr' ? 'Her satıra 0–100 arası KDV oranı girin.' : 'Enter a VAT rate from 0 to 100 for each line.');
                 }
@@ -991,9 +990,9 @@ export default function PurchasingView() {
       onOpen: (box) => guardedSubmit(box.querySelector('#rcGo'), async () => {
         const chosen = [];
         for (const line of lines) {
-          const qty = Number(box.querySelector(`#rcQ${line.receiptLineId}`).value || 0);
+          const qty = Number(/** @type {FormField} */ (box.querySelector(`#rcQ${line.receiptLineId}`)).value || 0);
           if (!(qty > 0)) continue;
-          const vatRaw = box.querySelector(`#rcV${line.receiptLineId}`).value;
+          const vatRaw = /** @type {FormField} */ (box.querySelector(`#rcV${line.receiptLineId}`)).value;
           const vatRate = Number(vatRaw);
           if (vatRaw === '' || !Number.isFinite(vatRate) || vatRate < 0 || vatRate > 100) {
             throw new Error(tr ? 'Her satıra 0–100 arası KDV oranı girin.' : 'Enter a VAT rate from 0 to 100 for each line.');
@@ -1099,14 +1098,14 @@ export default function PurchasingView() {
       onOpen: box => {
         const button = box.querySelector('#supplierPayRevGo');
         button.onclick = async () => {
-          if (button.disabled) return;
+          if (/** @type {FormControl} */ (button).disabled) return;
           const reason = val('supplierPayRevReason');
           if (reason.trim().length < 3) return UI.toast(tr ? 'En az 3 karakter gerekçe girin.' : 'Enter a reason of at least 3 characters.');
-          button.disabled = true;
+          /** @type {FormControl} */ (button).disabled = true;
           try {
             await Api.reverseSupplierPayment(inv.id, paymentId, { reason, reversedOn: val('supplierPayRevDate'), requestKey });
             closeModal(); UI.ok(t('saved')); reload();
-          } catch (e) { UI.err(e); } finally { button.disabled = false; }
+          } catch (e) { UI.err(e); } finally { /** @type {FormControl} */ (button).disabled = false; }
         };
       }
     });

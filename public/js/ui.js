@@ -1,5 +1,4 @@
 /* exported UI */
-// @ts-nocheck
 const UI = (() => {
   let lang = localStorage.getItem('dt_lang') || 'tr';
   const t = (k) => (I18N[lang] && I18N[lang][k]) || I18N.tr[k] || k;
@@ -64,6 +63,10 @@ const UI = (() => {
   }
 
   /* ---------- modal ---------- */
+  /**
+   * @param {{ title: any, sub?: any, body: any, footer?: any, size?: string,
+   *           onOpen?: (box: HTMLElement) => unknown }} options
+   */
   function modal({ title, sub, body, footer, size = '', onOpen }) {
     const ov = document.getElementById('modalOverlay');
     const box = document.getElementById('modalBox');
@@ -103,7 +106,7 @@ const UI = (() => {
   let lastFocus = null;
   let lastActivation = null;
   document.addEventListener('click', e => {
-    const element = e.target.closest && e.target.closest('button, [href], input, select, textarea, [tabindex]');
+    const element = /** @type {Element} */ (e.target).closest && /** @type {Element} */ (e.target).closest('button, [href], input, select, textarea, [tabindex]');
     if (element && !element.closest('#modalOverlay')) lastActivation = { element, time: performance.now() };
   }, true);
   function closeModal() {
@@ -121,7 +124,7 @@ const UI = (() => {
     if (e.key !== 'Tab' || !ov || !ov.classList.contains('show')) return;
     const box = document.getElementById('modalBox');
     const items = [...box.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])')]
-      .filter(el => !el.disabled && el.offsetParent !== null);
+      .filter(el => !/** @type {FormControl} */ (el).disabled && el.offsetParent !== null);
     if (!items.length) return;
     const firstEl = items[0], lastEl = items[items.length - 1];
     if (e.shiftKey && (document.activeElement === firstEl || !box.contains(document.activeElement))) { e.preventDefault(); lastEl.focus(); }
@@ -130,7 +133,7 @@ const UI = (() => {
   // T18: a second click on a dialog's Save/Confirm while its request is still
   // running is ignored, so one click = one record.
   document.addEventListener('click', e => {
-    const btn = e.target.closest && e.target.closest('#modalBox .modal-foot .btn-primary, #modalBox .modal-foot .btn-danger');
+    const btn = /** @type {Element} */ (e.target).closest && /** @type {Element} */ (e.target).closest('#modalBox .modal-foot .btn-primary, #modalBox .modal-foot .btn-danger');
     if (btn && typeof Api !== 'undefined' && Api.pendingWriteCount && Api.pendingWriteCount() > 0) {
       e.preventDefault();
       e.stopImmediatePropagation();
@@ -265,10 +268,10 @@ const UI = (() => {
     `<label style="display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--text-muted);cursor:pointer;margin-bottom:12px">
        <input type="checkbox" id="${id}" ${checked ? 'checked' : ''} style="width:auto;margin:0"> ${esc(label)}</label>`;
 
-  const val = (id) => { const e = document.getElementById(id); return e ? e.value.trim() : ''; };
+  const val = (id) => { const e = document.getElementById(id); return e ? /** @type {FormField} */ (e).value.trim() : ''; };
   const numVal = (id) => { const v = parseFloat(val(id)); return isNaN(v) ? 0 : v; };
   const intVal = (id) => { const v = parseInt(val(id), 10); return isNaN(v) ? 0 : v; };
-  const checked = (id) => { const e = document.getElementById(id); return e ? e.checked : false; };
+  const checked = (id) => { const e = document.getElementById(id); return e ? /** @type {HTMLInputElement} */ (e).checked : false; };
 
   /* ---------- table ---------- */
   /**
@@ -317,6 +320,7 @@ const UI = (() => {
 
   let tableControlsBound = false;
   let emptyObserver = null;
+  /** @param {ParentNode} [root] */
   function enhanceEmptyStates(root = document) {
     root.querySelectorAll?.('.empty').forEach(node => {
       if (node.dataset.emptyEnhanced || node.querySelector('strong,button') || node.getAttribute('role') === 'alert') return;
@@ -332,8 +336,9 @@ const UI = (() => {
     if (emptyObserver || typeof MutationObserver === 'undefined') return;
     emptyObserver = new MutationObserver(records => records.forEach(record => record.addedNodes.forEach(node => {
       if (node.nodeType !== 1) return;
-      if (node.matches?.('.empty')) enhanceEmptyStates(node.parentElement || document);
-      else enhanceEmptyStates(node);
+      const el = /** @type {Element} */ (node);
+      if (el.matches?.('.empty')) enhanceEmptyStates(el.parentElement || document);
+      else enhanceEmptyStates(el);
     })));
     emptyObserver.observe(document.body, { childList: true, subtree: true });
   }
@@ -341,26 +346,26 @@ const UI = (() => {
     if (tableControlsBound) return;
     tableControlsBound = true;
     document.addEventListener('change', e => {
-      const input = e.target.closest('[data-table-col-toggle],[data-table-sticky-toggle]');
+      const input = /** @type {Element} */ (e.target).closest('[data-table-col-toggle],[data-table-sticky-toggle]');
       if (!input) return;
       const shell = input.closest('.data-table-shell');
       if (!shell) return;
       const key = shell.dataset.preferenceKey;
       const toggles = [...shell.querySelectorAll('[data-table-col-toggle]')];
-      if (input.hasAttribute('data-table-col-toggle') && toggles.filter(x => x.checked).length === 0) {
-        input.checked = true;
+      if (input.hasAttribute('data-table-col-toggle') && toggles.filter(x => /** @type {HTMLInputElement} */ (x).checked).length === 0) {
+        /** @type {HTMLInputElement} */ (input).checked = true;
         toast(lang === 'tr' ? 'En az bir sütun görünür kalmalı.' : 'At least one column must remain visible.', 'err');
         return;
       }
-      const hidden = toggles.filter(x => !x.checked).map(x => x.dataset.tableColToggle);
-      const sticky = shell.querySelector('[data-table-sticky-toggle]')?.checked !== false;
+      const hidden = toggles.filter(x => !/** @type {HTMLInputElement} */ (x).checked).map(x => x.dataset.tableColToggle);
+      const sticky = /** @type {HTMLInputElement} */ (shell.querySelector('[data-table-sticky-toggle]'))?.checked !== false;
       shell.querySelectorAll('[data-col]').forEach(cell => { cell.hidden = hidden.includes(cell.dataset.col); });
       shell.querySelector('table')?.classList.toggle('sticky-first', sticky);
       try { localStorage.setItem(key, JSON.stringify({ hidden, sticky })); } catch {}
     });
     document.addEventListener('click', e => {
-      const refresh = e.target.closest('[data-empty-refresh]');
-      const target = e.target.closest('[data-empty-target]');
+      const refresh = /** @type {Element} */ (e.target).closest('[data-empty-refresh]');
+      const target = /** @type {Element} */ (e.target).closest('[data-empty-target]');
       if (refresh) {
         closeModal();
         if (typeof App !== 'undefined') App.go((location.hash || '#dashboard').slice(1).split('?')[0]);
@@ -526,7 +531,7 @@ const UI = (() => {
       tooltip: { ...tooltip, titleFont: { family: 'Segoe UI', size: 13, weight: '600', ...(tooltip.titleFont || {}) }, bodyFont: { family: 'Segoe UI', size: 12.5, ...(tooltip.bodyFont || {}) } }
     };
     (config.data?.datasets || []).forEach(ds => { if (ds.borderColor === '#24282C') ds.borderColor = panelColor; });
-    charts[canvasId] = new Chart(el.getContext('2d'), config);
+    charts[canvasId] = new Chart(/** @type {HTMLCanvasElement} */ (el).getContext('2d'), config);
   }
   const PALETTE = ['#F2A900', '#7FA6D9', '#6FA97A', '#E2574C', '#A88BD0', '#D9A87F', '#8BD0C4', '#D08BA8'];
 

@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Satış (Sales) — React'e kademeli geçişin bir sonraki ekranı.
  * Planning/Purchasing/Quality ile aynı sekmeli desen (6 sekme) + ön-koşul
@@ -142,10 +141,10 @@ export default function SalesView() {
               <button class="rm" data-rm="${i}">${UI.icon(UI.ICONS.x)}</button>
             </div>`).join('');
           box.querySelectorAll('#soLines select,#soLines input').forEach(inp => inp.oninput = () => {
-            lines[+inp.dataset.i][inp.dataset.f] = inp.dataset.f === 'itemId' ? inp.value : Number(inp.value);
+            lines[+inp.dataset.i][inp.dataset.f] = inp.dataset.f === 'itemId' ? /** @type {FormField} */ (inp).value : Number(/** @type {FormField} */ (inp).value);
             if (inp.dataset.f === 'itemId') {
               // Default to the item's list price so the user is not typing it every time
-              const it = items.find(x => x.id === inp.value);
+              const it = items.find(x => x.id === /** @type {FormField} */ (inp).value);
               if (it && it.salePrice) { lines[+inp.dataset.i].price = it.salePrice; draw(); }
             }
             totals();
@@ -349,7 +348,7 @@ export default function SalesView() {
 
           host.querySelectorAll('select,input').forEach(inp => inp.onchange = inp.oninput = async () => {
             const i = +inp.dataset.i, f = inp.dataset.f;
-            lines[i][f] = f === 'qty' ? Number(inp.value) : inp.value;
+            lines[i][f] = f === 'qty' ? Number(/** @type {FormField} */ (inp).value) : /** @type {FormField} */ (inp).value;
             if (f === 'itemId') { lines[i].lotId = ''; await drawLines(); }
           });
           host.querySelectorAll('[data-rm]').forEach(b => b.onclick = async () => { lines.splice(+b.dataset.rm, 1); await drawLines(); });
@@ -366,7 +365,7 @@ export default function SalesView() {
               <button class="rm" data-crm="${i}">${UI.icon(UI.ICONS.x)}</button>
             </div>`).join('');
           box.querySelectorAll('#shCrates input').forEach(inp => inp.oninput = () => {
-            crates[+inp.dataset.ci][inp.dataset.cf] = inp.dataset.cf === 'crateNo' ? inp.value : Number(inp.value);
+            crates[+inp.dataset.ci][inp.dataset.cf] = inp.dataset.cf === 'crateNo' ? /** @type {FormField} */ (inp).value : Number(/** @type {FormField} */ (inp).value);
             totals();
           });
           box.querySelectorAll('[data-crm]').forEach(b => b.onclick = () => { crates.splice(+b.dataset.crm, 1); drawCrates(); });
@@ -663,14 +662,14 @@ export default function SalesView() {
       onOpen: box => {
         const button = box.querySelector('#payRevGo');
         button.onclick = async () => {
-          if (button.disabled) return;
+          if (/** @type {FormControl} */ (button).disabled) return;
           const reason = val('payRevReason');
           if (reason.trim().length < 3) return UI.toast(tr ? 'En az 3 karakter gerekçe girin.' : 'Enter a reason of at least 3 characters.');
-          button.disabled = true;
+          /** @type {FormControl} */ (button).disabled = true;
           try {
             await Api.reverseInvoicePayment(inv.id, paymentId, { reason, reversedOn: val('payRevDate'), requestKey });
             closeModal(); UI.ok(t('saved')); reload();
-          } catch (e) { UI.err(e); } finally { button.disabled = false; }
+          } catch (e) { UI.err(e); } finally { /** @type {FormControl} */ (button).disabled = false; }
         };
       }
     });
@@ -695,8 +694,8 @@ export default function SalesView() {
       onOpen: (box) => {
         const button = box.querySelector('#coGo');
         button.onclick = async () => {
-          if (button.disabled) return;
-          button.disabled = true;
+          if (/** @type {FormControl} */ (button).disabled) return;
+          /** @type {FormControl} */ (button).disabled = true;
           try {
             const amount = Number(val('coAmt'));
             if (!(amount > 0)) throw new Error(tr ? 'Pozitif bir tutar girin.' : 'Enter a positive amount.');
@@ -704,7 +703,7 @@ export default function SalesView() {
             await Api.addInvoicePayment(inv.id, { amount, paidOn: val('coDate'), method: val('coMethod'),
               ...(val('coRef') ? { reference: val('coRef') } : {}), requestKey });
             closeModal(); UI.ok(t('saved')); reload();
-          } catch (e) { UI.err(e); } finally { button.disabled = false; }
+          } catch (e) { UI.err(e); } finally { /** @type {FormControl} */ (button).disabled = false; }
         };
       }
     });
@@ -769,7 +768,7 @@ export default function SalesView() {
             `<span style="color:${r.marginPct < 0 ? 'var(--danger)' : r.marginPct < 15 ? 'var(--accent)' : 'var(--success)'}">${num(r.marginPct, 1)}%</span>` }
       ], p.data)}</div>`;
 
-    document.getElementById('prGroup').onchange = e => { profitGroupRef.current = e.target.value; reload(); };
+    document.getElementById('prGroup').onchange = e => { profitGroupRef.current = /** @type {FormField} */ (e.target).value; reload(); };
     document.getElementById('prCsv').onclick = () => UI.exportCsv('karlilik.csv',
       [profitGroup, t('qty'), t('revenue'), t('cost'), t('profit'), t('margin')],
       p.data.map(r => [r.key, r.qty, r.revenueBase, r.costBase, r.profitBase, r.marginPct.toFixed(1)]));

@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Sayımlar (Counts) — React'e kademeli geçişin bir sonraki ekranı.
  *
@@ -121,9 +120,9 @@ export default function CountsView() {
           box.querySelectorAll('.cnt-q').forEach(inp => {
             const line = c.lines.find(x => String(x.id) === inp.dataset.id);
             const cell = box.querySelector(`.diff[data-id="${inp.dataset.id}"]`);
-            if (inp.value === '') { cell.innerHTML = '—'; return; }
+            if (/** @type {FormField} */ (inp).value === '') { cell.innerHTML = '—'; return; }
             counted++;
-            const d = Number(inp.value) - line.systemQty;
+            const d = Number(/** @type {FormField} */ (inp).value) - line.systemQty;
             cell.innerHTML = diffHtml(d);
             totalDiffValue += d * (line.unitCost || 0);
           });
@@ -137,9 +136,9 @@ export default function CountsView() {
         box.querySelector('#cntSave')?.addEventListener('click', async () => {
           const lines = [];
           box.querySelectorAll('.cnt-q').forEach(inp => {
-            if (inp.value === '') return;
-            const reason = box.querySelector(`.cnt-r[data-id="${inp.dataset.id}"]`)?.value || '';
-            lines.push({ id: Number(inp.dataset.id), countedQty: Number(inp.value), reason });
+            if (/** @type {FormField} */ (inp).value === '') return;
+            const reason = /** @type {FormField} */ (box.querySelector(`.cnt-r[data-id="${inp.dataset.id}"]`))?.value || '';
+            lines.push({ id: Number(inp.dataset.id), countedQty: Number(/** @type {FormField} */ (inp).value), reason });
           });
           try { await Api.saveCountLines(c.id, lines); UI.ok(t('saved')); closeModal(); reload(); } catch (e) { UI.err(e); }
         });
@@ -147,9 +146,9 @@ export default function CountsView() {
         box.querySelector('#cntApprove')?.addEventListener('click', () => {
           const lines = [];
           box.querySelectorAll('.cnt-q').forEach(inp => {
-            if (inp.value === '') return;
-            const reason = box.querySelector(`.cnt-r[data-id="${inp.dataset.id}"]`)?.value || '';
-            lines.push({ id: Number(inp.dataset.id), countedQty: Number(inp.value), reason });
+            if (/** @type {FormField} */ (inp).value === '') return;
+            const reason = /** @type {FormField} */ (box.querySelector(`.cnt-r[data-id="${inp.dataset.id}"]`))?.value || '';
+            lines.push({ id: Number(inp.dataset.id), countedQty: Number(/** @type {FormField} */ (inp).value), reason });
           });
           UI.confirmDialog(t('countWarning'), async () => {
             try {

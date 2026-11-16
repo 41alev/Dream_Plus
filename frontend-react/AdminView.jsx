@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Yönetim (Admin) — React'e kademeli geçişin SON ekranı (Aşama 3 tamamlanıyor).
  *
@@ -157,7 +156,7 @@ export default function AdminView() {
           };
           box.querySelector('#usPerms').textContent = map[role] || '';
         };
-        box.querySelector('#usRole').onchange = e => describe(e.target.value);
+        box.querySelector('#usRole').onchange = e => describe(/** @type {FormField} */ (e.target).value);
         describe(u?.role || 'operator');
 
         box.querySelector('#usGo').onclick = async () => {
@@ -438,9 +437,9 @@ export default function AdminView() {
       ], res.data)}
       ${pager(res, p => { auditFilterRef.current.page = p; reload(); })}</div>`;
 
-    document.getElementById('auType').onchange = e => { auditFilterRef.current.entityType = e.target.value; auditFilterRef.current.page = 1; reload(); };
+    document.getElementById('auType').onchange = e => { auditFilterRef.current.entityType = /** @type {FormField} */ (e.target).value; auditFilterRef.current.page = 1; reload(); };
     const uInp = document.getElementById('auUser');
-    uInp.oninput = UI.debounce(() => { auditFilterRef.current.username = uInp.value; auditFilterRef.current.page = 1; reload(); }, 400);
+    uInp.oninput = UI.debounce(() => { auditFilterRef.current.username = /** @type {FormField} */ (uInp).value; auditFilterRef.current.page = 1; reload(); }, 400);
   }
 
   const fmtVal = (v) => {
@@ -600,7 +599,7 @@ export default function AdminView() {
             </div>` }
         ], batches.data || [], { emptyText: t('noImports') })}</div>`;
 
-    document.getElementById('imType').onchange = e => { importTypeRef.current = e.target.value; reload(); };
+    document.getElementById('imType').onchange = e => { importTypeRef.current = /** @type {FormField} */ (e.target).value; reload(); };
     document.getElementById('imTpl').onclick = () => {
       // Yetkilendirme başlığı gerektiği için doğrudan bağlantı kullanılamaz
       downloadTemplate(importType);
@@ -657,7 +656,7 @@ export default function AdminView() {
 
   async function doUpload() {
     const fileInput = document.getElementById('imFile');
-    const file = fileInput.files[0];
+    const file = /** @type {HTMLInputElement} */ (fileInput).files[0];
     if (!file) return UI.toast(UI.getLang() === 'tr' ? 'Önce dosya seçin.' : 'Choose a file first.', 'err');
 
     const fd = new FormData();
@@ -666,7 +665,7 @@ export default function AdminView() {
     fd.append('duplicateMode', val('imDup'));
 
     const btn = document.getElementById('imUpload');
-    btn.disabled = true;
+    /** @type {FormControl} */ (btn).disabled = true;
     btn.innerHTML = `<span class="spinner"></span>${t('loading')}`;
     try {
       importPreviewDataRef.current = await Api.importPreview(fd);
@@ -688,7 +687,7 @@ export default function AdminView() {
           footer: `<button class="btn btn-ghost" data-close>${t('close')}</button>`
         });
       }
-      btn.disabled = false;
+      /** @type {FormControl} */ (btn).disabled = false;
       btn.innerHTML = UI.icon(UI.ICONS.upload) + t('uploadAndPreview');
     }
   }
@@ -916,7 +915,7 @@ export default function AdminView() {
         </div>`).join('')
         : `<div style="font-size:12px;color:var(--text-faint);padding:6px 0">${UI.getLang() === 'tr'
             ? 'İmza kutusu yok.' : 'No signature boxes.'}</div>`;
-      host.querySelectorAll('input').forEach(i => i.oninput = () => { sigs[+i.dataset.i] = i.value; });
+      host.querySelectorAll('input').forEach(i => i.oninput = () => { sigs[+i.dataset.i] = /** @type {FormField} */ (i).value; });
       host.querySelectorAll('[data-rm]').forEach(b => b.onclick = () => { sigs.splice(+b.dataset.rm, 1); drawSigs(); });
     };
     drawSigs();
@@ -925,15 +924,15 @@ export default function AdminView() {
       sigs.push(''); drawSigs();
     };
 
-    document.getElementById('tplType').onchange = e => { tplTypeRef.current = e.target.value; reload(); };
+    document.getElementById('tplType').onchange = e => { tplTypeRef.current = /** @type {FormField} */ (e.target).value; reload(); };
 
     /* --- logo --- */
     const fileInput = document.getElementById('tplLogoFile');
     document.getElementById('tplLogoBtn').onclick = () => fileInput.click();
     fileInput.onchange = async () => {
-      if (!fileInput.files[0]) return;
+      if (!/** @type {HTMLInputElement} */ (fileInput).files[0]) return;
       const fd = new FormData();
-      fd.append('logo', fileInput.files[0]);
+      fd.append('logo', /** @type {HTMLInputElement} */ (fileInput).files[0]);
       try {
         await Api.uploadLogo(fd);
         UI.clearPrintCache();          // önbellekteki eski logo kalmasın
@@ -964,7 +963,7 @@ export default function AdminView() {
       layout: {
         paperSize: val('tplPaper'), orientation: val('tplOrient'),
         marginMm: numVal('tplMargin'), fontSize: numVal('tplFont'),
-        accentColor: document.getElementById('tplColor').value,
+        accentColor: /** @type {FormField} */ (document.getElementById('tplColor')).value,
         logoHeightMm: numVal('tplLogoH'),
         showLogo: checked('tplShowLogo'), showCompanyInfo: checked('tplShowCo'),
         showDocumentDate: checked('tplShowDate'), tableStriped: checked('tplStriped'),
@@ -1217,7 +1216,7 @@ export default function AdminView() {
       try {
         accResultRef.current = await Api.accountingExport(accFromRef.current, accToRef.current);
         document.getElementById('accResultBox').innerHTML = renderAccResult(accResultRef.current);
-        document.getElementById('accCsv').disabled = false;
+        /** @type {FormControl} */ (document.getElementById('accCsv')).disabled = false;
       } catch (e) { UI.err(e); }
     };
 
@@ -1323,7 +1322,7 @@ export default function AdminView() {
                <button class="btn btn-primary" id="whGo2">${t('save')}</button>`,
       onOpen: (box) => {
         box.querySelector('#whGo2').onclick = async () => {
-          const selectedEvents = [...box.querySelectorAll('.wh-event:checked')].map(i => i.value);
+          const selectedEvents = [...box.querySelectorAll('.wh-event:checked')].map(i => /** @type {FormField} */ (i).value);
           if (!selectedEvents.length) return UI.toast(UI.getLang() === 'tr' ? 'En az bir olay seçin.' : 'Pick at least one event.', 'err');
           const payload = { url: val('whUrl2'), description: val('whDesc2'), events: selectedEvents };
           try {

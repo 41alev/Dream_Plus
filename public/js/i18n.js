@@ -1,5 +1,4 @@
 /* exported I18N */
-// @ts-nocheck
 const I18N = {
 tr: {
   loginUsername:"Kullanıcı adı", loginPassword:"Şifre", loginSubmit:"Giriş Yap",

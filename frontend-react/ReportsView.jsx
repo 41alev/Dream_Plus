@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Raporlar (Reports) — React'e kademeli geçişin bir sonraki ekranı.
  *
@@ -141,7 +140,7 @@ export default function ReportsView() {
         { key: 'expiryDate', label: t('expiryDate'), render: r => dt(r.expiryDate) }
       ], d.items)}</div>`;
 
-    document.getElementById('dsDays').onchange = e => { deadDaysRef.current = Number(e.target.value); reload(); };
+    document.getElementById('dsDays').onchange = e => { deadDaysRef.current = Number(/** @type {FormField} */ (e.target).value); reload(); };
     UI.chart('rpAge', {
       type: 'bar',
       data: {
@@ -433,7 +432,7 @@ export default function ReportsView() {
       <div id="pvResult"></div>`;
 
     drawFields(cfg.dataSource);
-    document.getElementById('pvSrc').onchange = (e) => drawFields(e.target.value);
+    document.getElementById('pvSrc').onchange = (e) => drawFields(/** @type {FormField} */ (e.target).value);
 
     async function runAndRender() {
       cfg.dataSource = val('pvSrc'); cfg.dimension = val('pvDim'); cfg.metric = val('pvMet');

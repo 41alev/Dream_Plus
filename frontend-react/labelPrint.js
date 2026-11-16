@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Etiket yazdırma diyaloğu — Items ve Lots ekranları arasında paylaşılan,
  * React durumundan bağımsız bir yardımcı (UI.modal() global overlay

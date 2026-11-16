@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Planlama (Planning) — React'e kademeli geçişin bir sonraki ekranı.
  *
@@ -219,8 +218,8 @@ export default function PlanningView() {
         { key: 'act', label: '', render: c => `<button class="btn btn-ghost btn-sm" data-days="${c.workCenterId}">${t('detail')}</button>` }
       ], cap.data)}</div>`;
 
-    document.getElementById('capFrom').onchange = e => { capFromRef.current = e.target.value; reload(); };
-    document.getElementById('capTo').onchange = e => { capToRef.current = e.target.value; reload(); };
+    document.getElementById('capFrom').onchange = e => { capFromRef.current = /** @type {FormField} */ (e.target).value; reload(); };
+    document.getElementById('capTo').onchange = e => { capToRef.current = /** @type {FormField} */ (e.target).value; reload(); };
     document.getElementById('capCsv').onclick = () => UI.exportCsv('kapasite.csv',
       [t('workCenterCode'), t('workCenter'), t('capacityMinutes'), t('loadMinutes'), t('utilizationPct'), t('overloadDays')],
       cap.data.map(c => [c.code, c.name, c.totalCapacityMinutes, c.totalLoadMinutes, c.utilizationPct, c.overloadedDays]));
@@ -367,7 +366,7 @@ export default function PlanningView() {
                <button class="btn btn-primary" id="wcGo">${t('save')}</button>`,
       onOpen: (box) => {
         box.querySelector('#wcGo').onclick = async () => {
-          const shiftIds = [...box.querySelectorAll('.wc-shift:checked')].map(i => Number(i.value));
+          const shiftIds = [...box.querySelectorAll('.wc-shift:checked')].map(i => Number(/** @type {FormField} */ (i).value));
           const p = {
             code: val('wcCode'), name: val('wcName'), description: val('wcDesc'),
             warehouseId: val('wcWh') ? intVal('wcWh') : undefined,
@@ -406,7 +405,7 @@ export default function PlanningView() {
                <button class="btn btn-primary" id="sfGo">${t('save')}</button>`,
       onOpen: (box) => {
         box.querySelector('#sfGo').onclick = async () => {
-          const weekdays = [...box.querySelectorAll('.sf-day:checked')].map(i => Number(i.value));
+          const weekdays = [...box.querySelectorAll('.sf-day:checked')].map(i => Number(/** @type {FormField} */ (i).value));
           if (!weekdays.length) return UI.toast(UI.getLang() === 'tr' ? 'En az bir gün seçin.' : 'Pick at least one day.', 'err');
           try {
             await Api.createShift({
@@ -496,13 +495,13 @@ export default function PlanningView() {
         </div>`).join('');
       host.querySelectorAll('input,select').forEach(inp => inp.oninput = () => {
         const f = inp.dataset.f;
-        rows[+inp.dataset.i][f] = (f === 'operationName') ? inp.value : Number(inp.value);
+        rows[+inp.dataset.i][f] = (f === 'operationName') ? /** @type {FormField} */ (inp).value : Number(/** @type {FormField} */ (inp).value);
       });
       host.querySelectorAll('[data-rm]').forEach(b => b.onclick = () => { rows.splice(+b.dataset.rm, 1); draw(); });
     };
     draw();
 
-    document.getElementById('rtItem').onchange = e => { routingItemIdRef.current = e.target.value; reload(); };
+    document.getElementById('rtItem').onchange = e => { routingItemIdRef.current = /** @type {FormField} */ (e.target).value; reload(); };
     UI.enhanceSelects(body);
     document.getElementById('rtAdd')?.addEventListener('click', () => {
       const nextNo = rows.length ? Math.max(...rows.map(r => r.operationNo)) + 10 : 10;
@@ -512,10 +511,10 @@ export default function PlanningView() {
     });
     document.getElementById('rtSave')?.addEventListener('click', async () => {
       const saveButton = document.getElementById('rtSave');
-      if (saveButton.disabled) return;
+      if (/** @type {FormControl} */ (saveButton).disabled) return;
       const clear = rows.length === 0;
       if (clear && !window.confirm(UI.getLang() === 'tr' ? 'Bu ürünün rotası silinecek. Devam edilsin mi?' : 'Clear this item routing?')) return;
-      saveButton.disabled = true;
+      /** @type {FormControl} */ (saveButton).disabled = true;
       try {
         await Api.saveRouting(routingItemId, rows.map(r => ({
           operationNo: r.operationNo, operationName: r.operationName, workCenterId: r.workCenterId,
@@ -523,7 +522,7 @@ export default function PlanningView() {
           queueMinutes: r.queueMinutes, scrapPct: r.scrapPct
         })), ops.revision, clear);
         UI.ok(t('saved')); reload();
-      } catch (e) { UI.err(e); saveButton.disabled = false; }
+      } catch (e) { UI.err(e); /** @type {FormControl} */ (saveButton).disabled = false; }
     });
   }
 

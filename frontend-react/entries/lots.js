@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { mountView } from '../mountView.jsx';
 import LotsView, { traceDialog } from '../LotsView.jsx';
 

@@ -1,5 +1,4 @@
 /* exported Api */
-// @ts-nocheck
 const Api = (() => {
   const TOKEN_KEY = 'dt_token', USER_KEY = 'dt_user';
   const getToken = () => localStorage.getItem(TOKEN_KEY);
@@ -26,7 +25,7 @@ const Api = (() => {
           body: body === undefined ? undefined : (isForm ? body : JSON.stringify(body))
         });
       } catch (networkError) {
-        const err = new Error('Sunucuya ulaşılamadı; bağlantıyı kontrol edip tekrar deneyin / Server unreachable, check the connection and retry');
+        const err = /** @type {ApiError} */ (new Error('Sunucuya ulaşılamadı; bağlantıyı kontrol edip tekrar deneyin / Server unreachable, check the connection and retry'));
         err.network = true;
         err.cause = networkError;
         throw err;
@@ -40,7 +39,7 @@ const Api = (() => {
       let data = null;
       try { data = await res.json(); } catch {}
       if (!res.ok) {
-        const err = new Error((data && data.error) || `HTTP ${res.status}`);
+        const err = /** @type {ApiError} */ (new Error((data && data.error) || `HTTP ${res.status}`));
         err.status = res.status;
         err.payload = data;
         throw err;

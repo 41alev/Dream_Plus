@@ -1,4 +1,3 @@
-// @ts-nocheck
 window.addEventListener('load', () => {
   if (typeof SwaggerUIBundle === 'undefined') {
     document.getElementById('offline-note').style.display = 'block';

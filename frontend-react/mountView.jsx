@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Router her navigasyonda `ViewX.render(el)`'i tekrar çağırır ve vanilla
  * sürümler her seferinde veriyi TAZE çeker (bkz. public/js/app.js `go()`).
