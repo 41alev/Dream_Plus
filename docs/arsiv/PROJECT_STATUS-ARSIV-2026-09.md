@@ -3,7 +3,7 @@
 > 26 Eylül 2026'da `PROJECT_STATUS.md` dosyasından **olduğu gibi** taşındı
 > (yaklaşık 3.100 satır). Buradaki "tamamlandı", "sonraki adım", "güncel
 > durum" ifadeleri yazıldıkları günün durumudur; güncel durum için
-> [`../PROJECT_STATUS.md`](../PROJECT_STATUS.md) en üst bölümüne bakın.
+> [`../PROJECT_STATUS.md`](../../PROJECT_STATUS.md) en üst bölümüne bakın.
 > Karar gerekçeleri ve bulunan hataların hikâyesi için birincil kaynak
 > olmaya devam eder.
 

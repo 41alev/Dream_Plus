@@ -1,10 +1,10 @@
 # Dream Plus
 
 > Son teknik denetim ve açık sınırlar:
-> [`docs/ENGINEERING-DENETIM-2026-10-10.md`](docs/ENGINEERING-DENETIM-2026-10-10.md).
+> [`docs/arsiv/ENGINEERING-DENETIM-2026-10-10.md`](docs/arsiv/ENGINEERING-DENETIM-2026-10-10.md).
 >
 > Güncel satış ve teslim kapıları:
-> [`docs/SATISA-HAZIRLIK-SON-DURUM-2026-09-26.md`](docs/SATISA-HAZIRLIK-SON-DURUM-2026-09-26.md).
+> [`docs/arsiv/SATISA-HAZIRLIK-SON-DURUM-2026-09-26.md`](docs/arsiv/SATISA-HAZIRLIK-SON-DURUM-2026-09-26.md).
 
 Fabrika ölçeğinde depo, üretim, satın alma, satış ve kalite yönetimi. Node.js + Express + SQLite backend,
 masaüstü tarayıcı için React ekranları. Türkçe/İngilizce arayüz. (Mobil/PWA el terminali
