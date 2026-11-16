@@ -74,6 +74,17 @@ bu gerçek kurulumdur.
 (elektrik kesintisi, Windows güncellemesi) sistem durur. Bunu **kurulum
 gününde** çöz — geri dönüp ikinci kez gitmek istemezsin.
 
+### Windows — tek tık (önerilen)
+
+Paket klasöründe `Kurulum.cmd` çift tıkla (yönetici izni ister). Node.js 22+
+kontrolü, `npm ci --omit=dev`, rastgele `JWT_SECRET` ile `.env`, ilk kurulum,
+açılışta başlayan **DreamPlus** Windows görevi (LOCAL SERVICE hesabı, çökerse
+5 sn sonra yeniden başlar, günlük `data\logs\server.log`) ve istenirse
+Özel/Etki alanı ağları için güvenlik duvarı kuralı yapılır. Önizleme:
+`powershell -ExecutionPolicy Bypass -File windows\kurulum.ps1 -DryRun`.
+Görevi durdur/başlat: `schtasks /End /TN DreamPlus` · `schtasks /Run /TN DreamPlus`.
+Kaldırma: `Kaldir.cmd` (veriye dokunmaz). NSSM aşağıda alternatif olarak durur.
+
 ### Windows — NSSM ile servis yap (önerilen, kod değişikliği gerekmez)
 
 1. [nssm.cc](https://nssm.cc/download) adresinden `nssm.exe` indir (küçük,

@@ -26,6 +26,8 @@ const INCLUDE = [
   // public/dist is built and tested before packaging. The customer Dockerfile
   // below consumes that output, so JSX/Vite development sources do not travel.
   'docker-compose.yml', 'nginx.conf', '.dockerignore',
+  // One-click Windows install: Kurulum.cmd -> windows/kurulum.ps1.
+  'Kurulum.cmd', 'Kaldir.cmd', 'windows',
   'docs/KURULUM.md', 'docs/KULLANIM-KILAVUZU.md', 'docs/SAHA-KURULUM-KARTI.md',
   'docs/SAHA-KURULUM-COK-BASIT.md', 'docs/KVKK-DEGERLENDIRME.md'
 ];
